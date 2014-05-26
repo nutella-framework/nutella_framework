@@ -1,4 +1,3 @@
-ep
-==
+# Nutella
 
-Embedded Phenomena framework
+A framework for Internet of Things learning applications
