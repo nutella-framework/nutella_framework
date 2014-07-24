@@ -1,0 +1,37 @@
+project.version = "0.0.1"
+
+task zip(type: Zip, dependsOn: "build") {
+  description "Packages the framework for offline use (includes all dependencies)"
+  from "dist"
+  exclude { details -> details.file.name.endsWith(".zip")}
+  baseName = "nutella-" + project.version
+  destinationDir = file("dist")
+}
+
+
+task build(dependsOn: ["copyMainFiles", "copyCLIFiles"]) << {
+  description "Builds the whole framework"
+}
+
+task copyMainFiles(type: Copy) {
+  from "nutella-cli/nutella", "LICENSE", "README.md"
+  into "dist"
+}
+
+task copyCLIFiles(type: Copy) {
+  from "nutella-cli"
+  into "dist/nutella-cli"
+  exclude { details -> details.file.name.matches("nutella")}
+}
+
+// Other build steps go here
+
+
+task clean(type: Delete) {
+  delete "dist"
+}
+
+
+task distribute << {
+  description "NYI - Automatically distributes via Github"
+}

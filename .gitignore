@@ -1,0 +1,12 @@
+# Distribution directory
+dist
+
+# Gradle files
+.gradle
+
+# IntelliJ files
+.idea
+*.iml
+
+# Mac crap
+.DS_Store
