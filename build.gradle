@@ -9,12 +9,12 @@ task zip(type: Zip, dependsOn: "build") {
 }
 
 
-task build(dependsOn: ["copyMainFiles", "copyCLIFiles"]) << {
+task build(dependsOn: ["copyHomeFiles", "copyCLIFiles"]) << {
   description "Builds the whole framework"
 }
 
-task copyMainFiles(type: Copy) {
-  from "nutella-cli/nutella", "LICENSE", "README.md"
+task copyHomeFiles(type: Copy) {
+  from "nutella", "LICENSE", "README.md"
   into "dist"
 }
 
@@ -24,14 +24,9 @@ task copyCLIFiles(type: Copy) {
   exclude { details -> details.file.name.matches("nutella")}
 }
 
-// Other build steps go here
+// Other build steps go here, add the dependencies!
 
 
 task clean(type: Delete) {
   delete "dist"
-}
-
-
-task distribute << {
-  description "NYI - Automatically distributes via Github"
 }

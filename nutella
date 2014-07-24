@@ -2,4 +2,5 @@
 
 NUTELLA_HOME=`which nutella | sed 's|\(.*\)/.*|\1|'`
 export NUTELLA_HOME
-ruby $NUTELLA_HOME/nutella-cli.rb "$@"
+
+ruby $NUTELLA_HOME/nutella-cli/nutella-cli.rb "$@"
