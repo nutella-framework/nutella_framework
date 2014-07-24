@@ -1,1 +1,6 @@
-script: gradle build 
+language: java
+jdk:
+  - oraclejdk8
+notifications:
+  email: false
+script: gradle build
