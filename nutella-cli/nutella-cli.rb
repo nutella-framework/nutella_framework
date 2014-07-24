@@ -1,9 +1,11 @@
 # Nutella Command Line Interface
 # by Alessandro Gnoli
+require 'pathname'
 
 NUTELLA_VERSION = "0.0.1"
 NUTELLA_HOME = ENV['NUTELLA_HOME']
 
+# Print Nutella logo
 puts "              _       _ _
              | |     | | |
   _ __  _   _| |_ ___| | | __ _
@@ -11,19 +13,27 @@ puts "              _       _ _
  | | | | |_| | ||  __/ | | (_| |
  |_| |_|\\__,_|\\__\\___|_|_|\\__,_|
 
-"
+Welcome to nutella version #{NUTELLA_VERSION}! For a complete lists of available commands type `nutella help`.
 
-if ARGV.first == '--version'
-  puts "Version " + nutella_version
+"
+# If no other arguments, just quit here.
+if ARGV.empty?
   exit 0
-elsif ARGV.first == '-v'
-  puts "Version " + nutella_version
-  # Shift the -v to the end of the parameter list
-  ARGV << ARGV.shift
-  # If no other arguments, just quit here.
-  exit 0 if ARGV.length == 1
 end
 
-puts "Welcome to the Nutella shell right now there are no commands that are supported yet."
-puts "So, yes, all this program does for now is show a nice rendering of the word Nutella."
-puts ""
+# Parse command
+def getCommand (command)
+  Dir["#{NUTELLA_HOME}/nutella-cli/commands/*.rb"].each do |file|
+    if command == Pathname.new(file).basename.to_s[0..-4]
+      return file
+    end
+  end
+  nil
+end
+
+command = getCommand(ARGV.first)
+if !command.nil?
+  exec "ruby #{command} #{ARGV[1]}"
+else
+  puts "Unknown command #{ARGV.first}"
+end
