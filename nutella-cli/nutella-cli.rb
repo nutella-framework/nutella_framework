@@ -12,7 +12,6 @@ class NutellaCLI
      |  _ \\| | | | __/ _ \\ | |/ _  |
      | | | | |_| | ||  __/ | | (_| |
      |_| |_|\\__,_|\\__\\___|_|_|\\__,_|
-
     "
     # If no other arguments, show help and quit here
     if ARGV.empty?
