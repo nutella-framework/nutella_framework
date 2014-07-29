@@ -15,7 +15,7 @@ class NutellaCLI
     "
     # If no other arguments, show help and quit here
     if ARGV.empty?
-      puts "Welcome to nutella version #{nutella.version}! For a complete lists of available commands type `nutella help`."
+      puts "Welcome to nutella version #{nutella.version}! For a complete lists of available commands type `nutella help`\n\n"
       exit 0
     end
   end

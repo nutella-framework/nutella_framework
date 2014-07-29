@@ -1,18 +1,14 @@
 require_relative '../command'
 
 class Start < Command
+  @description = "Starts all or some of the bots in the current project"
+  
   def run(args=nil)
-    @prj_dir = Dir.pwd
-    # Check that the current directory is actually a nutella project
-    if File.exist?("#{@prj_dir}/conf/project.json")
-      conf = JSON.parse( IO.read("#{@prj_dir}/conf/project.json") )
-      if conf["nutella_version"].nil?
-        puts "The current directory is not a Nutella project"
-        return
-      end
-    else
-      puts "The current directory is not a Nutella project"
+    # Is current directory a nutella prj?
+    unless nutellaPrj?
+      return
     end
+    
     
     # Start all the bots
     Dir.entries("#{@prj_dir}/bots").each do |file|

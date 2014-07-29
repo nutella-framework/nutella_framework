@@ -1,6 +1,24 @@
 # CLI command
 class Command 
   attr_accessor :description
+  @prj_dir = Dir.pwd  #Current directory
+  
+  # Check that the current directory is actually a nutella project
+  def nutellaPrj?
+    @prj_dir = Dir.pwd
+    if File.exist?("#{@prj_dir}/conf/project.json")
+      conf = JSON.parse( IO.read("#{@prj_dir}/conf/project.json") )
+      if conf["nutella_version"].nil?
+        puts "The current directory is not a Nutella project"
+        return false
+      end
+    else
+      puts "The current directory is not a Nutella project"
+      return false
+    end
+    return true
+  end
+  
   def run (args=nil)
     puts "Running a generic command! POOP!"
   end

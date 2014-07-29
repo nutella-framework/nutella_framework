@@ -1,10 +1,11 @@
 require_relative '../command'
 require_relative '../nutella-cli'
 require 'fileutils'
-require 'json'
 
 
 class New < Command
+  @description = "Creates a new project"
+  
   def run(args=nil)
     @prj_dir = args[0]
     # If no other arguments, show help and quit here
@@ -12,18 +13,10 @@ class New < Command
       puts "You need to specify a name for your new project"
       return
     end
-
     # Create the directory structure for a new nutella project
     createDirStructure
-    
-    # Download, compile, configure and instantiate the broker
-    if !instantiateBroker
-      return
-    end
-
-    # Run createbot command to create bots
+    # Instantiate broker and other basic templates using 'add' command
     # NutellaCLI.executeCommand("createbot", )
-
     puts "Your new project #{@prj_dir} is ready!" 
   end
   
@@ -35,8 +28,8 @@ class New < Command
     end
     
     # interfaces dir
-    unless File.directory?("#{@prj_dir}/bots")
-      FileUtils.mkdir_p("#{@prj_dir}/bots")
+    unless File.directory?("#{@prj_dir}/interfaces")
+      FileUtils.mkdir_p("#{@prj_dir}/interfaces")
     end
     
     # conf dir
@@ -46,7 +39,7 @@ class New < Command
 
     # create configuration file
     config_file_hash = {
-      "nutella_version" => "#{NUTELLA_VERSION}",
+      "nutella_version" => "#{nutella.version}",
       "broker" => "mosca-internal"
     }
     File.open("#{@prj_dir}/conf/project.json","w") do |f|
@@ -54,21 +47,4 @@ class New < Command
     end
   end
   
-  def instantiateBroker 
-    # Check if node/npm is installed correctly
-    # if ???
-#       puts "Node and npm are not installed and they are required to run the MQTT broker"
-#       return false
-#     end
-
-    # Clone, cd and npm install
-    system "git clone git://github.com/mcollina/mosca.git #{@prj_dir}/bots/broker"
-    Dir.chdir("#{@prj_dir}/bots/broker")
-    system "npm install"
-    
-    # Add startup script like all other bots
-    File.open("startup", 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 -v\n") 
-    }
-    File.chmod(0755, "startup")
-  end
 end
