@@ -1,5 +1,6 @@
 # Distribution directory
-dist
+dist/
+deps/
 
 # Gradle files
 .gradle
@@ -10,3 +11,4 @@ dist
 
 # Mac crap
 .DS_Store
+

@@ -15,19 +15,29 @@ task zip(type: Zip, dependsOn: "build") {
 }
 
 
-task build(dependsOn: ["copyHomeFiles", "copyCLIFiles"]) << {
+task build(dependsOn: ["copyHomeFiles", "copyTemplates", "copyCLIFiles", "copyConfigFiles"]) << {
   description "Builds the whole framework"
 }
 
 task copyHomeFiles(type: Copy) {
-  from "nutella", "LICENSE", "README.md"
+  from "nutella", "LICENSE", "README.md", "config.json"
   into "dist"
+}
+
+task copyTemplates(type: Copy) {
+  from "templates"
+  into "dist/templates"
 }
 
 task copyCLIFiles(type: Copy) {
   from "nutella-cli"
   into "dist/nutella-cli"
   exclude { details -> details.file.name.matches("nutella")}
+}
+
+task copyConfigFiles(type: Copy) {
+  from "nutella-config"
+  into "dist/nutella-config"
 }
 
 task clean(type: Delete) {
