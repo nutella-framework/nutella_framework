@@ -15,7 +15,7 @@ class NutellaCLI
     "
     # If no other arguments, show help and quit here
     if ARGV.empty?
-      puts "Welcome to nutella version #{NUTELLA_VERSION}! For a complete lists of available commands type `nutella help`."
+      puts "Welcome to nutella version #{nutella.version}! For a complete lists of available commands type `nutella help`."
       exit 0
     end
   end
@@ -31,7 +31,7 @@ class NutellaCLI
   # Execute command
   def NutellaCLI.executeCommand (command, args=nil) 
     # Include all commands
-    Dir["#{NUTELLA_HOME}/nutella-cli/commands/*.rb"].each do |file|
+    Dir["#{nutella.home_dir}/nutella-cli/commands/*.rb"].each do |file|
       require_relative "commands/#{File.basename(file, File.extname(file))}"
     end
     # Check that the command exists

@@ -1,5 +1,11 @@
-project.version = "0.0.1"
+import groovy.json.JsonSlurper
 
+// Import version number and other configuration from config.json
+def config = new JsonSlurper().parse(new File("config.json"))
+project.version = config.version
+
+
+// Tasks definitions
 task zip(type: Zip, dependsOn: "build") {
   description "Packages the framework for offline use (includes all dependencies)"
   from "dist"
@@ -24,9 +30,11 @@ task copyCLIFiles(type: Copy) {
   exclude { details -> details.file.name.matches("nutella")}
 }
 
-// Other build steps go here, add the dependencies!
-
-
 task clean(type: Delete) {
   delete "dist"
 }
+
+/*
+ * TODO add other tasks here, for instance when we will need to include dependencies 
+ * for JAVA portions of the project
+ */

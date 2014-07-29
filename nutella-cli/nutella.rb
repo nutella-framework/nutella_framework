@@ -1,10 +1,12 @@
 # Nutella main script
 
 require_relative 'nutella-cli'
+require_relative '../nutella-config/config'
 
-NUTELLA_VERSION = "0.0.1"
 NUTELLA_HOME = ENV['NUTELLA_HOME']
-
+nutella.home_dir = ENV['NUTELLA_HOME']
+nutella.loadConfig
+nutella.storeConfig
 
 NutellaCLI.printPrompt
 args = ARGV.dup
