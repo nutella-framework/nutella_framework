@@ -12,12 +12,15 @@ class Unseal < Command
     # Check if we have a broker and installs one if not
     if !nutella.dependencies.broker.has_key?(:exist)
       installBroker
-    end  
+    end
+    
+    # TODO Copy mqtt.js library where it belongs  
+    return 0
   end
   
   def installBroker    
     # Clone, cd and npm install
-    install_dir = "#{nutella.home_dir}/deps/mosca"
+    install_dir = "#{nutella.home_dir}/deps/broker"
     system "git clone git://github.com/mcollina/mosca.git #{install_dir}"
     Dir.chdir(install_dir)
     system "npm install"

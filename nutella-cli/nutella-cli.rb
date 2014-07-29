@@ -1,5 +1,5 @@
 # Nutella CLI
-
+require 'ansi/code'
 require_relative 'command'
 
 class NutellaCLI
@@ -36,9 +36,10 @@ class NutellaCLI
     end
     # Check that the command exists
     if commandExists?(command.capitalize)
-      Object::const_get(command.capitalize).new.run(args)
+      return Object::const_get(command.capitalize).new.run(args)
     else
-      puts "Unknown command #{command}"
+      puts "Unknown command #{command}" 
+      return 1
     end
   end
   

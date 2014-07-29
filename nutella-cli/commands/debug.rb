@@ -6,5 +6,6 @@ class Debug < Command
   def run(args=nil)
     puts "Running command 'debug' - NOT YET IMPLEMENTED"
     # This is the blocking version of start, for coding purposes
+    return 0
   end
 end

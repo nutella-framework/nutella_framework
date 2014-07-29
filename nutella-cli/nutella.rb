@@ -11,6 +11,6 @@ nutella.storeConfig
 NutellaCLI.printPrompt
 args = ARGV.dup
 args.shift
-NutellaCLI.executeCommand(ARGV.first, args)
+exitStatus = NutellaCLI.executeCommand(ARGV.first, args)
 puts ""
-
+exit(exitStatus)

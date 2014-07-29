@@ -6,10 +6,8 @@ class Start < Command
   def run(args=nil)
     # Is current directory a nutella prj?
     unless nutellaPrj?
-      return
+      return 1
     end
-    
-    
     # Start all the bots
     Dir.entries("#{@prj_dir}/bots").each do |file|
       if File.exist?("#{@prj_dir}/bots/#{file}/startup")
@@ -18,6 +16,7 @@ class Start < Command
       end
     end
     puts "Started X of Y bots"
+    return 0
   end
 end
 
