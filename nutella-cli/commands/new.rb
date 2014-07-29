@@ -34,6 +34,11 @@ class New < Command
       FileUtils.mkdir_p("#{@prj_dir}/bots")
     end
     
+    # interfaces dir
+    unless File.directory?("#{@prj_dir}/bots")
+      FileUtils.mkdir_p("#{@prj_dir}/bots")
+    end
+    
     # conf dir
     unless File.directory?("#{@prj_dir}/conf")
       FileUtils.mkdir_p("#{@prj_dir}/conf")
@@ -41,7 +46,8 @@ class New < Command
 
     # create configuration file
     config_file_hash = {
-        "broker" => "internal"
+      "nutella_version" => "#{NUTELLA_VERSION}",
+      "broker" => "mosca-internal"
     }
     File.open("#{@prj_dir}/conf/project.json","w") do |f|
       f.write(JSON.pretty_generate(config_file_hash))
@@ -61,12 +67,7 @@ class New < Command
     system "npm install"
     
     # Add startup script like all other bots
-    File.open("startup", 'w') { |file| file.write("
-      #!/bin/sh
-      
-      BASEDIR=$(dirname $0)
-      ./$BASEDIR/bin/mosca --http-port 1884 -v"
-      ) 
+    File.open("startup", 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 -v\n") 
     }
     File.chmod(0755, "startup")
   end
