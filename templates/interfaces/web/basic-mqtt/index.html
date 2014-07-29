@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <script src="mqtt.js"></script>
+  </head>
+  <body>
+	  Publishing to channel "demo1"<br>
+	  Subscribed to channel "demo2"<br>
+	  <br>
+	  <input type="text" id="message_text"><button type="button" onclick='sendMessage()'>Send message</button>
+	  <br>
+	  Received messages
+	  <div id="out" auto style="height:300px;width:600px;border:1px solid #ccc;font:14px Monospace;overflow:auto">
+	  </div>
+	  
+	  
+	  
+    <script>
+      var client = mqtt.createClient(1884, "localhost");
+
+      client.subscribe("demo2");
+
+      client.on("message", function(topic, payload) {
+		  out = document.getElementById("out");
+		  out.innerText = out.innerText + payload + "\n"
+      });
+
+      function sendMessage() {
+		  client.publish("demo1", document.getElementById("message_text").value);
+		  document.getElementById("message_text").value = ""
+	  }
+	  
+	  window.onUnload = function () {
+	  	client.end();
+	  }
+    </script>
+  </body>
+</html>
