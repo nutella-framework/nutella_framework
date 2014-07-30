@@ -53,7 +53,9 @@ class New < Command
     # create base configuration file
     config_file_hash = {
       "nutella_version" => "#{nutella.version}",
-      "broker" => "mosca-internal"
+      "broker" => "internal-mosca",
+      "name" => @prj_dir,
+      "version" => "0.1.0-SNAPSHOT"
     }
     File.open("#{@prj_dir}/conf/project.json","w") do |f|
       f.write(JSON.pretty_generate(config_file_hash))

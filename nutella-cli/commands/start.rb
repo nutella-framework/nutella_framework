@@ -11,7 +11,7 @@ class Start < Command
     # Start all the bots
     Dir.entries("#{@prj_dir}/bots").each do |file|
       if File.exist?("#{@prj_dir}/bots/#{file}/startup")
-        exec("#{@prj_dir}/bots/#{file}/startup") if fork.nil?
+        exec("#{@prj_dir}/bots/#{file}/startup #{args[0]}") if fork.nil?    
         puts "Started bot #{file}"
       end
     end
