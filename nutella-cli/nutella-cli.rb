@@ -38,7 +38,7 @@ class NutellaCLI
     if commandExists?(command.capitalize)
       return Object::const_get(command.capitalize).new.run(args)
     else
-      puts "Unknown command #{command}" 
+      puts ANSI.red + "Unknown command #{command}" + ANSI.reset
       return 1
     end
   end

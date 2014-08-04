@@ -11,8 +11,10 @@ class Start < Command
     # Start all the bots
     Dir.entries("#{@prj_dir}/bots").each do |file|
       if File.exist?("#{@prj_dir}/bots/#{file}/startup")
-        exec("#{@prj_dir}/bots/#{file}/startup #{args[0]}") if fork.nil?    
+        pid = fork
+        exec("#{@prj_dir}/bots/#{file}/startup #{args[0].to_s.empty? ? prj_config("name") : args[0]}") if pid.nil?    
         puts "Started bot #{file}"
+        # puts pid
       end
     end
     puts "Started X of Y bots"

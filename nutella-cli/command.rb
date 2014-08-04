@@ -1,6 +1,6 @@
 # CLI command
 class Command 
-  attr_accessor :description
+  class << self; attr_accessor :description end
   @prj_dir = Dir.pwd  #Current directory
   
   # Check that the current directory is actually a nutella project

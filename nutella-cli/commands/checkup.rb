@@ -1,6 +1,6 @@
 require_relative '../command'
 
-class Unseal < Command
+class Checkup < Command
   @description = "Checks that all the dependencies are installed and prepares nutella to run"
   
   def run(args=nil)
