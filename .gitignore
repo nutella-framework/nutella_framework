@@ -1,6 +1,7 @@
 # Distribution directory
 dist/
-deps/
+broker/
+config.json
 
 # Gradle files
 .gradle

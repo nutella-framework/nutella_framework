@@ -33,13 +33,13 @@ class New < Command
     puts " DONE"
     
     # Add templates
-    puts "Adding templates..."
-    ret_val = NutellaCLI.executeCommand("add", ["#{nutella.home_dir}/deps/broker", "bots"])
-    if ret_val != 0
-      puts "Couldn't add template #{nutella.home_dir}/deps/broker"
-      removeDirStructure
-      return ret_val
-    end
+    # puts "Adding templates..."
+#     ret_val = NutellaCLI.executeCommand("add", ["#{nutella.home_dir}/deps/broker", "bots"])
+#     if ret_val != 0
+#       puts "Couldn't add template #{nutella.home_dir}/deps/broker"
+#       removeDirStructure
+#       return ret_val
+#     end
     
     puts ANSI.green + "Your new project #{@prj_dir} is ready!" + ANSI.reset   # Display a nice success message and return
     return 0 
@@ -53,7 +53,6 @@ class New < Command
     # create base configuration file
     config_file_hash = {
       "nutella_version" => "#{nutella.version}",
-      "broker" => "internal-mosca",
       "name" => @prj_dir,
       "version" => "0.1.0-SNAPSHOT"
     }

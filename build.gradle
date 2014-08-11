@@ -15,18 +15,14 @@ task zip(type: Zip, dependsOn: "build") {
 }
 
 
-task build(dependsOn: ["copyHomeFiles", "copyTemplates", "copyCLIFiles", "copyConfigFiles"]) << {
+task build(dependsOn: ["copyHomeFiles", "copyCLIFiles", "copyConfigFiles"]) << {
   description "Builds the whole framework"
 }
 
 task copyHomeFiles(type: Copy) {
-  from "nutella", "LICENSE", "README.md", "config.json"
+  from "nutella", "LICENSE", "README.md", "config-clean.json"
+	rename ('config-clean.json', 'config.json')
   into "dist"
-}
-
-task copyTemplates(type: Copy) {
-  from "templates"
-  into "dist/templates"
 }
 
 task copyCLIFiles(type: Copy) {
@@ -40,8 +36,16 @@ task copyConfigFiles(type: Copy) {
   into "dist/nutella-config"
 }
 
-task clean(type: Delete) {
+task clean(dependsOn: "overrideConfig", type: Delete) {
   delete "dist"
+	delete "broker"
+}
+
+task overrideConfig(type: Copy) {
+  from(".")
+  into(".")
+ 	include("config-clean.json")
+	rename ("config-clean.json", "config.json")
 }
 
 /*
