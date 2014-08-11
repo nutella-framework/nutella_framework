@@ -1,7 +1,7 @@
 import groovy.json.JsonSlurper
 
 // Import version number and other configuration from config.json
-def config = new JsonSlurper().parseText(new File("config.json").text)
+def config = new JsonSlurper().parseText(new File("config-clean.json").text)
 project.version = config.version
 
 
@@ -31,21 +31,22 @@ task copyCLIFiles(type: Copy) {
   exclude { details -> details.file.name.matches("nutella")}
 }
 
-task copyConfigFiles(type: Copy) {
+task copyConfigFiles(dependsOn: "copyCleanConf", type: Copy) {
   from "nutella-config"
   into "dist/nutella-config"
 }
 
-task clean(dependsOn: "overrideConfig", type: Delete) {
-  delete "dist"
-	delete "broker"
+task copyCleanConf(type: Copy) { 
+	from(projectDir)
+	into(projectDir)
+	include("config-clean.json")
+	rename ("config-clean.json", "config.json")
 }
 
-task overrideConfig(type: Copy) {
-  from(".")
-  into(".")
- 	include("config-clean.json")
-	rename ("config-clean.json", "config.json")
+task clean(type: Delete) {
+  delete "dist"
+	delete "broker"
+	delete "config.json"
 }
 
 /*
