@@ -10,10 +10,13 @@ class Checkup < Command
     # TODO Execute this command from Travis to verify installation
     
     # Check if we have a broker and installs one if not
-    if !nutella.has_key?(:exist)
+    nutella.loadConfig
+    begin
+      nutella.broker!  
+    rescue
       installBroker
     end
-    
+      
     return 0
   end
   

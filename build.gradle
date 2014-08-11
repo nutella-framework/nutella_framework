@@ -36,6 +36,7 @@ task copyConfigFiles(dependsOn: "copyCleanConf", type: Copy) {
   into "dist/nutella-config"
 }
 
+// Copies the canned conf file into the current directory so we can develop quickly
 task copyCleanConf(type: Copy) { 
 	from(projectDir)
 	into(projectDir)
