@@ -10,7 +10,7 @@ class New < Command
     
     # If no other arguments, show help and quit here
     if args.empty?
-      puts "You need to specify a name for your new project"
+      puts ANSI.yellow + "You need to specify a name for your new project" + ANSI.reset
       return 64
     end
     

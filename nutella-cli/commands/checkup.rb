@@ -9,13 +9,16 @@ class Checkup < Command
     # TODO and all the associated configurations
     # TODO Execute this command from Travis to verify installation
     
-    # Check if we have a broker and installs one if not
+    # Check if we have a broker and install one if not
     nutella.loadConfig
     begin
       nutella.broker!  
     rescue
       installBroker
     end
+    
+    # Output message
+    puts ANSI.green + "All systems go! You are ready to use nutella!" + ANSI.reset
       
     return 0
   end
@@ -28,7 +31,7 @@ class Checkup < Command
     system "npm install"
     
     # Add startup script
-    File.open("startup", 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 -v\n") }
+    File.open("startup", 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 -v &\necho $! > $BASEDIR/bin/.pid\n") }
     File.chmod(0755, "startup")
     
     # Add configuration

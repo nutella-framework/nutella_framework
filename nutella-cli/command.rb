@@ -9,11 +9,11 @@ class Command
     if File.exist?("#{@prj_dir}/conf/project.json")
       conf = JSON.parse( IO.read("#{@prj_dir}/conf/project.json") )
       if conf["nutella_version"].nil?
-        puts "The current directory is not a Nutella project"
+        puts ANSI.yellow + "The current directory is not a Nutella project" + ANSI.reset 
         return false
       end
     else
-      puts "The current directory is not a Nutella project"
+      puts ANSI.yellow + "The current directory is not a Nutella project" + ANSI.reset 
       return false
     end
     return true
@@ -29,6 +29,7 @@ class Command
   end
   
   # Commands overload this method to execute
+  # Returns 0 if the execution is successful
   def run (args=nil)
     puts "Running a generic command! POOP!"
   end

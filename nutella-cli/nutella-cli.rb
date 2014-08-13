@@ -35,6 +35,9 @@ class NutellaCLI
       require_relative "commands/#{File.basename(file, File.extname(file))}"
     end
     # Check that the command exists
+    if command == nil
+      NutellaCLI.printPrompt
+    end
     if commandExists?(command.capitalize)
       return Object::const_get(command.capitalize).new.run(args)
     else
