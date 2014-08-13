@@ -31,7 +31,7 @@ class Checkup < Command
     system "npm install"
     
     # Add startup script
-    File.open("startup", 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 -v &\necho $! > $BASEDIR/bin/.pid\n") }
+    File.open("startup", 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 &\necho $! > $BASEDIR/bin/.pid\n") }
     File.chmod(0755, "startup")
     
     # Add configuration

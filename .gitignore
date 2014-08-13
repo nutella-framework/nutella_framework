@@ -6,10 +6,6 @@ config.json
 # Gradle files
 .gradle
 
-# IntelliJ files
-.idea
-*.iml
-
 # Mac crap
 .DS_Store
 
