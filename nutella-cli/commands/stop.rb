@@ -14,7 +14,7 @@ class Stop < Command
     
     # Remove from the list of runs and if running on internal broker, stop it
     if removeFromRunsList(runid)
-      if nutella.broker == "internal-mosca" # Are we using the internal broker
+      if nutella.broker == "localhost" # Are we using the internal broker
         stopBroker
       end
     end

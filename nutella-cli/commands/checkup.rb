@@ -36,7 +36,7 @@ class Checkup < Command
     
     # Add configuration
     nutella.loadConfig
-    nutella.broker = "internal-mosca"
+    nutella.broker = "localhost"
     nutella.storeConfig
   end
   

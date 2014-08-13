@@ -20,7 +20,7 @@ You might want to kill it with 'nutella stop "+ runid + "'" + ANSI.reset
     end
     
     # If running on internal broker, start it
-    if nutella.broker == "internal-mosca" # Are we using the internal broker
+    if nutella.broker == "localhost" # Are we using the internal broker
       startBroker
     end
     

@@ -1,5 +1,7 @@
 require_relative 'config'
 
+
+
 def addToRunsList(runid)
   nutella.loadConfig
   begin
@@ -18,18 +20,6 @@ def addToRunsList(runid)
   end
 end
 
-def isInRunsList(runid)
-  nutella.loadConfig
-  begin
-    nutella.runs!  
-    # we have a runs key, is there a runid key?
-    return nutella.runs.include?(runid)
-  rescue
-    # There is no nutella.runs key so the answer is false
-  end
-  false
-end
-
 def removeFromRunsList(runid)
   nutella.loadConfig
   begin
@@ -45,5 +35,38 @@ def removeFromRunsList(runid)
   rescue
     # There is no nutella.runs key
     true
+  end
+end
+
+def isInRunsList?(runid)
+  nutella.loadConfig
+  begin
+    nutella.runs!  
+    # we have a runs key, is there a runid key?
+    return nutella.runs.include?(runid)
+  rescue
+    # There is no nutella.runs key so the answer is false
+  end
+  false
+end
+
+def isRunsListEmpty?()
+  nutella.loadConfig
+  begin
+    nutella.runs!  
+    # we have a runs key, is the list empty?
+    return nutella.runs.empty?
+  rescue
+    # There is no nutella.runs key so the answer is true
+  end
+  true
+end
+
+def getRunsList(projectName=nil)
+  nutella.loadConfig
+  if projectName == nil
+    return nutella.runs
+  else
+    return nutella.runs.select { |run| run.start_with?(projectName) }
   end
 end
