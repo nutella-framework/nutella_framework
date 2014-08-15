@@ -21,6 +21,7 @@ class Install < Command
     end
     
     
+    
     # What kind of template are we handling?
     if isTemplateInCentralDB?
       return addCentralTemplate
@@ -60,22 +61,28 @@ class Install < Command
   end
   
   def addLocalTemplate
-    puts "Adding #{@template}"
+    templateNutellaFileJson = JSON.parse(IO.read("#{@template}/nutella.json"))
     
-    # TODO I need to know what kind of template this is to do this!!!!
-    # if @destinationFolder!=nil
-#       # Am I trying to copy onto a template that already exists?
-#       if File.directory?("#{@prj_dir}/#{args[1]}/#{File.basename(args[0])}")
-#         puts "Template #{File.basename(args[0])} already exists in #{args[1]}, can't add template"
-#         return 1
-#       end
-#     end
+    # If destination is not specified, set it to the template name
+    if @destinationFolder==nil
+      @destinationFolder = templateNutellaFileJson["name"]
+    end
     
-    
-    # print "Adding template #{File.basename(args[0])}..."
-    # FileUtils.copy_entry args[0], "#{@prj_dir}/#{args[1]}/#{File.basename(args[0])}"
-    # puts " DONE"
-    
+    # Am I trying to copy onto a template that already exists?
+    if templateNutellaFileJson["type"]=="bot"
+      # Look into bots folder
+      dir = "#{@prj_dir}/bots/#{@destinationFolder}"
+    else
+      # Look into interfaces folder
+      dir = "#{@prj_dir}/interfaces/#{@destinationFolder}"
+    end
+    if File.directory?(dir)
+      puts ANSI.red + "Folder #{dir} aready exists! Can't add template #{@template}" + ANSI.reset
+      return 1
+    end
+    FileUtils.copy_entry @template, dir
+    dir.slice!(@prj_dir)
+    puts ANSI.green + "Installed template: #{@template} as #{dir}" + ANSI.reset
     return 0
   end
   
@@ -92,7 +99,9 @@ class Install < Command
     end
     # If template is a bot, check for the mandatory startup script and make sure it's executable
     if templateNutellaFileJson["type"]=="bot"
-      puts "it's a bot"
+      if !File.executable?("#{@template}/startup")
+        return false
+      end
     end 
     true
   end
