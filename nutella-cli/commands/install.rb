@@ -1,5 +1,6 @@
 require 'json'
 require 'git'
+require 'net/http'
 require_relative '../command'
 
 class Install < Command
@@ -22,12 +23,12 @@ class Install < Command
     end
     
     # What kind of template are we handling?
-    if isTemplateInCentralDB?
-      return addCentralTemplate
-    elsif isTemplateALocalDir?
+    if isTemplateALocalDir?
       return addLocalTemplate
     elsif isTemplateAGitRepo?
       return addRemoteTemplate
+    elsif isTemplateInCentralDB?
+      return addCentralTemplate
     else
       puts ANSI.yellow + "The specified template is not a valid nutella template" + ANSI.reset
       return 1
@@ -35,12 +36,6 @@ class Install < Command
   
     return 0
   end
-  
-  
-  def isTemplateInCentralDB?
-    # Download first!
-    false
-  end  
   
   
   def isTemplateALocalDir?
@@ -53,17 +48,9 @@ class Install < Command
   
   
   def isTemplateAGitRepo?
-    # Download first! 
-    nutella.loadConfig
-    nutella.tmp_dir = "#{nutella.home_dir}/.tmp"
-    nutella.storeConfig
-    cleanTmpDir
-    if !Dir.exists?(nutella.tmp_dir)
-      Dir.mkdir(nutella.tmp_dir)
-    end
     begin
       dest_dir = @template[@template.rindex("/")+1 .. @template.length-5]
-      Git.clone(@template, dest_dir, :path => nutella.tmp_dir)
+      cloneTemplateFromRemoteTo(dest_dir)
       return validateTemplate(nutella.tmp_dir+"/#{dest_dir}")
     rescue
       return false 
@@ -72,11 +59,21 @@ class Install < Command
   end
   
   
-  def addCentralTemplate
-    return 0
-  end
+  def isTemplateInCentralDB?
+    uri = URI.parse("https://raw.githubusercontent.com/ltg-uic/nutella/templates-database/" + @template + ".json")
+    begin
+      nutella_json = JSON.parse(Net::HTTP.get(uri))
+      if nutella_json["name"]==@template
+        @template = nutella_json["repo"]
+        return isTemplateAGitRepo?
+      end
+    rescue
+      return false
+    end
+    false
+  end  
   
-  
+
   def addLocalTemplate(dir)
     templateNutellaFileJson = JSON.parse(IO.read("#{dir}/nutella.json"))
     
@@ -99,15 +96,33 @@ class Install < Command
     end
     FileUtils.copy_entry dir, dest_dir
     dir.slice!(@prj_dir)
-    puts ANSI.green + "Installed template: #{@template} as #{dir}" + ANSI.reset
+    # TODO improve this message
+    puts ANSI.green + "Installed template: #{@template} as #{dest_dir}" + ANSI.reset
     return 0
   end
   
   
   def addRemoteTemplate
-    dest_dir = @template[@template.rindex("/")+1 .. @template.length-5]
-    addLocalTemplate dest_dir
+    templ_name = @template[@template.rindex("/")+1 .. @template.length-5]
+    addLocalTemplate nutella.tmp_dir+"/#{templ_name}"
     return 0
+  end
+  
+  
+  def addCentralTemplate
+    return addRemoteTemplate
+  end
+  
+  
+  def cloneTemplateFromRemoteTo(dest_dir)
+    nutella.loadConfig
+    nutella.tmp_dir = "#{nutella.home_dir}/.tmp"
+    nutella.storeConfig
+    cleanTmpDir
+    if !Dir.exists?(nutella.tmp_dir)
+      Dir.mkdir(nutella.tmp_dir)
+    end
+    Git.clone(@template, dest_dir, :path => nutella.tmp_dir)
   end
     
     
@@ -118,14 +133,18 @@ class Install < Command
     rescue
       return false
     end
-    # If template is a bot, check for the mandatory startup script and make sure it's executable
+    # If template is a bot, perform additional checks
     if templateNutellaFileJson["type"]=="bot"
+      # Is there a andatory 'startup' script and is it executable
       if !File.executable?("#{dir}/startup")
         return false
       end
+      # TODO if there is a dependencies script, make sure it's executable
+      # TODO if there is a compile script, make usre it's executable
     end 
     true
   end
+  
   
   def cleanTmpDir
     nutella.loadConf
