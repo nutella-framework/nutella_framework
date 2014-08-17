@@ -1,7 +1,8 @@
-# Distribution directory
+# Nutella
 dist/
 broker/
 config.json
+.tmp/
 
 # Gradle files
 .gradle

@@ -1,4 +1,5 @@
 require 'json'
+require 'git'
 require_relative '../command'
 
 class Install < Command
@@ -19,8 +20,6 @@ class Install < Command
     if args.length==2
       @destinationFolder = args[1]
     end
-    
-    
     
     # What kind of template are we handling?
     if isTemplateInCentralDB?
@@ -43,25 +42,43 @@ class Install < Command
     false
   end  
   
+  
   def isTemplateALocalDir?
     # Does the specified directory exist?
     if !File.directory?(@template)
       return false
     end
-    return validateTemplate
+    return validateTemplate @template
   end
   
+  
   def isTemplateAGitRepo?
-    # Download first!
+    # Download first! 
+    nutella.loadConfig
+    nutella.tmp_dir = "#{nutella.home_dir}/.tmp"
+    nutella.storeConfig
+    cleanTmpDir
+    if !Dir.exists?(nutella.tmp_dir)
+      Dir.mkdir(nutella.tmp_dir)
+    end
+    begin
+      dest_dir = @template[@template.rindex("/")+1 .. @template.length-5]
+      Git.clone(@template, dest_dir, :path => nutella.tmp_dir)
+      return validateTemplate(nutella.tmp_dir+"/#{dest_dir}")
+    rescue
+      return false 
+    end
     false
   end
+  
   
   def addCentralTemplate
     return 0
   end
   
-  def addLocalTemplate
-    templateNutellaFileJson = JSON.parse(IO.read("#{@template}/nutella.json"))
+  
+  def addLocalTemplate(dir)
+    templateNutellaFileJson = JSON.parse(IO.read("#{dir}/nutella.json"))
     
     # If destination is not specified, set it to the template name
     if @destinationFolder==nil
@@ -71,39 +88,48 @@ class Install < Command
     # Am I trying to copy onto a template that already exists?
     if templateNutellaFileJson["type"]=="bot"
       # Look into bots folder
-      dir = "#{@prj_dir}/bots/#{@destinationFolder}"
+      dest_dir = "#{@prj_dir}/bots/#{@destinationFolder}"
     else
       # Look into interfaces folder
-      dir = "#{@prj_dir}/interfaces/#{@destinationFolder}"
+      dest_dir = "#{@prj_dir}/interfaces/#{@destinationFolder}"
     end
-    if File.directory?(dir)
-      puts ANSI.red + "Folder #{dir} aready exists! Can't add template #{@template}" + ANSI.reset
+    if File.directory?(dest_dir)
+      puts ANSI.red + "Folder #{dest_dir} aready exists! Can't add template #{@template}" + ANSI.reset
       return 1
     end
-    FileUtils.copy_entry @template, dir
+    FileUtils.copy_entry dir, dest_dir
     dir.slice!(@prj_dir)
     puts ANSI.green + "Installed template: #{@template} as #{dir}" + ANSI.reset
     return 0
   end
   
+  
   def addRemoteTemplate
+    dest_dir = @template[@template.rindex("/")+1 .. @template.length-5]
+    addLocalTemplate dest_dir
     return 0
   end
     
-  def validateTemplate
+    
+  def validateTemplate(dir)
     # Parse the template's nutella.json file
     begin
-      templateNutellaFileJson = JSON.parse(IO.read("#{@template}/nutella.json"))
+      templateNutellaFileJson = JSON.parse(IO.read("#{dir}/nutella.json"))
     rescue
       return false
     end
     # If template is a bot, check for the mandatory startup script and make sure it's executable
     if templateNutellaFileJson["type"]=="bot"
-      if !File.executable?("#{@template}/startup")
+      if !File.executable?("#{dir}/startup")
         return false
       end
     end 
     true
+  end
+  
+  def cleanTmpDir
+    nutella.loadConf
+    FileUtils.rm_rf(nutella.tmp_dir)
   end
   
 end
