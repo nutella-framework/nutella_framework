@@ -7,11 +7,11 @@ class Runs < Command
     # If no argument show the full runs list
     if args.empty?
       puts "Currently running:"
-      puts getRunsList    
+      puts getRunsList   
     else
       runs = getRunsList(args[0])
       puts "Currently running #{runs.length} instances of project #{args[0]}:"
-      puts getRunsList(args[0])
+      puts runs
     end
     
     return 0

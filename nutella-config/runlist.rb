@@ -64,9 +64,16 @@ end
 
 def getRunsList(projectName=nil)
   nutella.loadConfig
-  if projectName == nil
-    return nutella.runs
-  else
-    return nutella.runs.select { |run| run.start_with?(projectName) }
+  begin
+    nutella.runs!  
+    # we have a runs key, proceed
+    if projectName == nil
+      return nutella.runs
+    else
+      return nutella.runs.select { |run| run.start_with?(projectName) }
+    end
+    
+  rescue
+    # There is no nutella.runs key so return an empty list of runs
   end
 end
