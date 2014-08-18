@@ -1,4 +1,5 @@
 require_relative '../command'
+require_relative '../tmux/tmux'
 
 class Start < Command
   @description = "Starts all or some of the bots in the current project"
@@ -13,30 +14,26 @@ class Start < Command
     end
     
     # Add to the list of runs
-    if !addToRunsList(runid)
-      puts ANSI.red + "Impossible to start project: an instance of this project with the same name is already running! 
-You might want to kill it with 'nutella stop "+ runid + "'" + ANSI.reset
-      return 0;
-    end
+#     if !addToRunsList(runid)
+#       puts ANSI.red + "Impossible to start project: an instance of this project with the same name is already running!
+# You might want to kill it with 'nutella stop "+ runid + "'" + ANSI.reset
+#       return 0;
+#     end
     
     # If running on internal broker, start it
-    if nutella.broker == "localhost" # Are we using the internal broker
-      startBroker
-    end
+    # if nutella.broker == "localhost" # Are we using the internal broker
+    #   startBroker
+    # end
     
     # Start all the bots
-# TODO
-=begin
-    Dir.entries("#{@prj_dir}/bots").each do |file|
-    if File.exist?("#{@prj_dir}/bots/#{file}/startup")
-    pid = fork
-    exec("#{@prj_dir}/bots/#{file}/startup #{args[0].to_s.empty? ? prj_config("name") : args[0]}") if pid.nil?    
-    puts "Started bot #{file}"
-    # puts pid
+    tmux = Tmux.new(runid)
+    Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
+      if !File.exist?("#{@prj_dir}/bots/#{bot}/startup")
+        puts ANSI.yellow + "Impossible to start bot #{bot}. Couldn't locate 'startup' script." + ANSI.reset
+        next
+      end    
+      tmux.newWindow(bot)
     end
-    end
-    puts "Started X of Y bots"
-=end
     
     # Output success message
     if runid == prj_config("name")
