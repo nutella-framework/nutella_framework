@@ -5,15 +5,15 @@ class Start < Command
   @description = "Starts all or some of the bots in the current project"
   
   def run(args=nil)
-    # Extract runid
-    runid = args[0].to_s.empty? ? prj_config("name") : prj_config("name") + "_" + args[0]
-    
     # Is current directory a nutella prj?
     unless nutellaPrj?
       return 1
     end
     
-    # Add to the list of runs
+    # Extract runid
+    runid = args[0].to_s.empty? ? prj_config("name") : prj_config("name") + "_" + args[0]
+    
+    # Add to the list of runs and check the runId is unique
     if !addToRunsList(runid)
       puts ANSI.red + "Impossible to start project: an instance of this project with the same name is already running!
 You might want to kill it with 'nutella stop "+ runid + "'" + ANSI.reset
@@ -25,13 +25,18 @@ You might want to kill it with 'nutella stop "+ runid + "'" + ANSI.reset
       startBroker
     end
     
+    # Create .botsconfig file
+    deleteBotsConfig
+    createBotsConfig
+    
+    
     # Start all the bots
     tmux = Tmux.new(runid)
     Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
       if !File.exist?("#{@prj_dir}/bots/#{bot}/startup")
         puts ANSI.yellow + "Impossible to start bot #{bot}. Couldn't locate 'startup' script." + ANSI.reset
         next
-      end    
+      end
       tmux.newWindow(bot)
     end
     
@@ -70,6 +75,21 @@ You might want to kill it with 'nutella stop "+ runid + "'" + ANSI.reset
     pid = fork
     exec("#{nutella.home_dir}/broker/startup") if pid.nil?  
   end
+  
+  def createBotsConfig
+    nutella.loadConfig
+    botsconfig = nutella.to_h
+    botsconfig.delete(:runs)
+    botsconfig[:prj_name] = prj_config("name")
+    File.open("#{@prj_dir}/.botsconfig.json", "w") do |f|
+      f.write(JSON.pretty_generate(botsconfig))
+    end
+  end
+  
+  def deleteBotsConfig
+    File.delete("#{@prj_dir}/.botsconfig.json") if File.exist?("#{@prj_dir}/.botsconfig.json")
+  end
+  
    
 end
 

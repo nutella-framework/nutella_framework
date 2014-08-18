@@ -29,12 +29,13 @@ def removeFromRunsList(runid)
       # If so remove it
       nutella.runs.delete(runid)
       nutella.storeConfig
+      # Return removed element
+      return runid
     end
-    # Is our list empty?
-    return nutella.runs.empty?
+    nil
   rescue
     # There is no nutella.runs key
-    true
+    nil
   end
 end
 
@@ -50,7 +51,7 @@ def isInRunsList?(runid)
   false
 end
 
-def isRunsListEmpty?()
+def isRunsListEmpty?
   nutella.loadConfig
   begin
     nutella.runs!  

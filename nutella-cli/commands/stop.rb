@@ -5,23 +5,29 @@ class Stop < Command
   @description = "Stops all or some of the bots in the current project"
   
   def run(args=nil)
-    # Extract runid
-    runid = args[0].to_s.empty? ? prj_config("name") : prj_config("name") + "_" + args[0]
-    
     # Is current directory a nutella prj?
     unless nutellaPrj?
       return 1
     end
     
+    # Extract runid
+    runid = args[0].to_s.empty? ? prj_config("name") : prj_config("name") + "_" + args[0]
+    
     # Remove from the list of runs and if running on internal broker, stop it
-    if removeFromRunsList(runid)
-      if nutella.broker == "localhost" # Are we using the internal broker
+    if removeFromRunsList(runid)==runid
+      if isRunsListEmpty? and nutella.broker == "localhost" # Are we using the internal broker
         stopBroker
       end
+    else
+      puts ANSI.yellow + "Run #{runid} doesn't exist. Impossible to stop it." + ANSI.reset
+      return 0
     end
     
     # Stops all the bots
     Tmux.killSession(runid)
+    
+    # Deletes bots config file if it exists
+    File.delete("#{@prj_dir}/.botsconfig.json") if File.exist?("#{@prj_dir}/.botsconfig.json")
     
     # Output success message
     if runid == prj_config("name")
