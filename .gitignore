@@ -4,8 +4,10 @@ config.json
 config-clean.json
 .tmp/
 
-#Gem/rake
+#Gem/Jeweler
 Gemfile.lock
+pkg/
+coverage/
 
 # Mac crap
 .DS_Store

@@ -1,6 +1,10 @@
-#!/bin/sh
+#!/usr/bin/env ruby
 
-NUTELLA_HOME=`which nutella | sed 's|\(.*\)/.*|\1|'`
-export NUTELLA_HOME
+begin
+  require 'rubygems'
+  gem 'nutella-framework'
+rescue LoadError
+end
 
-ruby $NUTELLA_HOME/nutella-cli/nutella.rb "$@"
+require 'nutella-framework'
+Nutella::CommandLineInterface.run
