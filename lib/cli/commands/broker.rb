@@ -1,4 +1,4 @@
-require_relative '../command'
+require 'cli/command'
 require 'socket'
 
 class Broker < Command

@@ -1,10 +1,5 @@
 #!/usr/bin/env ruby
 
-begin
-  require 'rubygems'
-  gem 'nutella-framework'
-rescue LoadError
-end
+require 'nutella_framework'
 
-require 'nutella-framework'
-Nutella::CommandLineInterface.run
+Nutella::NutellaCLI.run

@@ -4,11 +4,16 @@ config.json
 config-clean.json
 .tmp/
 
-#Gem/Jeweler
+# Jeweler / Gem / Bundler/ Coverage
 Gemfile.lock
 pkg/
 coverage/
+rdoc
+doc
+.yardoc
+.bundle
 
 # Mac crap
 .DS_Store
+
 
