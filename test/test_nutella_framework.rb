@@ -1,7 +1,11 @@
 require 'helper'
+require 'nutella_framework'
 
 class TestNutella < Test::Unit::TestCase
-  should "probably rename this file and start testing for real" do
-    flunk "hey buddy, you should probably rename this file and start testing for real"
+  
+  def test_nutella_hello
+    assert_equal  "Running nutella",
+      NutellaCLI.run
   end
+  
 end
