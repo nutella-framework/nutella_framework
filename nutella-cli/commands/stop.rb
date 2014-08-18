@@ -1,4 +1,5 @@
 require_relative '../command'
+require_relative '../tmux/tmux'
 
 class Stop < Command
   @description = "Stops all or some of the bots in the current project"
@@ -20,7 +21,7 @@ class Stop < Command
     end
     
     # Stops all the bots
-    # TODO
+    Tmux.killSession(runid)
     
     # Output success message
     if runid == prj_config("name")

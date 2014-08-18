@@ -14,16 +14,16 @@ class Start < Command
     end
     
     # Add to the list of runs
-#     if !addToRunsList(runid)
-#       puts ANSI.red + "Impossible to start project: an instance of this project with the same name is already running!
-# You might want to kill it with 'nutella stop "+ runid + "'" + ANSI.reset
-#       return 0;
-#     end
+    if !addToRunsList(runid)
+      puts ANSI.red + "Impossible to start project: an instance of this project with the same name is already running!
+You might want to kill it with 'nutella stop "+ runid + "'" + ANSI.reset
+      return 0;
+    end
     
     # If running on internal broker, start it
-    # if nutella.broker == "localhost" # Are we using the internal broker
-    #   startBroker
-    # end
+    if nutella.broker == "localhost" # Are we using the internal broker
+      startBroker
+    end
     
     # Start all the bots
     tmux = Tmux.new(runid)
