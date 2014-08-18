@@ -7,7 +7,19 @@ module Nutella
   
     def self.run
       puts "Running nutella"
-      p ARGV
+=begin
+{
+  "home_dir": "/Users/tebemis/Code/nutella",
+  "version": "0.1.0",
+  "project_url": "http://ltg-uic.github.io/nutella/",
+  "broker": "localhost",
+  "tmp_dir": "/Users/tebemis/Code/nutella/.tmp",
+  "runs": [
+
+  ]
+}
+=end
+      
       # NUTELLA_HOME = ENV['NUTELLA_HOME']
       #   nutella.home_dir = ENV['NUTELLA_HOME']
       #   nutella.loadConfig

@@ -1,11 +1,6 @@
-require 'helper'
-require 'nutella_framework'
+#require 'helper'
+require "test/unit"
 
-class TestNutella < Test::Unit::TestCase
-  
-  def test_nutella_hello
-    assert_equal  "Running nutella",
-      NutellaCLI.run
-  end
+class TestNutellaFramework < Test::Unit::TestCase
   
 end

@@ -27,10 +27,25 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/nutella",
-    "lib/nutella-config/config.rb",
-    "lib/nutella-config/nutella_config_store.rb",
-    "lib/nutella-config/runlist.rb",
-    "test/helper.rb"
+    "lib/cli/command.rb",
+    "lib/cli/commands/broker.rb",
+    "lib/cli/commands/checkup.rb",
+    "lib/cli/commands/debug.rb",
+    "lib/cli/commands/help.rb",
+    "lib/cli/commands/install.rb",
+    "lib/cli/commands/new.rb",
+    "lib/cli/commands/runs.rb",
+    "lib/cli/commands/start.rb",
+    "lib/cli/commands/stop.rb",
+    "lib/cli/nutella_cli.rb",
+    "lib/cli/tmux.rb",
+    "lib/config/config.rb",
+    "lib/config/nutella_config_store.rb",
+    "lib/config/runlist.rb",
+    "lib/nutella_framework.rb",
+    "nutella_framework.gemspec",
+    "test/helper.rb",
+    "test/test_nutella_framework.rb"
   ]
   s.homepage = "http://github.com/tebemis/nutella_framework"
   s.licenses = ["MIT"]
@@ -41,27 +56,27 @@ Gem::Specification.new do |s|
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<ansi>, [">= 1.4.0"])
-      s.add_development_dependency(%q<shoulda>, [">= 0"])
+      s.add_runtime_dependency(%q<ansi>, [">= 1.4", "~> 1.4"])
+      s.add_development_dependency(%q<shoulda>, [">= 3.5", "~> 3.5"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0"])
-      s.add_development_dependency(%q<jeweler>, ["~> 2.0.1"])
-      s.add_development_dependency(%q<simplecov>, [">= 0"])
+      s.add_development_dependency(%q<jeweler>, [">= 2.0.1", "~> 2.0.1"])
+      s.add_development_dependency(%q<simplecov>, [">= 0.9", "~> 0.9"])
     else
-      s.add_dependency(%q<ansi>, [">= 1.4.0"])
-      s.add_dependency(%q<shoulda>, [">= 0"])
+      s.add_dependency(%q<ansi>, [">= 1.4", "~> 1.4"])
+      s.add_dependency(%q<shoulda>, [">= 3.5", "~> 3.5"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_dependency(%q<bundler>, ["~> 1.0"])
-      s.add_dependency(%q<jeweler>, ["~> 2.0.1"])
-      s.add_dependency(%q<simplecov>, [">= 0"])
+      s.add_dependency(%q<jeweler>, [">= 2.0.1", "~> 2.0.1"])
+      s.add_dependency(%q<simplecov>, [">= 0.9", "~> 0.9"])
     end
   else
-    s.add_dependency(%q<ansi>, [">= 1.4.0"])
-    s.add_dependency(%q<shoulda>, [">= 0"])
+    s.add_dependency(%q<ansi>, [">= 1.4", "~> 1.4"])
+    s.add_dependency(%q<shoulda>, [">= 3.5", "~> 3.5"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])
     s.add_dependency(%q<bundler>, ["~> 1.0"])
-    s.add_dependency(%q<jeweler>, ["~> 2.0.1"])
-    s.add_dependency(%q<simplecov>, [">= 0"])
+    s.add_dependency(%q<jeweler>, [">= 2.0.1", "~> 2.0.1"])
+    s.add_dependency(%q<simplecov>, [">= 0.9", "~> 0.9"])
   end
 end
 
