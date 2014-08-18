@@ -1,11 +1,11 @@
 # Nutella
-dist/
 broker/
 config.json
+config-clean.json
 .tmp/
 
-# Gradle files
-.gradle
+#Gem/rake
+Gemfile.lock
 
 # Mac crap
 .DS_Store
