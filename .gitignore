@@ -1,7 +1,5 @@
 # Nutella
 broker/
-config.json
-config-clean.json
 .tmp/
 
 # Jeweler / Gem / Bundler/ Coverage
