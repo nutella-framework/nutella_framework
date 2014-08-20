@@ -3,15 +3,12 @@ broker/
 .tmp/
 
 # Jeweler / Gem / Bundler/ Coverage
-Gemfile.lock
 pkg/
 coverage/
-rdoc
-doc
+rdoc/
+doc/
 .yardoc
 .bundle
 
 # Mac crap
 .DS_Store
-
-
