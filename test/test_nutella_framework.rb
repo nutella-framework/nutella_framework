@@ -1,7 +1,11 @@
 require 'helper'
 
 class TestNutellaFramework < MiniTest::Test
-  should "probably rename this file and start testing for real" do
-    # flunk "hey buddy, you should probably rename this file and start testing for real"
+  should "find help command" do
+    # assert(Nutella::NutellaCLI.commandExists?("help"))
+    ARGV << "help"
+    Nutella::NutellaCLI.run
   end
 end
+  
+
