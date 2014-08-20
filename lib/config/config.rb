@@ -1,24 +1,55 @@
-# This handles the configuration files of Nutella, it uses configatron but customizes it
-require 'configatron/version'
+# This handles the configuration files of Nutella
+# It's basically a hash overload that stores into a file
+require 'singleton'
+require 'json'
 
-require 'configatron/deep_clone'
-require 'configatron/errors'
-require 'configatron/integrations'
-require 'configatron/root_store'
-require 'configatron/store'
-require_relative 'nutella_config_store'
-
-# Proc *must* load before dynamic/delayed, or else Configatron::Proc
-# will refer to the global ::Proc
-require 'configatron/proc'
-require 'configatron/delayed'
-require 'configatron/dynamic'
-
-class Configatron
-end
-
-module Kernel
-  def nutella
-    NutellaConfigStore.instance
+module Nutella
+  CONFIG_FILE=File.dirname(__FILE__)+"/../../config.json"
+  
+  class JSONFileHash < Hash
+    include Singleton
+    
+    def []=(key,val)
+      result = super(key,val)
+      storeConfigToFile
+      result
+    end
+    
+    def [](key)
+      loadConfigFromFile
+      super(key)
+    end
+    
+    def clear
+      result = super
+      storeConfigToFile
+      result
+    end
+    
+    private
+    
+    def storeConfigToFile
+      File.open(CONFIG_FILE, "w") do |f|
+        f.write(JSON.pretty_generate(self))
+      end
+    end
+    
+    def loadConfigFromFile
+      begin
+        self.merge! JSON.parse IO.read CONFIG_FILE
+      rescue
+        # File doesn't exist... do nothing
+      end
+    end
+    
+    def removeConfigFile
+      File.delete(CONFIG_FILE) if File.exist?(CONFIG_FILE)
+    end
+    
   end
+  
+  def Nutella.config
+    JSONFileHash.instance
+  end
+  
 end

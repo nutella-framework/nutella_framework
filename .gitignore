@@ -1,4 +1,5 @@
 # Nutella
+config.json
 broker/
 .tmp/
 
