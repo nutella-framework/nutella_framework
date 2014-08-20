@@ -1,11 +1,4 @@
-language: java
-
-jdk:
-  - oraclejdk8
-
-notifications:
-  email: false
-
-install: true
-
-script: gradle build
+language: ruby
+rvm:
+  - 2.1.2
+	

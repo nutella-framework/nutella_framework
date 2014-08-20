@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'nutella_framework'
+
+Nutella::NutellaCLI.run

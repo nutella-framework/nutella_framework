@@ -1,12 +1,15 @@
 # Nutella
-dist/
-broker/
 config.json
+broker/
 .tmp/
 
-# Gradle files
-.gradle
+# Jeweler / Gem / Bundler/ Coverage
+pkg/
+coverage/
+rdoc/
+doc/
+.yardoc
+.bundle
 
 # Mac crap
 .DS_Store
-
