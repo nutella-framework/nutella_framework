@@ -7,8 +7,8 @@ module Nutella
   
     def run(args=nil)
       # If no argument then we jsut display info about the broker
-      if args.empty?
-        puts "Currently using broker: #{nutella.broker}"
+      if args==nil || args.empty?
+        puts "Currently using broker: #{Nutella.config["broker"]}"
       else
         if !isRunsListEmpty?
           puts ANSI.yellow + "You are currently running some projects on this broker. You can't change the broker while running." + ANSI.reset
@@ -20,10 +20,8 @@ module Nutella
           puts ANSI.yellow + "Not a valid hostname" + ANSI.reset
           return 1
         end
-        nutella.loadConfig
-        nutella.broker = args[0]
-        nutella.storeConfig
-        puts ANSI.green + "Now using broker: #{nutella.broker}" + ANSI.reset
+        Nutella.config["broker"] = args[0]
+        puts ANSI.green + "Now using broker: #{Nutella.config["broker"]}" + ANSI.reset
       end
       return 0
     end

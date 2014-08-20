@@ -10,6 +10,7 @@ rdoc/
 doc/
 .yardoc
 .bundle
+Gemfile.lock
 
 # Mac crap
 .DS_Store

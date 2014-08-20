@@ -3,6 +3,10 @@ require 'helper'
 module Nutella
   
   class TestNutellaConfig < MiniTest::Test
+    
+    def setup
+      Nutella.config.clear
+    end
   
     should "set a key value" do
       assert_equal "value1", Nutella.config["key1"]="value1"
@@ -32,7 +36,6 @@ module Nutella
     end
   
     should "read and write correctly from/to file" do
-      Nutella.config.clear
       Nutella.config["k_write1"]="v_write1"
       Nutella.config["k_write2"]=5
       Nutella.config["k_write5"]={"k_nest1" =>"v_nest1", "k_nest2" =>"v_nest2", "k_nest3" => {"k_nest4" =>"v_nest4"}}
