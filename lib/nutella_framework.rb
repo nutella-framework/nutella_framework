@@ -1,6 +1,6 @@
 # Nutella main script
 require 'core/nutella_core'
-#require 'cli/nutella_cli'
+require 'cli/nutella_cli'
 require 'config/config'
 require 'config/runlist'
 

@@ -1,5 +1,5 @@
-require 'cli/command'
-require 'cli/tmux'
+require 'core/command'
+require 'core/tmux'
 
 module Nutella
   class Start < Command

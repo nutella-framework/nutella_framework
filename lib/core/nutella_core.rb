@@ -11,7 +11,7 @@ module Nutella
       if commandExists?(command)
         return Object::const_get("Nutella::#{command.capitalize}").new.run(args)
       else
-        raise CommandException.new(:error), "Unknown command #{command}"
+        raise CommandException.new :error, "Unknown command #{command}"
       end
     end
     

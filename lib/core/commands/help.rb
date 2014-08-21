@@ -1,4 +1,4 @@
-require 'cli/command'
+require 'core/command'
 
 module Nutella
   
@@ -6,12 +6,13 @@ module Nutella
     @description = "Displays what every command does and how to use it"
   
     def run(args=nil)
-      NutellaCLI.printPrompt
+      message=""
       Dir[File.dirname(__FILE__)+"/*.rb"].each do |file|
-        print "#{File.basename(file, File.extname(file))}\t\t"
-        puts Object::const_get("Nutella::#{File.basename(file, File.extname(file)).capitalize}").description
+        message += "#{File.basename(file, File.extname(file))}\t\t"
+        message += Object::const_get("Nutella::#{File.basename(file, File.extname(file)).capitalize}").description
+        message += "\n"
       end
-      return 0
+      raise CommandException.new(:info), message
     end
     
   end

@@ -4,9 +4,10 @@ module Nutella
   class TestNutellaFramework < MiniTest::Test
     
     should "run command help correctly" do
-      # Nutella.store_constants
-      puts "OUT"
-      p Nutella.executeCommand "help"
+      Nutella.store_constants
+      e = assert_raises CommandException do
+        Nutella.executeCommand "help"
+      end
     end
     
     

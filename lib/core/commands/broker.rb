@@ -1,4 +1,4 @@
-require 'cli/command'
+require 'core/command'
 require 'socket'
 
 module Nutella

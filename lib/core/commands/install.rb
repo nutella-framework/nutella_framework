@@ -1,4 +1,4 @@
-require 'cli/command'
+require 'core/command'
 require 'json'
 require 'git'
 require 'net/http'

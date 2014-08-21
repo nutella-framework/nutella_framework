@@ -1,5 +1,4 @@
-require 'cli/command'
-require 'cli/nutella_cli'
+require 'core/command'
 require 'fileutils'
 
 module Nutella

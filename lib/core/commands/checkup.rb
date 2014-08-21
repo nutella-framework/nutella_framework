@@ -1,4 +1,4 @@
-require 'cli/command'
+require 'core/command'
 
 module Nutella
   class Checkup < Command
