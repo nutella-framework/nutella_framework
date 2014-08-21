@@ -1,19 +1,30 @@
 require 'ansi/code'
 
-# Include all commands
-Dir[File.dirname(__FILE__)+"/commands/*.rb"].each do |file|
-  require "cli/commands/#{File.basename(file, File.extname(file))}"
-end
-
 module Nutella
 
   class NutellaCLI
     
     # Reads the parameters and executes commands
     def self.run
+      # Read parameters
       args = ARGV.dup
       args.shift
-      exitStatus = executeCommand(ARGV.first, args)
+      # Check that the command is not empty, if so, print the prompt
+      if ARGV.first == nil
+        printPrompt
+      end
+      begin
+        Nutella.executeCommand(ARGV.first, args)
+      rescue CommandException => e 
+        if e.log_level==:error
+          puts ANSI.red + e.message + ANSI.reset
+        elsif e.log_level==:warn
+          puts ANSI.yellow + e.message + ANSI.reset
+        elsif e.log_level==:info || e.log_level==nil
+          puts e.message
+        elsif e.log_level==:success
+          puts ANSI.green + e.message + ANSI.reset
+      end
       puts ""
       exit(exitStatus)
     end
@@ -33,29 +44,6 @@ module Nutella
         puts "Welcome to nutella version #{nutella_version}! For a complete lists of available commands type `nutella help`\n\n"
         exit 0
       end
-    end
-    
-    # Execute command
-    def self.executeCommand (command, args=nil) 
-      # Check that the command exists
-      if command == nil
-        printPrompt
-      end
-      if commandExists?(command)
-        return Object::const_get("Nutella::#{command.capitalize}").new.run(args)
-      else
-        puts ANSI.red + "Unknown command #{command}" + ANSI.reset
-        return 1
-      end
-    end
-    
-    private
-    
-    # Check that command exists
-    def self.commandExists?(command)
-      return Nutella.const_get("Nutella::#{command.capitalize}").is_a?(Class)
-    rescue NameError
-      return false
     end
   
   end

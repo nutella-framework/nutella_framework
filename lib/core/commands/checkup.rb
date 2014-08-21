@@ -9,12 +9,10 @@ module Nutella
       # TODO check all the dependencies before installing anything, git, ruby, npm,
       # TODO and all the associated configurations
       # TODO Execute this command from Travis to verify installation
-    
+      
+      
       # Check if we have a broker and install one if not
-      nutella.loadConfig
-      begin
-        nutella.broker!  
-      rescue
+      if Nutella.config.has_key? "broker"
         installBroker
       end
     
@@ -26,8 +24,7 @@ module Nutella
   
     def installBroker    
       # Clone, cd and npm install
-      install_dir = "#{nutella.home_dir}/broker"
-      system "git clone git://github.com/mcollina/mosca.git #{install_dir}"
+      system "git clone git://github.com/mcollina/mosca.git #{Nutella.config["broker_dir"]}"
       Dir.chdir(install_dir)
       system "npm install"
     
@@ -36,9 +33,7 @@ module Nutella
       File.chmod(0755, "startup")
     
       # Add configuration
-      nutella.loadConfig
-      nutella.broker = "localhost"
-      nutella.storeConfig
+      Nutella.config["broker"] = "localhost"
     end
   end
 end

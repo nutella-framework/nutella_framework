@@ -2,10 +2,13 @@ require 'helper'
 
 module Nutella
   class TestNutellaFramework < MiniTest::Test
-        
-    should "find help command" do
-      assert NutellaCLI.commandExists? "help" 
+    
+    should "run command help correctly" do
+      # Nutella.store_constants
+      puts "OUT"
+      p Nutella.executeCommand "help"
     end
+    
     
     # should "read the broker parameter correctly" do
 #       Nutella.store_constants

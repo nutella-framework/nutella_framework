@@ -1,6 +1,6 @@
 # Nutella main script
 require 'core/nutella_core'
-require 'cli/nutella_cli'
+#require 'cli/nutella_cli'
 require 'config/config'
 require 'config/runlist'
 
@@ -11,8 +11,8 @@ module Nutella
   def Nutella.store_constants
     Nutella.config.clear
     Nutella.config["nutella_home"] = NUTELLA_HOME
-    Nutella.config["broker"] = "localhost"
     Nutella.config["tmp_dir"] = NUTELLA_HOME+".tmp"
+    Nutella.config["broker_dir"] = NUTELLA_HOME+"/broker"
   end
   
   Nutella.store_constants
