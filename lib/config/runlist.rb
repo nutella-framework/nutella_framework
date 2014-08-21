@@ -1,80 +1,91 @@
-require_relative 'config'
+# This handles the list of running instances of Nutella
+# The list is uniquely maintained inside a file
+require 'singleton'
+require 'json'
+require 'set'
 
-
-
-def addToRunsList(runid)
-  nutella.loadConfig
-  begin
-    nutella.runs!  
-    # we have a runs key, is there a runid key?
-    if nutella.runs.include?(runid)
-      return false;
-    else
-      nutella.runs.push(runid)
-      nutella.storeConfig
+module Nutella
+  
+  class RunList
+    
+    RUN_LIST_FILE=File.dirname(__FILE__)+"/../../runlist.json"
+    
+    include Singleton
+    
+    def add?(runid)
+      begin
+        result = JSON.parse(IO.read(RUN_LIST_FILE)).to_set.add? runid
+      rescue
+        # No file, create one
+        result = [runid].to_set
+      end
+      if result!=nil
+        File.open(RUN_LIST_FILE, "w") do |f|
+          f.write(JSON.pretty_generate(result.to_a))
+        end
+      end
+      result
     end
-  rescue
-    # There is no nutella.runs key
-    nutella.runs = [runid]
-    nutella.storeConfig
-  end
-end
 
-def removeFromRunsList(runid)
-  nutella.loadConfig
-  begin
-    nutella.runs!  
-    # we have a runs key, is there a runid key?
-    if nutella.runs.include?(runid)
-      # If so remove it
-      nutella.runs.delete(runid)
-      nutella.storeConfig
-      # Return removed element
-      return runid
+    def delete?(runid)
+      begin
+        result = JSON.parse(IO.read(RUN_LIST_FILE)).to_set.delete? runid
+      rescue
+        removeRunListFile
+        result = nil # List is empty, so nil
+      end
+      if result!=nil
+        File.open(RUN_LIST_FILE, "w") do |f|
+          f.write(JSON.pretty_generate(result.to_a))
+        end
+      end
+      result
     end
-    nil
-  rescue
-    # There is no nutella.runs key
-    nil
-  end
-end
 
-def isInRunsList?(runid)
-  nutella.loadConfig
-  begin
-    nutella.runs!  
-    # we have a runs key, is there a runid key?
-    return nutella.runs.include?(runid)
-  rescue
-    # There is no nutella.runs key so the answer is false
-  end
-  false
-end
+    def include?(runid)
+      begin
+        return JSON.parse(IO.read(RUN_LIST_FILE)).include? runid
+      rescue
+        false # There is no file so it doens't include runid
+      end
+    end
 
-def isRunsListEmpty?
-  nutella.loadConfig
-  begin
-    nutella.runs!  
-    # we have a runs key, is the list empty?
-    return nutella.runs.empty?
-  rescue
-    # There is no nutella.runs key so the answer is true
-  end
-  true
-end
+    def empty?
+      begin
+        return JSON.parse(IO.read(RUN_LIST_FILE)).empty?
+      rescue
+        true # There is no file so list is empty
+      end
+    end
 
-def getRunsList(projectName=nil)
-  nutella.loadConfig
-  begin
-    nutella.runs!  
-    # we have a runs key, proceed
-    if projectName == nil
-      return nutella.runs
-    else
-      return nutella.runs.select { |run| run.start_with?(projectName) }
+    def to_a(projectName=nil)
+      begin
+        list = JSON.parse(IO.read(RUN_LIST_FILE))
+        # filter by project
+        if projectName == nil
+          return list
+        else
+          return list.select { |run| run.start_with?(projectName) }
+        end
+      rescue
+        Array.new # There is no file or something went wrong
+      end
     end
     
-  rescue
-    # There is no nutella.runs key so return an empty list of runs
+    private 
+    
+    def removeRunListFile
+      File.delete(RUN_LIST_FILE) if File.exist?(RUN_LIST_FILE)
+    end
+    
   end
+  
+  
+  def Nutella.runlist
+    RunList.instance
+  end
+  
 end
+
+
+

@@ -4,9 +4,11 @@ require 'singleton'
 require 'json'
 
 module Nutella
-  CONFIG_FILE=File.dirname(__FILE__)+"/../../config.json"
   
   class JSONFileHash < Hash
+    
+    CONFIG_FILE=File.dirname(__FILE__)+"/../../config.json"
+    
     include Singleton
     
     def []=(key,val)
