@@ -4,7 +4,7 @@ module Nutella
   class TestNutellaFramework < MiniTest::Test
     
     should "run help correctly" do
-      Nutella.store_constants
+      Nutella.init
       e = assert_raises HelpOutException do
         Nutella.executeCommand "help"
       end

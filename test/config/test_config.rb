@@ -5,7 +5,7 @@ module Nutella
   class TestNutellaConfig < MiniTest::Test
     
     def setup
-      Nutella.config.clear
+      Nutella.config.send(:removeConfigFile)
     end
   
     should "set a key value" do
