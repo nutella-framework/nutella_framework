@@ -1,6 +1,8 @@
 source "http://rubygems.org"
 
 gem "ansi", ">= 1.4.3"
+gem "semantic", ">=1.3"
+gem "logging", ">=1.8.2"
 
 group :development do
   gem "shoulda", ">= 0"

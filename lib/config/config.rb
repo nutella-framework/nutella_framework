@@ -22,13 +22,6 @@ module Nutella
       hash[key]
     end
     
-    # def clear
-#       hash = loadConfig
-#       result = hash.clear
-#       storeConfig hash
-#       result
-#     end
-    
     def empty?
       hash = loadConfig
       hash.empty?

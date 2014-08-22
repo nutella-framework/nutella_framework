@@ -22,7 +22,6 @@ module Nutella
       return false
     end
     
-    
     # Initialize
     def Nutella.init
       Nutella.config["nutella_home"] = NUTELLA_HOME

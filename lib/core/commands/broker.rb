@@ -6,7 +6,6 @@ module Nutella
     @description = "Displays information about the current broker and allows us to change it"
   
     def run(args=nil)
-      p Nutella.config.to_s
       # If no argument then we jsut display info about the broker
       if args==nil || args.empty?
         raise CommandException.new(:info), "Currently using broker: #{Nutella.config["broker"]}"
