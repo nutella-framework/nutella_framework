@@ -35,17 +35,6 @@ module Nutella
       assert_equal "v55", Nutella.config["key5"]["k55"]
     end
   
-    should "read and write correctly from/to file" do
-      Nutella.config["k_write1"]="v_write1"
-      Nutella.config["k_write2"]=5
-      Nutella.config["k_write5"]={"k_nest1" =>"v_nest1", "k_nest2" =>"v_nest2", "k_nest3" => {"k_nest4" =>"v_nest4"}}
-      Nutella.config["k_write6"]=["arr_1",5, false]
-      pre = Nutella.config.to_s
-      Nutella.config.send(:storeConfigToFile)
-      Nutella.config.send(:loadConfigFromFile)
-      assert_equal pre, Nutella.config.to_s
-    end
-  
     def teardown
       Nutella.config.send(:removeConfigFile)
     end

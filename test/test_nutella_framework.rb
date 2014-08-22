@@ -3,13 +3,13 @@ require 'helper'
 module Nutella
   class TestNutellaFramework < MiniTest::Test
     
-    should "run command help correctly" do
+    should "run help correctly" do
       Nutella.store_constants
-      e = assert_raises CommandException do
+      e = assert_raises HelpOutException do
         Nutella.executeCommand "help"
       end
     end
-    
+
     
     # should "read the broker parameter correctly" do
 #       Nutella.store_constants

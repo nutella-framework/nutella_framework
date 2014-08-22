@@ -2,6 +2,9 @@ require 'core/command'
 
 module Nutella
   
+  class HelpOutException < CommandException
+  end
+  
   class Help < Command
     @description = "Displays what every command does and how to use it"
   
@@ -12,7 +15,7 @@ module Nutella
         message += Object::const_get("Nutella::#{File.basename(file, File.extname(file)).capitalize}").description
         message += "\n"
       end
-      raise CommandException.new(:info), message
+      raise HelpOutException.new(:info), message
     end
     
   end

@@ -11,7 +11,7 @@ module Nutella
       if commandExists?(command)
         return Object::const_get("Nutella::#{command.capitalize}").new.run(args)
       else
-        raise CommandException.new :error, "Unknown command #{command}"
+        raise CommandException.new(:error), "Unknown command #{command}"
       end
     end
     
@@ -20,6 +20,14 @@ module Nutella
       return Nutella.const_get("Nutella::#{command.capitalize}").is_a?(Class)
     rescue NameError
       return false
+    end
+    
+    
+    # Initialize
+    def Nutella.init
+      Nutella.config["nutella_home"] = NUTELLA_HOME
+      Nutella.config["tmp_dir"] = NUTELLA_HOME+".tmp"
+      Nutella.config["broker_dir"] = NUTELLA_HOME+"broker"
     end
 
 end

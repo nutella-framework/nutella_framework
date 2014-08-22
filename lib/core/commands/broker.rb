@@ -6,24 +6,22 @@ module Nutella
     @description = "Displays information about the current broker and allows us to change it"
   
     def run(args=nil)
+      p Nutella.config.to_s
       # If no argument then we jsut display info about the broker
       if args==nil || args.empty?
-        puts "Currently using broker: #{Nutella.config["broker"]}"
+        raise CommandException.new(:info), "Currently using broker: #{Nutella.config["broker"]}"
       else
-        if !isRunsListEmpty?
-          puts ANSI.yellow + "You are currently running some projects on this broker. You can't change the broker while running." + ANSI.reset
-          return 0;
+        if !Nutella.runlist.empty?
+          raise CommandException.new(:warn), "You are currently running some projects on this broker. You can't change the broker while running."
         end
         begin
           IPSocket.getaddress(args[0])
         rescue
-          puts ANSI.yellow + "Not a valid hostname" + ANSI.reset
-          return 1
+          raise CommandException.new(:warn), "Not a valid hostname"
         end
         Nutella.config["broker"] = args[0]
-        puts ANSI.green + "Now using broker: #{Nutella.config["broker"]}" + ANSI.reset
+        raise CommandException.new(:success), "Now using broker: #{Nutella.config["broker"]}"
       end
-      return 0
     end
   end
 end

@@ -20,7 +20,7 @@ module Nutella
         result = [runid].to_set
       end
       if result!=nil
-        File.open(RUN_LIST_FILE, "w") do |f|
+        File.open(RUN_LIST_FILE, "w+") do |f|
           f.write(JSON.pretty_generate(result.to_a))
         end
       end
@@ -35,7 +35,7 @@ module Nutella
         result = nil # List is empty, so nil
       end
       if result!=nil
-        File.open(RUN_LIST_FILE, "w") do |f|
+        File.open(RUN_LIST_FILE, "w+") do |f|
           f.write(JSON.pretty_generate(result.to_a))
         end
       end
