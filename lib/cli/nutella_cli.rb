@@ -1,5 +1,3 @@
-require 'ansi/code'
-
 module Nutella
 
   class NutellaCLI
@@ -18,11 +16,16 @@ module Nutella
       args = ARGV.dup
       args.shift
       # Check that the command is not empty, if so, print the prompt
-      if ARGV.first == nil
+      command = ARGV.first
+      if command == nil
         printPrompt
         exit 0
       end
-      Nutella.executeCommand ARGV.first, args
+      # Prepend warning if nutella is not ready
+      if (Nutella.config["ready"].nil? && command!="checkup")
+        console.warn "Looks like this is a fresh installation of nutella. Please run `nutella checkup` to check all dependencies are installed."
+      end
+      Nutella.executeCommand command, args
       exit 0
     end
   
@@ -30,7 +33,11 @@ module Nutella
     def self.printPrompt
       console.info(NUTELLA_LOGO)
       nutella_version = File.open(NUTELLA_HOME+"VERSION", "rb").read
-      console.info("Welcome to nutella version #{nutella_version}! For a complete lists of available commands type `nutella help`\n\n")
+      console.info("Welcome to nutella version #{nutella_version}! For a complete lists of available commands type `nutella help`\n")
+      # Append warning if nutella is not ready
+      if (Nutella.config["ready"].nil?)
+        console.warn "Looks like this is a fresh installation of nutella. Please run `nutella checkup` to check all dependencies are installed."
+      end
     end
   end
 

@@ -7,7 +7,7 @@ module Nutella
   
     def run(args=nil)
       # Is current directory a nutella prj?
-      unless nutellaPrj?
+      if !nutellaPrj?
         return 1
       end
     

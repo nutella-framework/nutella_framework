@@ -10,7 +10,7 @@ module Nutella
     include Singleton
     
     # Check that the current directory is actually a nutella project
-    def nutellaPrj?
+    def exist?
       @prj_dir = Dir.pwd
       if File.exist?("#{@prj_dir}/conf/project.json")
         conf = JSON.parse( IO.read("#{@prj_dir}/conf/project.json") )
@@ -26,7 +26,7 @@ module Nutella
     end
   
     # Returns the value for an entry in the project configuration file
-    def prj_config(entry)
+    def config(entry)
       @prj_dir = Dir.pwd
       if File.exist?("#{@prj_dir}/conf/project.json")
         conf = JSON.parse( IO.read("#{@prj_dir}/conf/project.json") )

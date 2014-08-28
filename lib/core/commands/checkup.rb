@@ -7,25 +7,31 @@ module Nutella
   
     def run(args=nil)
       # First check that we have all the tools we need to run nutella
-      checkDependencies
+      if !allDependenciesInstalled?
+        return
+      end
       
       # Check if we have a broker and install one if not
-      # TODO Change this is wrong!!!!
-      if Nutella.config.has_key? "broker"
-        installBroker
+      if !File.directory? Nutella.config["broker_dir"]
+        console.warn "You don't seem to have a local broker installed so we are going to go ahead and install one for you. This might take some time..."
+        if !installBroker
+          console.error "Whoops...something went wrong while installing the broker. "
+          return
+        end
+      else
+        console.info "You have a local broker installed. Yay!"
       end
-    
-      # Output message
+          
+      # Set config and output message
+      Nutella.config["ready"] = true
       console.success("All systems go! You are ready to use nutella!")
-      
-      return 0
     end
   
     def installBroker    
       # Clone, cd and npm install
-      system "git clone git://github.com/mcollina/mosca.git #{Nutella.config["broker_dir"]}"
-      Dir.chdir(install_dir)
-      system "npm install"
+      out1 = system "git clone git://github.com/mcollina/mosca.git #{Nutella.config["broker_dir"]} > /dev/null 2>&1"
+      Dir.chdir(Nutella.config["broker_dir"])
+      out2 = system "npm install > /dev/null 2>&1"
     
       # Add startup script
       File.open("startup", 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 &\necho $! > $BASEDIR/bin/.pid\n") }
@@ -33,48 +39,63 @@ module Nutella
     
       # Add configuration
       Nutella.config["broker"] = "localhost"
+      return out1 && out2
     end
     
     
-    def checkDependencies
-      checkNode
+    # TODO we should refactor the code into a common check method and pass the "trimming operations"" as a lambda
+    def allDependenciesInstalled?
+      if checkNode? && checkGit?
+        return true
+      end
+      false
     end
     
-    def checkGit
-      git_version = "git version 1.8.5.2"
-      out = `git --version`
-      out[0] = ''
+    
+    def checkNode?
+      req_version = "0.10.0"
       begin
+        out = `node --version`
+        out[0] = ''
         actual_version = Semantic::Version.new out
       rescue
-        console.warn("Doesn't look like node is installed in your system." + 
-          "Unfotunately nutella can't do much unless all the dependencies are installed. :(")
+        console.warn "Doesn't look like node is installed in your system. " + 
+          "Unfotunately nutella can't do much unless all the dependencies are installed. :("
+          return
       end
-      required_version = Semantic::Version.new "0.10.0" 
+      required_version = Semantic::Version.new req_version 
       if actual_version < required_version
-        console.warn("Your version of node is a little old. Nutella requires #{node_version}. Please upgrade!")
+        console.warn "Your version of node is a little old (#{actual_version}). Nutella requires #{required_version}. Please upgrade!"
+        return
       else
-        console.success("Your node version is #{actual_version}. Yay!")
+        console.info "Your node version is #{actual_version}. Yay!"
+        true
       end
     end
     
-    def checkNode
-      node_version = "0.10.0"
-      out = `node --version`
-      out[0] = ''
+    
+    def checkGit?
+      req_version = "1.8.0"
       begin
-        actual_version = Semantic::Version.new out
+        out = `git --version`
+        out.slice!(0,12)
+        actual_version = Semantic::Version.new out[0..4]
       rescue
-        console.warn("Doesn't look like node is installed in your system." + 
-          "Unfotunately nutella can't do much unless all the dependencies are installed. :(")
+        console.warn "Doesn't look like git is installed in your system. " + 
+          "Unfotunately nutella can't do much unless all the dependencies are installed. :("
+          return
       end
-      required_version = Semantic::Version.new "0.10.0" 
+      required_version = Semantic::Version.new req_version
       if actual_version < required_version
-        console.warn("Your version of node is a little old. Nutella requires #{node_version}. Please upgrade!")
+        console.warn "Your version of git is a little old (#{actual_version}). Nutella requires #{required_version}. Please upgrade!"
+        return
       else
-        console.success("Your node version is #{actual_version}. Yay!")
+        console.info "Your git version is #{actual_version}. Yay!" 
+        true
       end
     end
+    
+    
   end
 end
 
