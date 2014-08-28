@@ -10,33 +10,34 @@ module Nutella
   
     def run(args=nil)
       # Is current directory a nutella prj?
-      if !nutellaPrj?
-        return 1
+      if !Nutella.currentProject.exist?
+        return
       end
     
       # Check args
       if args.empty?
-        console.warn("You need to specify a template name, directory or URL")
-        return 0
+        console.warn "You need to specify a template name, directory or URL"
+        return
       end
       @template = args[0]
       if args.length==2
         @destinationFolder = args[1]
       end
+      
+      # Extract project directory
+      @prj_dir = Nutella.currentProject.dir
     
       # What kind of template are we handling?
       if isTemplateALocalDir?
-        return addLocalTemplate
+        addLocalTemplate
       elsif isTemplateAGitRepo?
-        return addRemoteTemplate
+        addRemoteTemplate
       elsif isTemplateInCentralDB?
-        return addCentralTemplate
+        addCentralTemplate
       else
-        console.warn("The specified template is not a valid nutella template")
-        return 1
+        console.warn "The specified template is not a valid nutella template"
       end
-  
-      return 0
+      
     end
     
     
@@ -56,7 +57,7 @@ module Nutella
       begin
         dest_dir = @template[@template.rindex("/")+1 .. @template.length-5]
         cloneTemplateFromRemoteTo(dest_dir)
-        return validateTemplate(nutella.tmp_dir+"/#{dest_dir}")
+        return validateTemplate("#{Nutella.config["tmp_dir"]}/#{dest_dir}")
       rescue
         return false 
       end
@@ -79,8 +80,8 @@ module Nutella
     end  
   
 
-    def addLocalTemplate(dir)
-      templateNutellaFileJson = JSON.parse(IO.read("#{dir}/nutella.json"))
+    def addLocalTemplate
+      templateNutellaFileJson = JSON.parse(IO.read("#{@template}/nutella.json"))
     
       # If destination is not specified, set it to the template name
       if @destinationFolder==nil
@@ -97,20 +98,17 @@ module Nutella
       end
       if File.directory?(dest_dir)
         console.error("Folder #{dest_dir} aready exists! Can't add template #{@template}")
-        return 1
+        return
       end
-      FileUtils.copy_entry dir, dest_dir
-      dir.slice!(@prj_dir)
+      FileUtils.copy_entry @template, dest_dir
       # TODO improve this message
       console.success("Installed template: #{@template} as #{dest_dir}")
-      return 0
     end
   
   
     def addRemoteTemplate
       templ_name = @template[@template.rindex("/")+1 .. @template.length-5]
-      addLocalTemplate nutella.tmp_dir+"/#{templ_name}"
-      return 0
+      addLocalTemplate "#{Nutella.config["tmp_dir"]}/#{templ_name}"
     end
   
   
@@ -120,14 +118,11 @@ module Nutella
   
   
     def cloneTemplateFromRemoteTo(dest_dir)
-      nutella.loadConfig
-      nutella.tmp_dir = "#{nutella.home_dir}/.tmp"
-      nutella.storeConfig
       cleanTmpDir
-      if !Dir.exists?(nutella.tmp_dir)
-        Dir.mkdir(nutella.tmp_dir)
+      if !Dir.exists?(Nutella.config["tmp_dir"])
+        Dir.mkdir(Nutella.config["tmp_dir"])
       end
-      Git.clone(@template, dest_dir, :path => nutella.tmp_dir)
+      Git.clone(@template, dest_dir, :path => Nutella.config["tmp_dir"])
     end
     
     
@@ -152,8 +147,7 @@ module Nutella
   
   
     def cleanTmpDir
-      nutella.loadConf
-      FileUtils.rm_rf(nutella.tmp_dir)
+      FileUtils.rm_rf Nutella.config["tmp_dir"]
     end
   
   end
