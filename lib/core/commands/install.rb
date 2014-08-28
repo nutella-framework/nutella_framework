@@ -38,6 +38,9 @@ module Nutella
   
       return 0
     end
+    
+    
+    private
   
   
     def isTemplateALocalDir?

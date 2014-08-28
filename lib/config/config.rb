@@ -37,6 +37,11 @@ module Nutella
       hash.to_s
     end
     
+    def to_h
+      hash = loadConfig
+      hash
+    end
+    
     private
     
     def storeConfig(hash)

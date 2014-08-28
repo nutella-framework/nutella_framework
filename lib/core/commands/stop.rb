@@ -7,22 +7,25 @@ module Nutella
   
     def run(args=nil)
       # Is current directory a nutella prj?
-      if !nutellaPrj?
-        return 1
+      if !Nutella.currentProject.exist?
+        return
       end
     
       # Extract runid
-      runid = args[0].to_s.empty? ? prj_config("name") : prj_config("name") + "_" + args[0]
+      runid = args[0].to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + args[0]
     
-      # Remove from the list of runs and if running on internal broker, stop it
-      if removeFromRunsList(runid)==runid
-        if isRunsListEmpty? and nutella.broker == "localhost" # Are we using the internal broker
-          stopBroker
-        end
-      else
-        console.log "Run #{runid} doesn't exist. Impossible to stop it."
-        return 0
+      # Remove from the list of runs
+      if Nutella.runlist.delete?(runid).nil?
+        console.warn "Run #{runid} doesn't exist. Impossible to stop it."
+        return
       end
+      # Are we using the internal broker? If yes, stop it
+      if Nutella.runlist.empty? and Nutella.config['broker'] == "localhost" 
+        stopBroker
+      end
+      
+      # Extract project directory
+      @prj_dir = Nutella.currentProject.dir
     
       # Stops all the bots
       Tmux.killSession(runid)
@@ -31,18 +34,19 @@ module Nutella
       File.delete("#{@prj_dir}/.botsconfig.json") if File.exist?("#{@prj_dir}/.botsconfig.json")
     
       # Output success message
-      if runid == prj_config("name")
-        console.success + "Project " + prj_config("name") + " stopped"
+      if runid == Nutella.currentProject.config["name"]
+        console.success "Project #{Nutella.currentProject.config["name"]} stopped"
       else
-        console.success + "Project " + prj_config("name") + ", run " + args[0] + " stopped"
+        console.success "Project #{Nutella.currentProject.config["name"]}, run #{args[0]} stopped"
       end
-    
-      # Return 0 for success
-      return 0
     end
   
+    
+    private
+  
+  
     def stopBroker
-      pidFile = "#{nutella.home_dir}/broker/bin/.pid";
+      pidFile = "#{Nutella.config["broker_dir"]}/bin/.pid"
       if File.exist?(pidFile) # Does the broker pid file exist?
         pidF = File.open(pidFile, "rb")
         pid = pidF.read.to_i

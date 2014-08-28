@@ -35,6 +35,11 @@ module Nutella
         end
     end
     
+    # Returns current project directory
+    def dir
+      Dir.pwd
+    end
+    
   end
   
   

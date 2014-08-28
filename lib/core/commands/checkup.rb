@@ -26,6 +26,10 @@ module Nutella
       Nutella.config["ready"] = true
       console.success("All systems go! You are ready to use nutella!")
     end
+    
+  
+    private 
+    
   
     def installBroker    
       # Clone, cd and npm install

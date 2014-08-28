@@ -31,8 +31,10 @@ module Nutella
       Dir.chdir @prj_dir  # CD into the project
       # Display a nice success message and return
       console.success "Your new project #{@prj_dir} is ready!" 
-      return 0 
     end
+    
+    
+    private 
   
   
     def createDirStructure

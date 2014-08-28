@@ -7,22 +7,25 @@ module Nutella
   
     def run(args=nil)
       # Is current directory a nutella prj?
-      if !nutellaPrj?
-        return 1
+      if !Nutella.currentProject.exist?
+        return
       end
     
       # Extract runid
-      runid = args[0].to_s.empty? ? prj_config("name") : prj_config("name") + "_" + args[0]
+      runid = args[0].to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + args[0]
     
       # Add to the list of runs and check the runId is unique
-      if !addToRunsList(runid)
-        console.error "Impossible to start project: an instance of this project with the same name is already running!
-  You might want to kill it with 'nutella stop "+ runid + "'"
-        return 0;
+      if !Nutella.runlist.add?(runid)
+        console.error "Impossible to start project: an instance of this project with the same name is already running!"
+        console.error "You might want to kill it with 'nutella stop "+ runid + "'"
+        return;
       end
+      
+      # Extract project directory
+      @prj_dir = Nutella.currentProject.dir
     
       # If running on internal broker, start it
-      if nutella.broker == "localhost" # Are we using the internal broker
+      if Nutella.config["broker"] == "localhost" # Are we using the internal broker
         startBroker
       end
     
@@ -42,18 +45,19 @@ module Nutella
       end
     
       # Output success message
-      if runid == prj_config("name")
-        console.success "Project " + prj_config("name") + " started"
+      if runid == Nutella.currentProject.config["name"]
+        console.success "Project " + Nutella.currentProject.config["name"] + " started"
       else
-        console.success "Project " + prj_config("name") + ", run " + args[0] + " started"
+        console.success "Project " + Nutella.currentProject.config["name"] + ", run " + args[0] + " started"
       end
-
-      # Return 0 for success
-      return 0
     end
+    
+    
+    private
+  
   
     def startBroker
-      pidFile = "#{nutella.home_dir}/broker/bin/.pid";
+      pidFile = "#{Nutella.config["broker_dir"]}/bin/.pid"
       if File.exist?(pidFile) # Does the broker pid file exist?
         pidF = File.open(pidFile, "rb")
         pid = pidF.read.to_i
@@ -74,14 +78,13 @@ module Nutella
   
     def startAndCreatePid()
       pid = fork
-      exec("#{nutella.home_dir}/broker/startup") if pid.nil?  
+      exec("#{Nutella.config["broker_dir"]}/startup") if pid.nil?  
     end
   
     def createBotsConfig
-      nutella.loadConfig
-      botsconfig = nutella.to_h
+      botsconfig = Nutella.config.to_h
       botsconfig.delete(:runs)
-      botsconfig[:prj_name] = prj_config("name")
+      botsconfig[:prj_name] = Nutella.currentProject.config["name"]
       File.open("#{@prj_dir}/.botsconfig.json", "w") do |f|
         f.write(JSON.pretty_generate(botsconfig))
       end
