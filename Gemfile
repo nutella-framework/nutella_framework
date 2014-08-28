@@ -6,7 +6,7 @@ gem 'logging', '~> 1.8', '>=1.8.2'
 
 group :development do
   gem 'shoulda', '~> 3', '>= 3'
-  gem 'rdoc', '~> 3.12', '>= 3.12'
+  gem 'rdoc', '~> 4.0', '>= 4.0'
   gem 'bundler', '~> 1.0', '>= 1.0'
   gem 'jeweler', '~> 2.0.1', '>= 2.0.1'
   gem 'simplecov', '~> 0', '>= 0'
