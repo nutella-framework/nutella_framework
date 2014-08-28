@@ -46,55 +46,41 @@ module Nutella
       return out1 && out2
     end
     
-    
-    # TODO we should refactor the code into a common check method and pass the "trimming operations"" as a lambda
     def allDependenciesInstalled?
-      if checkNode? && checkGit?
+      # Node version lambda
+      node_semver = lambda do
+        out = `node --version`
+        out[0] = ''
+        Semantic::Version.new out
+      end
+      # Git version lambda
+      git_semver = lambda do
+        out = `git --version`
+        out.slice!(0,12)
+        Semantic::Version.new out[0..4]
+      end
+      # Check versions
+      if checkVersion?("node", "0.10.0", node_semver) && checkVersion?("git", "1.8.0", git_semver)
         return true
       end
       false
     end
     
     
-    def checkNode?
-      req_version = "0.10.0"
+    def checkVersion?(dep, req_version, lambda)
       begin
-        out = `node --version`
-        out[0] = ''
-        actual_version = Semantic::Version.new out
+        actual_version = lambda.call
       rescue
-        console.warn "Doesn't look like node is installed in your system. " + 
-          "Unfotunately nutella can't do much unless all the dependencies are installed. :("
+        console.warn "Doesn't look like #{dep} is installed in your system. " + 
+          "Unfotunately nutella can't do much unless all the dependencies are installed :("
           return
       end
       required_version = Semantic::Version.new req_version 
       if actual_version < required_version
-        console.warn "Your version of node is a little old (#{actual_version}). Nutella requires #{required_version}. Please upgrade!"
+        console.warn "Your version of #{dep} is a little old (#{actual_version}). Nutella requires #{required_version}. Please upgrade!"
         return
       else
-        console.info "Your node version is #{actual_version}. Yay!"
-        true
-      end
-    end
-    
-    
-    def checkGit?
-      req_version = "1.8.0"
-      begin
-        out = `git --version`
-        out.slice!(0,12)
-        actual_version = Semantic::Version.new out[0..4]
-      rescue
-        console.warn "Doesn't look like git is installed in your system. " + 
-          "Unfotunately nutella can't do much unless all the dependencies are installed. :("
-          return
-      end
-      required_version = Semantic::Version.new req_version
-      if actual_version < required_version
-        console.warn "Your version of git is a little old (#{actual_version}). Nutella requires #{required_version}. Please upgrade!"
-        return
-      else
-        console.info "Your git version is #{actual_version}. Yay!" 
+        console.info "Your #{dep} version is #{actual_version}. Yay!"
         true
       end
     end

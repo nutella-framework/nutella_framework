@@ -101,7 +101,6 @@ module Nutella
         return
       end
       FileUtils.copy_entry @template, dest_dir
-      # TODO improve this message
       console.success("Installed template: #{@template} as #{dest_dir}")
     end
   
@@ -139,8 +138,6 @@ module Nutella
         if !File.executable?("#{dir}/startup")
           return false
         end
-        # TODO if there is a dependencies script, make sure it's executable
-        # TODO if there is a compile script, make usre it's executable
       end 
       true
     end
