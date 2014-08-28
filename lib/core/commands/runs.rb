@@ -8,12 +8,12 @@ module Nutella
     def run(args=nil)
       # If no argument show the full runs list
       if args.empty?
-        puts "Currently running:"
-        puts getRunsList   
+        console.info "Currently running:"
+        console.info getRunsList   
       else
         runs = getRunsList(args[0])
-        puts "Currently running #{runs.length} instances of project #{args[0]}:"
-        puts runs
+        console.info "Currently running #{runs.length} instances of project #{args[0]}:"
+        console.info runs
       end
     
       return 0

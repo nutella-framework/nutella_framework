@@ -16,7 +16,7 @@ module Nutella
       end
     
       # Output message
-      puts ANSI.green + "All systems go! You are ready to use nutella!" + ANSI.reset
+      console.success("All systems go! You are ready to use nutella!")
       
       return 0
     end
@@ -47,14 +47,14 @@ module Nutella
       begin
         actual_version = Semantic::Version.new out
       rescue
-        raise CommandException.new(:warn), "Doesn't look like node is installed in your system." + 
-          "Unfotunately nutella can't do much unless all the dependencies are installed. :("
+        console.warn("Doesn't look like node is installed in your system." + 
+          "Unfotunately nutella can't do much unless all the dependencies are installed. :(")
       end
       required_version = Semantic::Version.new "0.10.0" 
       if actual_version < required_version
-        raise CommandException.new(:warn), "Your version of node is a little old. Nutella requires #{node_version}. Please upgrade!"
+        console.warn("Your version of node is a little old. Nutella requires #{node_version}. Please upgrade!")
       else
-        raise CommandException.new(:success), "Your node version is #{actual_version}. Yay!"
+        console.success("Your node version is #{actual_version}. Yay!")
       end
     end
     
@@ -65,14 +65,14 @@ module Nutella
       begin
         actual_version = Semantic::Version.new out
       rescue
-        raise CommandException.new(:warn), "Doesn't look like node is installed in your system." + 
-          "Unfotunately nutella can't do much unless all the dependencies are installed. :("
+        console.warn("Doesn't look like node is installed in your system." + 
+          "Unfotunately nutella can't do much unless all the dependencies are installed. :(")
       end
       required_version = Semantic::Version.new "0.10.0" 
       if actual_version < required_version
-        raise CommandException.new(:warn), "Your version of node is a little old. Nutella requires #{node_version}. Please upgrade!"
+        console.warn("Your version of node is a little old. Nutella requires #{node_version}. Please upgrade!")
       else
-        raise CommandException.new(:success), "Your node version is #{actual_version}. Yay!"
+        console.success("Your node version is #{actual_version}. Yay!")
       end
     end
   end

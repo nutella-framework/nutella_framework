@@ -16,7 +16,7 @@ module Nutella
     
       # Check args
       if args.empty?
-        puts ANSI.yellow + "You need to specify a template name, directory or URL" + ANSI.reset
+        console.warn("You need to specify a template name, directory or URL")
         return 0
       end
       @template = args[0]
@@ -32,7 +32,7 @@ module Nutella
       elsif isTemplateInCentralDB?
         return addCentralTemplate
       else
-        puts ANSI.yellow + "The specified template is not a valid nutella template" + ANSI.reset
+        console.warn("The specified template is not a valid nutella template")
         return 1
       end
   
@@ -93,13 +93,13 @@ module Nutella
         dest_dir = "#{@prj_dir}/interfaces/#{@destinationFolder}"
       end
       if File.directory?(dest_dir)
-        puts ANSI.red + "Folder #{dest_dir} aready exists! Can't add template #{@template}" + ANSI.reset
+        console.error("Folder #{dest_dir} aready exists! Can't add template #{@template}")
         return 1
       end
       FileUtils.copy_entry dir, dest_dir
       dir.slice!(@prj_dir)
       # TODO improve this message
-      puts ANSI.green + "Installed template: #{@template} as #{dest_dir}" + ANSI.reset
+      console.success("Installed template: #{@template} as #{dest_dir}")
       return 0
     end
   

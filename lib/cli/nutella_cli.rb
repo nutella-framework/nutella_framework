@@ -22,30 +22,15 @@ module Nutella
         printPrompt
         exit 0
       end
-      begin
-        Nutella.executeCommand ARGV.first, args
-      rescue CommandException => e 
-        if e.log_level==:error
-          puts ANSI.red + e.message + ANSI.reset
-        elsif e.log_level==:warn
-          puts ANSI.yellow + e.message + ANSI.reset
-        elsif e.log_level==:info
-          puts e.message
-        elsif e.log_level==:success
-          puts ANSI.green + e.message + ANSI.reset
-        end
-        exitStatus = 1
-      end
-      exitStatus = 0
-      puts ""
-      exit exitStatus
+      Nutella.executeCommand ARGV.first, args
+      exit 0
     end
   
     # Print Nutella logo
     def self.printPrompt
-      puts NUTELLA_LOGO
+      console.info(NUTELLA_LOGO)
       nutella_version = File.open(NUTELLA_HOME+"VERSION", "rb").read
-      puts "Welcome to nutella version #{nutella_version}! For a complete lists of available commands type `nutella help`\n\n"
+      console.info("Welcome to nutella version #{nutella_version}! For a complete lists of available commands type `nutella help`\n\n")
     end
   end
 

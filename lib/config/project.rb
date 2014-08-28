@@ -15,11 +15,11 @@ module Nutella
       if File.exist?("#{@prj_dir}/conf/project.json")
         conf = JSON.parse( IO.read("#{@prj_dir}/conf/project.json") )
         if conf["nutella_version"].nil?
-          puts ANSI.yellow + "The current directory is not a Nutella project" + ANSI.reset 
+          console.warn("The current directory is not a Nutella project") 
           return false
         end
       else
-        puts ANSI.yellow + "The current directory is not a Nutella project" + ANSI.reset 
+        console.warn("The current directory is not a Nutella project")
         return false
       end
       return true

@@ -10,27 +10,26 @@ module Nutella
     
       # If no other arguments, show help and quit here
       if args.empty?
-        puts ANSI.yellow + "You need to specify a name for your new project" + ANSI.reset
+        console.warn "You need to specify a name for your new project"
         return 64
       end
     
       # Does a project/directory with the same name exist already?
       if File.directory?(@prj_dir)
         if File.exist?("#{@prj_dir}/conf/project.json")
-          puts "A project named #{@prj_dir} already exists"
+          console.info "A project named #{@prj_dir} already exists"
           return 0
         else
-          puts "A directory named #{@prj_dir} already exists, impossible to create a new project in the same directory"
+          console.info "A directory named #{@prj_dir} already exists, impossible to create a new project in the same directory"
           return 1
         end
       end
     
       # Generate project structure
-      print "Generating project structure..."
       @cur_dir = Dir.pwd  # Store current directory
       createDirStructure  # Create project directory structure
       Dir.chdir @prj_dir  # CD into the project
-      puts " DONE"
+      console.log "Generated project structure"
     
       # Add templates
       # puts "Adding templates..."
@@ -41,7 +40,7 @@ module Nutella
   #       return ret_val
   #     end
     
-      puts ANSI.green + "Your new project #{@prj_dir} is ready!" + ANSI.reset   # Display a nice success message and return
+      console.succes "Your new project #{@prj_dir} is ready!" # Display a nice success message and return
       return 0 
     end
   
@@ -63,7 +62,7 @@ module Nutella
   
     def removeDirStructure
       Dir.chdir @cur_dir
-      puts "Removing project #{@prj_dir}"
+      console.info "Removing project #{@prj_dir}"
       FileUtils.rm_rf(@prj_dir)
     end
   

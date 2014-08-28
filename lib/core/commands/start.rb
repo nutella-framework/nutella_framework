@@ -16,8 +16,8 @@ module Nutella
     
       # Add to the list of runs and check the runId is unique
       if !addToRunsList(runid)
-        puts ANSI.red + "Impossible to start project: an instance of this project with the same name is already running!
-  You might want to kill it with 'nutella stop "+ runid + "'" + ANSI.reset
+        console.error "Impossible to start project: an instance of this project with the same name is already running!
+  You might want to kill it with 'nutella stop "+ runid + "'"
         return 0;
       end
     
@@ -35,7 +35,7 @@ module Nutella
       tmux = Tmux.new(runid)
       Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
         if !File.exist?("#{@prj_dir}/bots/#{bot}/startup")
-          puts ANSI.yellow + "Impossible to start bot #{bot}. Couldn't locate 'startup' script." + ANSI.reset
+          console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
           next
         end
         tmux.newWindow(bot)
@@ -43,9 +43,9 @@ module Nutella
     
       # Output success message
       if runid == prj_config("name")
-        puts ANSI.green + "Project " + prj_config("name") + " started" + ANSI.reset
+        console.success "Project " + prj_config("name") + " started"
       else
-        puts ANSI.green + "Project " + prj_config("name") + ", run " + args[0] + " started" + ANSI.reset 
+        console.success "Project " + prj_config("name") + ", run " + args[0] + " started"
       end
 
       # Return 0 for success

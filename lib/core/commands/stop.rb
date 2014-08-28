@@ -20,7 +20,7 @@ module Nutella
           stopBroker
         end
       else
-        puts ANSI.yellow + "Run #{runid} doesn't exist. Impossible to stop it." + ANSI.reset
+        console.log "Run #{runid} doesn't exist. Impossible to stop it."
         return 0
       end
     
@@ -32,9 +32,9 @@ module Nutella
     
       # Output success message
       if runid == prj_config("name")
-        puts ANSI.green + "Project " + prj_config("name") + " stopped" + ANSI.reset
+        console.success + "Project " + prj_config("name") + " stopped"
       else
-        puts ANSI.green + "Project " + prj_config("name") + ", run " + args[0] + " stopped" + ANSI.reset 
+        console.success + "Project " + prj_config("name") + ", run " + args[0] + " stopped"
       end
     
       # Return 0 for success

@@ -3,12 +3,10 @@ require 'helper'
 module Nutella
   class TestNutellaFramework < MiniTest::Test
     
-    should "run help correctly" do
-      Nutella.init
-      e = assert_raises HelpOutException do
-        Nutella.executeCommand "help"
-      end
-    end
+    # should "run help correctly" do
+#       Nutella.init
+#       Nutella.executeCommand "help"
+#     end
 
     
     # should "Verify the installation" do
