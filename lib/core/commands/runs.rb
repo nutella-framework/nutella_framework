@@ -8,15 +8,17 @@ module Nutella
     def run(args=nil)
       # If no argument show the full runs list
       if args.empty?
-        console.info "Currently running:"
-        console.info getRunsList   
+        if Nutella.runlist.empty?
+          console.info "You are not running any projects."
+        else
+          console.info "Currently running:"
+          console.info Nutella.runlist.to_a   
+        end
       else
-        runs = getRunsList(args[0])
+        runs = Nutella.runlist.to_a args[0]
         console.info "Currently running #{runs.length} instances of project #{args[0]}:"
         console.info runs
       end
-    
-      return 0
     end
   end
   

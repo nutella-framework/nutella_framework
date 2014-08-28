@@ -4,6 +4,7 @@ require 'core/nutella_core'
 require 'cli/nutella_cli'
 require 'config/config'
 require 'config/runlist'
+require 'config/project'
 
 module Nutella
   NUTELLA_HOME = File.dirname(__FILE__)+"/../"

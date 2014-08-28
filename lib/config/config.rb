@@ -1,15 +1,15 @@
 # This handles the configuration files of Nutella
 # It's basically a hash overload that stores into a file
-require 'singleton'
 require 'json'
 
 module Nutella
   
   class ConfigHash
     
-    CONFIG_FILE=File.dirname(__FILE__)+"/../../config.json"
+    def initialize(file)
+      @config_file=file
+    end
     
-    include Singleton
     
     def []=(key,val)
       hash = loadConfig
@@ -40,14 +40,14 @@ module Nutella
     private
     
     def storeConfig(hash)
-      File.open(CONFIG_FILE, "w+") do |f|
+      File.open(@config_file, "w+") do |f|
         f.write(JSON.pretty_generate(hash))
       end
     end
     
     def loadConfig   
       begin
-        return JSON.parse IO.read CONFIG_FILE
+        return JSON.parse IO.read @config_file
       rescue
         # File doesn't exist... do nothing
         Hash.new
@@ -55,13 +55,13 @@ module Nutella
     end
     
     def removeConfigFile
-      File.delete(CONFIG_FILE) if File.exist?(CONFIG_FILE)
+      File.delete(@config_file) if File.exist?(@config_file)
     end
     
   end
   
   def Nutella.config
-    ConfigHash.instance
+    ConfigHash.new(File.dirname(__FILE__)+"/../../config.json")
   end
   
 end

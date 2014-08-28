@@ -10,18 +10,18 @@ module Nutella
     
       # If no other arguments, show help and quit here
       if args.empty?
-        console.warn "You need to specify a name for your new project"
-        return 64
+        console.warn "You need to specify a name for your new project. Can't create project."
+        return
       end
     
       # Does a project/directory with the same name exist already?
       if File.directory?(@prj_dir)
         if File.exist?("#{@prj_dir}/conf/project.json")
-          console.info "A project named #{@prj_dir} already exists"
-          return 0
+          console.warn "A project named #{@prj_dir} already exists. Can't create project."
+          return
         else
-          console.info "A directory named #{@prj_dir} already exists, impossible to create a new project in the same directory"
-          return 1
+          console.warn "A directory named #{@prj_dir} already exists. Can't create project."
+          return
         end
       end
     
@@ -29,18 +29,8 @@ module Nutella
       @cur_dir = Dir.pwd  # Store current directory
       createDirStructure  # Create project directory structure
       Dir.chdir @prj_dir  # CD into the project
-      console.log "Generated project structure"
-    
-      # Add templates
-      # puts "Adding templates..."
-  #     ret_val = NutellaCLI.executeCommand("add", ["#{nutella.home_dir}/deps/broker", "bots"])
-  #     if ret_val != 0
-  #       puts "Couldn't add template #{nutella.home_dir}/deps/broker"
-  #       removeDirStructure
-  #       return ret_val
-  #     end
-    
-      console.succes "Your new project #{@prj_dir} is ready!" # Display a nice success message and return
+      # Display a nice success message and return
+      console.success "Your new project #{@prj_dir} is ready!" 
       return 0 
     end
   
@@ -51,7 +41,7 @@ module Nutella
       FileUtils.mkdir_p("#{@prj_dir}/conf")       # conf dir
       # create base configuration file
       config_file_hash = {
-        "nutella_version" => "#{nutella.version}",
+        "nutella_version" => File.open(NUTELLA_HOME+"VERSION", "rb").read,
         "name" => @prj_dir,
         "version" => "0.1.0-SNAPSHOT"
       }
