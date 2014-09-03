@@ -59,8 +59,16 @@ module Nutella
         out.slice!(0,12)
         Semantic::Version.new out[0..4]
       end
+      # Tmux version lambda
+      tmux_semver = lambda do
+        out = `tmux -V`
+        out.slice!(0,5)
+        Semantic::Version.new "#{out[0..2]}.0"
+      end
       # Check versions
-      if checkVersion?("node", "0.10.0", node_semver) && checkVersion?("git", "1.8.0", git_semver)
+      if checkVersion?("node", "0.10.0", node_semver) \
+        and checkVersion?("git", "1.8.0", git_semver) \
+        and checkVersion?("tmux", "1.8.0", tmux_semver) 
         return true
       end
       false

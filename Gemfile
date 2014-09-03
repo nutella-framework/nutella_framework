@@ -7,6 +7,7 @@ gem 'git', '~> 1.2', '>=1.2.8'
 
 group :development do
   gem 'shoulda', '~> 3', '>= 3'
+  gem "yard", '~> 0.8', '>= 0.8.7'
   gem 'rdoc', '~> 4.0', '>= 4.0'
   gem 'bundler', '~> 1.0', '>= 1.0'
   gem 'jeweler', '~> 2.0.1', '>= 2.0.1'

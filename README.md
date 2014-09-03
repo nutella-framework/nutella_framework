@@ -32,7 +32,7 @@ nutella start
 Pretty boring isn't it? Nothing is happeninig! Why? Well, because the project we just created is simply an empty shell. Let's spice things up a bit and throw some cinnamon into this crêpe!
 
 ## Templates
-What are templates? Templates are, well... templates! They are simply [boilerplate code](http://en.wikipedia.org/wiki/Boilerplate_code) which you don't have to write! Templates are there to simplify your life. Let's see how. Suppose our applicaiton 
+What are templates? Templates are simply [boilerplate code](http://en.wikipedia.org/wiki/Boilerplate_code) that you don't have to write.  Templates are there to simplify your life. Let's see how. Our new application is a ...
 **This tutorial is a work in progress**
 
 
