@@ -15,7 +15,7 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://guides.rubygems.org/specification-reference/ for more options
   gem.name = "nutella_framework"
-  gem.homepage = "https://github.com/ltg-uic/nutella_framework"
+  gem.homepage = "https://github.com/nutella-framework/nutella_framework"
   gem.license = "MIT"
   gem.summary = %Q{IoT-like learning applications framework}
   gem.description = %Q{Nutella is a framework to build and run "Internet of Things"-like learning applications}

@@ -66,7 +66,7 @@ module Nutella
   
   
     def isTemplateInCentralDB?
-      uri = URI.parse("https://raw.githubusercontent.com/ltg-uic/nutella/templates-database/" + @template + ".json")
+      uri = URI.parse("https://raw.githubusercontent.com/nutella-framework/nutella_framework/templates-database/" + @template + ".json")
       begin
         nutella_json = JSON.parse(Net::HTTP.get(uri))
         if nutella_json["name"]==@template
