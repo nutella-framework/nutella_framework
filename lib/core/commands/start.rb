@@ -10,53 +10,34 @@ module Nutella
       if !Nutella.currentProject.exist?
         return
       end
-    
-      runid = extractRunId args[0]
-    
+      runid = Nutella.runlist.extractRunId args[0]
       # Add to the list of runs and check the runId is unique
-      if !Nutella.runlist.add?(runid)
-        console.error "Impossible to start project: an instance of this project with the same name is already running!"
-        console.error "You might want to kill it with 'nutella stop "+ runid + "'"
-        return;
-      end
-      
+      addToRunsList(runid)
       # Extract project directory
       @prj_dir = Nutella.currentProject.dir
-    
       # If running on internal broker, start it
       if Nutella.config["broker"] == "localhost" # Are we using the internal broker
         startBroker
       end
-    
       # Create .botsconfig file
       deleteBotsConfig
       createBotsConfig
-    
-    
       # Start all the bots
-      tmux = Tmux.new(runid)
-      Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
-        if !File.exist?("#{@prj_dir}/bots/#{bot}/startup")
-          console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
-          next
-        end
-        tmux.newWindow(bot)
-      end
-    
+      startBots(runid)
       # Output success message
-      if runid == Nutella.currentProject.config["name"]
-        console.success "Project " + Nutella.currentProject.config["name"] + " started"
-      else
-        console.success "Project " + Nutella.currentProject.config["name"] + ", run " + args[0] + " started"
-      end
+      outputSuccessMessage(runid, args[0])
     end
     
     
     private
     
     
-    def extractRunId(run)
-      run.to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + run
+    def addToRunsList(runid)
+      if !Nutella.runlist.add?(runid)
+        console.error "Impossible to start project: an instance of this project with the same name is already running!"
+        console.error "You might want to kill it with 'nutella stop "+ runid + "'"
+        return;
+      end
     end
   
   
@@ -98,6 +79,24 @@ module Nutella
       File.delete("#{@prj_dir}/.botsconfig.json") if File.exist?("#{@prj_dir}/.botsconfig.json")
     end
   
+    def startBots(runid)
+      tmux = Tmux.new(runid)
+      Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
+        if !File.exist?("#{@prj_dir}/bots/#{bot}/startup")
+          console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
+          next
+        end
+        tmux.newWindow(bot)
+      end
+    end
+    
+    def outputSuccessMessage(runid, run)
+      if runid == Nutella.currentProject.config["name"]
+        console.success "Project " + Nutella.currentProject.config["name"] + " started"
+      else
+        console.success "Project " + Nutella.currentProject.config["name"] + ", run " + run + " started"
+      end
+    end
    
   end
   

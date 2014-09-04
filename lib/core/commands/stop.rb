@@ -9,7 +9,8 @@ module Nutella
       if !Nutella.currentProject.exist? 
         return
       end
-      runid = extractRunId args[0]
+      runid = Nutella.runlist.extractRunId args[0]
+      # Removes the run from the list of runs if it exists
       removeRunfromList(runid, args[0]) 
       # Stop broker if needed
       if Nutella.runlist.empty? and Nutella.config['broker'] == "localhost" 
@@ -26,9 +27,7 @@ module Nutella
     
     private
     
-    def extractRunId(run)
-      run.to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + run
-    end
+    
     
     def removeRunfromList(runid, run) 
       if Nutella.runlist.delete?(runid).nil?

@@ -62,6 +62,10 @@ module Nutella
       end
     end
     
+    def extractRunId(run)
+      run.to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + run
+    end
+    
     private 
     
     def removeRunListFile
