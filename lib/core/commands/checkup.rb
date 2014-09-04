@@ -46,6 +46,7 @@ module Nutella
       return out1 && out2
     end
     
+    
     def allDependenciesInstalled?
       # Node version lambda
       node_semver = lambda do

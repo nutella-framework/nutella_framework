@@ -16,7 +16,11 @@ module Nutella
     
       # Remove from the list of runs
       if Nutella.runlist.delete?(runid).nil?
-        console.warn "Run #{runid} doesn't exist. Impossible to stop it."
+        if runid == Nutella.currentProject.config["name"]
+          console.warn "Run #{runid} doesn't exist. Impossible to stop it."
+        else
+          console.warn "Run #{args[0]} doesn't exist. Impossible to stop it."
+        end
         return
       end
       # Are we using the internal broker? If yes, stop it
