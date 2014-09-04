@@ -19,13 +19,7 @@ module Nutella
         # No file, create one
         result = [runid].to_set
       end
-      if result!=nil
-        File.open(RUN_LIST_FILE, "w+") do |f|
-          f.write(JSON.pretty_generate(result.to_a))
-        end
-        File.chmod(0777, RUN_LIST_FILE)
-      end
-      result
+      writeFile(result)
     end
 
     def delete?(runid)
@@ -35,13 +29,7 @@ module Nutella
         removeRunListFile
         result = nil # List is empty, so nil
       end
-      if result!=nil
-        File.open(RUN_LIST_FILE, "w+") do |f|
-          f.write(JSON.pretty_generate(result.to_a))
-        end
-        File.chmod(0777, RUN_LIST_FILE)
-      end
-      result
+      writeFile(result)
     end
 
     def include?(runid)
@@ -78,6 +66,16 @@ module Nutella
     
     def removeRunListFile
       File.delete(RUN_LIST_FILE) if File.exist?(RUN_LIST_FILE)
+    end
+    
+    def writeFile(result)
+      if result!=nil
+        File.open(RUN_LIST_FILE, "w+") do |f|
+          f.write(JSON.pretty_generate(result.to_a))
+        end
+        File.chmod(0777, RUN_LIST_FILE)
+      end
+      result
     end
     
   end
