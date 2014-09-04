@@ -23,6 +23,7 @@ module Nutella
         File.open(RUN_LIST_FILE, "w+") do |f|
           f.write(JSON.pretty_generate(result.to_a))
         end
+        File.chmod(0777, RUN_LIST_FILE)
       end
       result
     end
@@ -38,6 +39,7 @@ module Nutella
         File.open(RUN_LIST_FILE, "w+") do |f|
           f.write(JSON.pretty_generate(result.to_a))
         end
+        File.chmod(0777, RUN_LIST_FILE)
       end
       result
     end

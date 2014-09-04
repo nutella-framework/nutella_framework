@@ -48,6 +48,7 @@ module Nutella
       File.open(@config_file, "w+") do |f|
         f.write(JSON.pretty_generate(hash))
       end
+      File.chmod(0777,@config_file)
     end
     
     def loadConfig   
