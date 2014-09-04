@@ -11,8 +11,7 @@ module Nutella
         return
       end
     
-      # Extract runid
-      runid = args[0].to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + args[0]
+      runid = extractRunId args[0]
     
       # Add to the list of runs and check the runId is unique
       if !Nutella.runlist.add?(runid)
@@ -54,6 +53,11 @@ module Nutella
     
     
     private
+    
+    
+    def extractRunId(run)
+      run.to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + run
+    end
   
   
     def startBroker

@@ -4,50 +4,42 @@ require 'core/tmux'
 module Nutella
   class Stop < Command
     @description = "Stops all or some of the bots in the current project"
-  
+    # Is current directory a nutella prj?
     def run(args=nil)
-      # Is current directory a nutella prj?
-      if !Nutella.currentProject.exist?
+      if !Nutella.currentProject.exist? 
         return
       end
-    
-      # Extract runid
-      runid = args[0].to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + args[0]
-    
-      # Remove from the list of runs
-      if Nutella.runlist.delete?(runid).nil?
-        if runid == Nutella.currentProject.config["name"]
-          console.warn "Run #{runid} doesn't exist. Impossible to stop it."
-        else
-          console.warn "Run #{args[0]} doesn't exist. Impossible to stop it."
-        end
-        return
-      end
-      # Are we using the internal broker? If yes, stop it
+      runid = extractRunId args[0]
+      removeRunfromList(runid, args[0]) 
+      # Stop broker if needed
       if Nutella.runlist.empty? and Nutella.config['broker'] == "localhost" 
         stopBroker
       end
-      
-      # Extract project directory
-      @prj_dir = Nutella.currentProject.dir
-    
       # Stops all the bots
-      Tmux.killSession(runid)
-    
+      Tmux.killSession(runid) 
       # Deletes bots config file if it exists
-      File.delete("#{@prj_dir}/.botsconfig.json") if File.exist?("#{@prj_dir}/.botsconfig.json")
-    
+      deleteBotsConfigFile
       # Output success message
-      if runid == Nutella.currentProject.config["name"]
-        console.success "Project #{Nutella.currentProject.config["name"]} stopped"
-      else
-        console.success "Project #{Nutella.currentProject.config["name"]}, run #{args[0]} stopped"
-      end
+      outputSuccessMessage(runid, args[0])
     end
   
     
     private
-  
+    
+    def extractRunId(run)
+      run.to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + run
+    end
+    
+    def removeRunfromList(runid, run) 
+      if Nutella.runlist.delete?(runid).nil?
+        if runid == Nutella.currentProject.config["name"]
+          console.warn "Run #{runid} doesn't exist. Impossible to stop it."
+        else
+          console.warn "Run #{run} doesn't exist. Impossible to stop it."
+        end
+        return
+      end
+    end
   
     def stopBroker
       pidFile = "#{Nutella.config["broker_dir"]}/bin/.pid"
@@ -59,8 +51,21 @@ module Nutella
         File.delete(pidFile)
       end
     end
+    
+    def deleteBotsConfigFile
+      prj_dir = Nutella.currentProject.dir 
+      if File.exist?("#{prj_dir}/.botsconfig.json")
+        File.delete("#{prj_dir}/.botsconfig.json") 
+      end
+    end
+    
+    def outputSuccessMessage(runid, run)
+      if runid == Nutella.currentProject.config["name"]
+        console.success "Project #{Nutella.currentProject.config["name"]} stopped"
+      else
+        console.success "Project #{Nutella.currentProject.config["name"]}, run #{run} stopped"
+      end
+    end
   
   end
-
-  
 end
