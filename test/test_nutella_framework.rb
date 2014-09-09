@@ -3,27 +3,28 @@ require 'helper'
 module Nutella
   class TestNutellaFramework < MiniTest::Test
     
-    # should "run help correctly" do
-#       Nutella.init
-#       Nutella.executeCommand "help"
-#     end
-
+    def setup
+      Nutella.init
+    end
     
-    # should "Verify the installation" do
-#       Nutella.init
-#       Nutella.executeCommand "checkup"
-#       # e = assert_raises HelpOutException do
-# #         Nutella.executeCommand "checkup"
-# #       end
-#     end
+    # The test works but it takes to long to run it all the time
+    # should "install remote interface template correctly" do
+#       Dir.chdir NUTELLA_HOME
+#       prj_dir = "#{Dir.pwd}/test_prj"
+#       # create new project and cs into it
+#       Nutella.executeCommand "new", ["test_prj"]
+#       Dir.chdir prj_dir
+#       Nutella.executeCommand "install", ["basic-web-interface"]
+#       # Cleanup
+#       Dir.chdir NUTELLA_HOME
+#       FileUtils.rm_rf prj_dir
+#     end    
     
     
-    # should "read the broker parameter correctly" do
-#       Nutella.store_constants
-#       $stdout = StringIO.new
-#       NutellaCLI.executeCommand("broker")
-#       assert_equal "Currently using broker: localhost\n", $stdout.string
-#     end
+    def teardown
+      Nutella.config.send(:removeConfigFile)
+    end
+    
   end
 end
   

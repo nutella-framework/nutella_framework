@@ -5,6 +5,7 @@ module Nutella
   class TestProject < MiniTest::Test
     
     def setup
+      Dir.chdir NUTELLA_HOME
       Nutella.executeCommand "new", ["test_project"]
       Dir.chdir NUTELLA_HOME + "test_project"
     end

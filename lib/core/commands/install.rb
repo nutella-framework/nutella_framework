@@ -26,7 +26,6 @@ module Nutella
       
       # Extract project directory
       @prj_dir = Nutella.currentProject.dir
-    
       # What kind of template are we handling?
       if isTemplateALocalDir?
         addLocalTemplate
@@ -66,7 +65,7 @@ module Nutella
   
   
     def isTemplateInCentralDB?
-      uri = URI.parse("https://raw.githubusercontent.com/nutella-framework/nutella_framework/templates-database/" + @template + ".json")
+      uri = URI.parse("https://raw.githubusercontent.com/nutella-framework/nutella_framework/templates-database/#{@template}")
       begin
         nutella_json = JSON.parse(Net::HTTP.get(uri))
         if nutella_json["name"]==@template
@@ -107,7 +106,8 @@ module Nutella
   
     def addRemoteTemplate
       templ_name = @template[@template.rindex("/")+1 .. @template.length-5]
-      addLocalTemplate "#{Nutella.config["tmp_dir"]}/#{templ_name}"
+      @template = "#{Nutella.config["tmp_dir"]}/#{templ_name}"
+      addLocalTemplate 
     end
   
   
@@ -134,17 +134,17 @@ module Nutella
       end
       # If template is a bot, perform additional checks
       if templateNutellaFileJson["type"]=="bot"
-        # Is there a andatory 'startup' script and is it executable
+        # Is there a mandatory 'startup' script and is it executable
         if !File.executable?("#{dir}/startup")
           return false
         end
-      end 
+      end
       true
     end
   
   
     def cleanTmpDir
-      FileUtils.rm_rf Nutella.config["tmp_dir"]
+      FileUtils.rm_rf "#{Nutella.config["tmp_dir"]}"
     end
   
   end
