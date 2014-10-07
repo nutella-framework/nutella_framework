@@ -23,6 +23,8 @@ module Nutella
       deleteBotsConfig
       createBotsConfig
       # Start all the bots
+      installBotsDependencies(runid)
+      compileBots(runid)
       startBots(runid)
       # Output success message
       outputSuccessMessage(runid, args[0])
@@ -79,6 +81,32 @@ module Nutella
       File.delete("#{@prj_dir}/.botsconfig.json") if File.exist?("#{@prj_dir}/.botsconfig.json")
     end
   
+    def installBotsDependencies(runid)
+      Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
+        if !File.exist?("#{@prj_dir}/bots/#{bot}/dependencies")
+          next
+        end
+        console.info "Installing dependencies for bot #{bot}."
+        cur_dir = Dir.pwd
+        Dir.chdir "#{@prj_dir}/bots/#{bot}"
+        system "./dependencies"
+        Dir.chdir cur_dir
+      end
+    end
+    
+    def compileBots(runid)
+      Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
+        if !File.exist?("#{@prj_dir}/bots/#{bot}/compile")
+          next
+        end
+        console.info "Compiling bot #{bot}."
+        cur_dir = Dir.pwd
+        Dir.chdir "#{@prj_dir}/bots/#{bot}"
+        system "./compile"
+        Dir.chdir cur_dir
+      end
+    end
+    
     def startBots(runid)
       tmux = Tmux.new(runid)
       Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
@@ -92,7 +120,7 @@ module Nutella
     
     def outputSuccessMessage(runid, run)
       if runid == Nutella.currentProject.config["name"]
-        console.success "Project " + Nutella.currentProject.config["name"] + " started"
+        console.success "Project " + Nutella.currentProject.config["name"] + " started. Do `tmux attach-session -t #{Nutella.currentProject.config["name"]}` to monitor your bots."
       else
         console.success "Project " + Nutella.currentProject.config["name"] + ", run " + run + " started"
       end
