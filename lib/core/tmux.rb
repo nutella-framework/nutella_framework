@@ -21,7 +21,7 @@ module Nutella
       # Select window
     	`tmux select-window -t #{@runId}:#{@sessions.length-1} &> /dev/null`
       # Start bot
-      `tmux send-keys "cd bots/#{bot};./startup #{@runId}" C-m`
+      `tmux send-keys "cd bots/#{bot};./startup #{@runId} #{Nutella.config["broker"]}" C-m`
     end
   
     def self.killSession(runId)
