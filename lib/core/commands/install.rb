@@ -128,13 +128,16 @@ module Nutella
       rescue
         return false
       end
-      # If template is a bot, perform additional checks
+      # If template is a bot, perform the appropriate checks
       if template_nutella_file_json['type']=='bot'
         # Is there a mandatory 'startup' script and is it executable
-        return false unless File.executable?("#{dir}/startup")
-        # TODO additional checks for bots
+        return false unless File.executable? "#{dir}/startup"
       end
-      # TODO Check interfaces
+      # If template is an interface, perform the appropriate checks
+      if template_nutella_file_json['type']=='interface'
+        # Is there the mandatory index.html file
+        return false unless File.exist? "#{dir}/index.html"
+      end
       true
     end
 
