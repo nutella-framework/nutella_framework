@@ -61,6 +61,10 @@ module Nutella
         Array.new # There is no file or something went wrong
       end
     end
+
+    def length
+      to_a.length
+    end
     
     def extractRunId(run)
       run.to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + run

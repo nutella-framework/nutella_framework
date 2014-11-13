@@ -3,31 +3,33 @@ require 'core/tmux'
 
 module Nutella
   class Start < Command
-    @description = "Starts all or some of the bots in the current project"
+    @description = 'Starts all or some of the bots in the current project'
   
     def run(args=nil)
       # Is current directory a nutella prj?
-      if !Nutella.currentProject.exist?
-        return
-      end
-      runid = Nutella.runlist.extractRunId args[0]
-      # Add to the list of runs and check the runId is unique
-      addToRunsList(runid)
+      return unless Nutella.currentProject.exist?
+      run_id = Nutella.runlist.extractRunId args[0]
+      # Check the runId is unique and add to the list of runs
+      return unless addToRunsList run_id
       # Extract project directory
       @prj_dir = Nutella.currentProject.dir
       # If running on internal broker, start it
-      if Nutella.config["broker"] == "localhost" # Are we using the internal broker
+      if Nutella.config['broker'] == 'localhost' # Are we using the internal broker
         startBroker
       end
       # Create .botsconfig file
       deleteBotsConfig
       createBotsConfig
       # Start all the bots
-      installBotsDependencies(runid)
-      compileBots(runid)
-      startBots(runid)
+      installBotsDependencies(run_id)
+      compileBots(run_id)
+      startBots(run_id)
+      # Start all interfaces
+      ports = start_interfaces
+      # Start all "hidden bots"
+      start_hidden_bots
       # Output success message
-      outputSuccessMessage(runid, args[0])
+      outputSuccessMessage(run_id, args[0])
     end
     
     
@@ -36,10 +38,11 @@ module Nutella
     
     def addToRunsList(runid)
       if !Nutella.runlist.add?(runid)
-        console.error "Impossible to start project: an instance of this project with the same name is already running!"
+        console.error 'Impossible to start project: an instance of this project with the same name is already running!'
         console.error "You might want to kill it with 'nutella stop "+ runid + "'"
-        return;
+        return false
       end
+      return true
     end
   
   
@@ -108,14 +111,36 @@ module Nutella
     end
     
     def startBots(runid)
-      tmux = Tmux.new(runid)
+      @tmux = Tmux.new(runid)
       Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
         if !File.exist?("#{@prj_dir}/bots/#{bot}/startup")
           console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
           next
         end
-        tmux.newWindow(bot)
+        @tmux.new_bot_window(bot)
       end
+    end
+
+    def start_interfaces
+      ports = Hash.new
+      Dir.entries("#{@prj_dir}/interfaces").select {|entry| File.directory?(File.join("#{@prj_dir}/interfaces",entry)) and !(entry =='.' || entry == '..') }.each do |iface|
+        if !File.exist?("#{@prj_dir}/interfaces/#{iface}/index.html")
+          console.warn "Impossible to start interface #{iface}. Couldn't locate 'index.html' file."
+          next
+        end
+        ports[iface] = @tmux.new_interface_window(iface)
+      end
+      ports
+    end
+
+    def start_hidden_bots
+      # p ports
+      # puts run_id
+      # Nutella.runlist.length
+      # Nutella.config['broker']
+      # Create the webpage for all interfaces
+      # Start the web_server serving the whole interfaces directory
+      # Output message that shows the port where we are connecting
     end
     
     def outputSuccessMessage(runid, run)
