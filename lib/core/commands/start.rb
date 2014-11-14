@@ -63,7 +63,8 @@ module Nutella
       else
         # Broker is not running and there is no file
         startAndCreatePid()
-      end 
+      end
+      sleep(0.5)
     end
   
     def startAndCreatePid()
