@@ -61,7 +61,7 @@ module Nutella
       Dir.entries(nutella_actors_dir).select {|entry| File.directory?(File.join(nutella_actors_dir,entry)) && !(entry =='.' || entry == '..') }.each do |actor|
         pid_file = "#{nutella_actors_dir}/#{actor}/.pid"
         if File.exist?(pid_file)
-          pid_f = File.open(pidFile, "rb")
+          pid_f = File.open(pid_file, "rb")
           pid = pid_f.read.to_i
           pid_f.close()
           Process.kill("SIGKILL", pid)

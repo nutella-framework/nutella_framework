@@ -7,8 +7,9 @@ require 'config/runlist'
 require 'config/project'
 
 module Nutella
-  NUTELLA_HOME = File.dirname(__FILE__)+"/../"
-  
+  home_dir = File.dirname(__FILE__)
+  NUTELLA_HOME = home_dir[0..-4]
+
   # Store some constants and defaults in the configuration file
   if Nutella.config.empty?
     Nutella.init

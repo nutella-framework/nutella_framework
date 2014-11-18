@@ -73,7 +73,7 @@ module Nutella
 
     def startAndCreatePid()
       pid = fork
-      exec("#{Nutella.config["broker_dir"]}/startup") if pid.nil?  
+      exec("#{Nutella.config["broker_dir"]}/startup") if pid.nil?
     end
 
 
@@ -162,23 +162,12 @@ module Nutella
 
 
     def start_nutella_actors
-      nutella_actors_dir = "#{Nutella.config['nutella_home']}/actors"
+      nutella_actors_dir = "#{Nutella.config['nutella_home']}actors"
       Dir.entries(nutella_actors_dir).select {|entry| File.directory?(File.join(nutella_actors_dir,entry)) && !(entry =='.' || entry == '..') }.each do |actor|
         if File.exist?("#{nutella_actors_dir}/#{actor}/startup")
           start_actor "#{nutella_actors_dir}/#{actor}"
         end
       end
-      # we need to pass:
-      # NUTELLA:run_list.json
-      # PROJECT:.actors_list.json
-      # .bots_config.json
-      #
-      # puts run_id
-      # Nutella.runlist.length
-      # Nutella.config['broker']
-      # Create the webpage for all interfaces
-      # Start the web_server serving the whole interfaces directory
-      # Output message that shows the port where we are connecting
     end
 
     def start_actor( actor_dir )
@@ -202,18 +191,23 @@ module Nutella
     end
 
     def start_actor_and_create_pid( actor_dir )
+      nutella_config_file = "#{Nutella.config['nutella_home']}config.json"
+      runs_list_file = "#{Nutella.config['nutella_home']}runlist.json"
+      command = "#{actor_dir}/startup #{nutella_config_file} #{runs_list_file}"
       pid = fork
-      exec("#{actor_dir}/startup") if pid.nil?
+      exec(command) if pid.nil?
       # pid file is created by the startup script!
     end
 
 
     def outputSuccessMessage(run_id, run)
-      if run_id == Nutella.currentProject.config["name"]
-        console.success "Project #{Nutella.currentProject.config['name']} started. Do `tmux attach-session -t #{Nutella.currentProject.config['name']}` to monitor your bots."
+      if run_id == Nutella.currentProject.config['name']
+        console.success "Project #{Nutella.currentProject.config['name']} started!"
       else
-        console.success "Project #{Nutella.currentProject.config['name']}, run #{run} started. Do `tmux attach-session -t #{run_id}` to monitor your bots."
+        console.success "Project #{Nutella.currentProject.config['name']}, run #{run} started!"
       end
+      console.success "Do `tmux attach-session -t #{run_id}` to monitor your bots."
+      console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{run_id} to access your interfaces"
     end
    
   end
