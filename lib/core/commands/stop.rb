@@ -11,7 +11,7 @@ module Nutella
       end
       runid = Nutella.runlist.extractRunId args[0]
       # Removes the run from the list of runs if it exists
-      removeRunfromList(runid, args[0]) 
+      return unless removeRunfromList(runid, args[0])
       # Stop broker if needed
       if Nutella.runlist.empty? and Nutella.config['broker'] == "localhost" 
         stopBroker
@@ -36,8 +36,9 @@ module Nutella
         else
           console.warn "Run #{run} doesn't exist. Impossible to stop it."
         end
-        return
+        return false
       end
+      return true
     end
   
     def stopBroker

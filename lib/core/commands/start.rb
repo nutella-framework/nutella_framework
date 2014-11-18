@@ -8,11 +8,11 @@ module Nutella
     def run(args=nil)
       # Is current directory a nutella prj?
       return unless Nutella.currentProject.exist?
-      run_id = Nutella.runlist.extractRunId args[0]
-      # Check the runId is unique and add to the list of runs
-      return unless addToRunsList run_id
       # Extract project directory
       @prj_dir = Nutella.currentProject.dir
+      run_id = Nutella.runlist.extractRunId args[0]
+      # Check the runId is unique and add to the list of runs
+      return unless addToRunsList( run_id, @prj_dir)
       # If running on internal broker, start it
       if Nutella.config['broker'] == 'localhost' # Are we using the internal broker
         startBroker
@@ -36,8 +36,8 @@ module Nutella
     private
     
     
-    def addToRunsList(runid)
-      unless Nutella.runlist.add? runid
+    def addToRunsList(runid, prj_dir)
+      unless Nutella.runlist.add?( runid, prj_dir )
         console.error 'Impossible to start project: an instance of this project with the same name is already running!'
         console.error "You might want to kill it with 'nutella stop #{runid}'"
         return false

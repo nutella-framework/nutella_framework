@@ -45,10 +45,11 @@ module Nutella
     
     def printProjectRuns(project_name, runs)
       console.info "Currently running #{runs.length} instances of project #{project_name}:"
-      runs.to_a.each do |run| 
-        run.slice! "#{project_name}_"
-        if run.empty? 
-          console.info "progetto (default)"
+      runs.to_a.each do |run|
+        run_id = run.dup
+        run_id.slice! "#{project_name}_"
+        if run_id.empty?
+          console.info " #{project_name}"
         else
           console.info " #{run}" 
         end
