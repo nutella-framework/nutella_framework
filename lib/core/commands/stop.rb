@@ -20,6 +20,8 @@ module Nutella
       Tmux.killSession(runid) 
       # Deletes bots config file if it exists
       deleteBotsConfigFile
+      # Delete .actors_list file if it exists
+      delete_actors_list_file
       # Output success message
       outputSuccessMessage(runid, args[0])
     end
@@ -57,6 +59,12 @@ module Nutella
       if File.exist?("#{prj_dir}/.botsconfig.json")
         File.delete("#{prj_dir}/.botsconfig.json") 
       end
+    end
+
+    def delete_actors_list_file
+      prj_dir = Nutella.currentProject.dir
+      actors_config_file = "#{prj_dir}/.actors_config.json"
+      File.delete(actors_config_file) if File.exist?(actors_config_file)
     end
     
     def outputSuccessMessage(runid, run)

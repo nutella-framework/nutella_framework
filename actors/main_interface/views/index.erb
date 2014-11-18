@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= @run_id %> interfaces</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    
+		<style type="text/css">
+			.row {
+				margin-bottom: 20px;
+			}
+		</style>
+    </head>
+    <body>
+			
+<!-- Content -->
+			<div class="container">
+				<div class="page-header">
+					<h1>Welcome to <em>roomquake</em>, run <em>rq_demo</em></h1>
+				   <p class="lead">Click on the buttons to launch the intereface</p>
+				</div>
+				
+				<% @interfaces.each do |i| %>
+				<div class="row">
+					<div class="col-xs-1 col-sm-1 col-lg-1"><a href="<%= i['url'] %>" target="_blank" type="button" class="btn btn-danger">Launch!</a></div>
+					<div class="col-xs-2 col-sm-2 col-lg-2 text-center"><strong><%= i['name'] %></strong></div>
+					<div class="col-xs-9 col-sm-9 col-lg-9"><%= i['description'] %></div>
+				</div>
+				
+				<% end %>
+						
+			</div>
+			
+<!-- Scripts -->
+        <script>
+					
+        </script>
+    </body>
+</html>

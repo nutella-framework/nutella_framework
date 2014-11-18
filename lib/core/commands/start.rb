@@ -23,11 +23,14 @@ module Nutella
       # Start all the bots
       installBotsDependencies(run_id)
       compileBots(run_id)
-      startBots(run_id)
+      pids = startBots run_id
       # Start all interfaces
-      ports = start_interfaces
-      # Start all "hidden bots"
-      start_hidden_bots
+      urls = start_interfaces
+      # Create .actors_list file
+      delete_actors_list_file
+      create_actors_list_file( pids, urls )
+      # Start all nutella actors
+      start_nutella_actors
       # Output success message
       outputSuccessMessage(run_id, args[0])
     end
@@ -66,12 +69,14 @@ module Nutella
       end
       sleep(0.5)
     end
-  
+
+
     def startAndCreatePid()
       pid = fork
       exec("#{Nutella.config["broker_dir"]}/startup") if pid.nil?  
     end
-  
+
+
     def createBotsConfig
       botsconfig = Nutella.config.to_h
       botsconfig.delete(:runs)
@@ -80,11 +85,29 @@ module Nutella
         f.write(JSON.pretty_generate(botsconfig))
       end
     end
-  
+
+
     def deleteBotsConfig
       File.delete("#{@prj_dir}/.botsconfig.json") if File.exist?("#{@prj_dir}/.botsconfig.json")
     end
-  
+
+
+    def create_actors_list_file(pids_hash, interfaces_hash )
+      actors_config_file = "#{@prj_dir}/.actors_config.json"
+      actors_hash = interfaces_hash
+      File.open(actors_config_file, 'w') do |f|
+        f.write(JSON.pretty_generate(actors_hash))
+      end
+    end
+
+
+    def delete_actors_list_file
+      actors_config_file = "#{@prj_dir}/.actors_config.json"
+      File.delete(actors_config_file) if File.exist?(actors_config_file)
+    end
+
+
+
     def installBotsDependencies(runid)
       Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
         if !File.exist?("#{@prj_dir}/bots/#{bot}/dependencies")
@@ -97,7 +120,8 @@ module Nutella
         Dir.chdir cur_dir
       end
     end
-    
+
+
     def compileBots(runid)
       Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
         if !File.exist?("#{@prj_dir}/bots/#{bot}/compile")
@@ -110,7 +134,8 @@ module Nutella
         Dir.chdir cur_dir
       end
     end
-    
+
+
     def startBots(runid)
       @tmux = Tmux.new(runid)
       Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
@@ -122,20 +147,32 @@ module Nutella
       end
     end
 
+
     def start_interfaces
-      ports = Hash.new
+      urls = Hash.new
       Dir.entries("#{@prj_dir}/interfaces").select {|entry| File.directory?(File.join("#{@prj_dir}/interfaces",entry)) and !(entry =='.' || entry == '..') }.each do |iface|
         if !File.exist?("#{@prj_dir}/interfaces/#{iface}/index.html")
           console.warn "Impossible to start interface #{iface}. Couldn't locate 'index.html' file."
           next
         end
-        ports[iface] = @tmux.new_interface_window(iface)
+        urls[iface] = @tmux.new_interface_window iface
       end
-      ports
+      urls
     end
 
-    def start_hidden_bots
-      # p ports
+
+    def start_nutella_actors
+      nutella_actors_dir = "#{Nutella.config['nutella_home']}/actors"
+      Dir.entries(nutella_actors_dir).select {|entry| File.directory?(File.join(nutella_actors_dir,entry)) && !(entry =='.' || entry == '..') }.each do |actor|
+        if File.exist?("#{nutella_actors_dir}#{actor}/startup")
+          start_actor "#{nutella_actors_dir}#{actor}"
+        end
+      end
+      # we need to pass:
+      # NUTELLA:run_list.json
+      # PROJECT:.actors_list.json
+      # .bots_config.json
+      #
       # puts run_id
       # Nutella.runlist.length
       # Nutella.config['broker']
@@ -143,7 +180,34 @@ module Nutella
       # Start the web_server serving the whole interfaces directory
       # Output message that shows the port where we are connecting
     end
-    
+
+    def start_actor( actor_dir )
+      pid_file = "#{actor_dir}/.pid"
+      if File.exist?(pid_file) # Does the actor pid file exist?
+        pid_f = File.open(pid_file, "rb")
+        pid = pid_f.read.to_i
+        pid_f.close()
+        begin
+          Process.getpgid pid #PID is still alive
+            # actor is already started and we don't need to do anything
+        rescue
+          # actor is dead but we have a stale pid file
+          File.delete(pid_file)
+          start_actor_and_create_pid actor_dir
+        end
+      else
+        # actor is not running and there is no file
+        start_actor_and_create_pid actor_dir
+      end
+    end
+
+    def start_actor_and_create_pid( actor_dir )
+      pid = fork
+      exec("#{actor_dir}/startup") if pid.nil?
+      # pid file is created by the startup script!
+    end
+
+
     def outputSuccessMessage(run_id, run)
       if run_id == Nutella.currentProject.config["name"]
         console.success "Project #{Nutella.currentProject.config['name']} started. Do `tmux attach-session -t #{Nutella.currentProject.config['name']}` to monitor your bots."

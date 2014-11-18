@@ -32,10 +32,11 @@ module Nutella
       @sessions.push(iface)
       # Select window
       `tmux select-window -t #{@runId}:#{@sessions.length-1} &> /dev/null`
-      port = 57880+@sessions.length
+      port = Nutella.config['main_interface_port'] + @sessions.length
+      url = "http://localhost:#{port}/index.html"
       # Start serving interface
       `tmux send-keys "cd interfaces/#{iface};thin -R #{Nutella.config['nutella_home']}/lib/extra/config.ru -p #{port.to_s} start" C-m`
-      port
+      url
     end
 
     def self.killSession(runId)

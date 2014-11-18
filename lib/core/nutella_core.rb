@@ -24,9 +24,10 @@ module Nutella
     
     # Initialize
     def Nutella.init
-      Nutella.config["nutella_home"] = NUTELLA_HOME
-      Nutella.config["tmp_dir"] = NUTELLA_HOME+".tmp"
-      Nutella.config["broker_dir"] = NUTELLA_HOME+"broker"
+      Nutella.config['nutella_home'] = NUTELLA_HOME
+      Nutella.config['tmp_dir'] = "#{NUTELLA_HOME}.tmp"
+      Nutella.config['broker_dir'] = "#{NUTELLA_HOME}broker"
+      Nutella.config['main_interface_port'] = 57880
     end
 
 end
