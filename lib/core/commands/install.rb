@@ -94,7 +94,6 @@ module Nutella
       # ... and remove nutella.json, .git folder and .gitignore file if they exist
       File.delete "#{dest_dir}/nutella.json" if File.exist? "#{dest_dir}/nutella.json"
       FileUtils.rm_rf "#{dest_dir}/.git"
-      File.delete "#{dest_dir}/.gitignore" if File.exist? "#{dest_dir}/.gitignore"
 
       # Make the user feel happy and accomplished! :)
       console.success("Installed template: #{template} as #{dest_dir_name}")
