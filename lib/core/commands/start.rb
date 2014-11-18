@@ -144,11 +144,11 @@ module Nutella
       # Output message that shows the port where we are connecting
     end
     
-    def outputSuccessMessage(runid, run)
-      if runid == Nutella.currentProject.config["name"]
-        console.success "Project " + Nutella.currentProject.config["name"] + " started. Do `tmux attach-session -t #{Nutella.currentProject.config["name"]}` to monitor your bots."
+    def outputSuccessMessage(run_id, run)
+      if run_id == Nutella.currentProject.config["name"]
+        console.success "Project #{Nutella.currentProject.config['name']} started. Do `tmux attach-session -t #{Nutella.currentProject.config['name']}` to monitor your bots."
       else
-        console.success "Project " + Nutella.currentProject.config["name"] + ", run " + run + " started"
+        console.success "Project #{Nutella.currentProject.config['name']}, run #{run} started. Do `tmux attach-session -t #{run_id}` to monitor your bots."
       end
     end
    
