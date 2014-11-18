@@ -38,8 +38,8 @@ module Nutella
     
     def changeBroker(broker)
       # Check that there are no runs hinging on this broker
-      if !Nutella.runlist.empty?
-        console.warn "You are currently running some projects on this broker. You can't change the broker while running."
+      unless Nutella.runlist.empty?
+        console.warn 'You are currently running some projects on this broker. You can\'t change the broker while running.'
         return
       end
       # Change it

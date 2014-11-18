@@ -30,8 +30,8 @@ module Nutella
     
     
     def removeRunfromList(runid, run) 
-      if Nutella.runlist.delete?(runid).nil?
-        if runid == Nutella.currentProject.config["name"]
+      unless Nutella.runlist.delete?(runid)
+        if runid == Nutella.currentProject.config['name']
           console.warn "Run #{runid} doesn't exist. Impossible to stop it."
         else
           console.warn "Run #{run} doesn't exist. Impossible to stop it."

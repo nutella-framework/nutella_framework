@@ -8,34 +8,42 @@ module Nutella
       Nutella.runlist.send(:removeRunListFile)
     end
     
-    should "return true if the list is empty" do
+    should 'return true if the list is empty' do
       assert Nutella.runlist.empty?
     end
 
-    should "return false if the list is not empty" do
-      refute_nil Nutella.runlist.add? "run1"
+    should 'return false if the list is not empty' do
+      refute_nil Nutella.runlist.add?( 'run1', '/path/to/my/run1')
       refute Nutella.runlist.empty?
     end
 
-    should "return empty array if the list is empty" do
+    should 'return empty array if the list is empty' do
       assert_empty Nutella.runlist.to_a
     end
 
-    should "return an array of runs in the list if not empty" do
-      refute_nil Nutella.runlist.add? "run1"
-      refute_nil Nutella.runlist.add? "run2"
-      assert_equal ["run1", "run2"], Nutella.runlist.to_a
+    should 'return an array of runs in the list if not empty' do
+      refute_nil Nutella.runlist.add?( 'run1', '/path/to/my/run1' )
+      refute_nil Nutella.runlist.add?( 'run2', '/path/to/my/run2' )
+      assert_equal %w{run1 run2}, Nutella.runlist.to_a
     end
-    
-    should "return nil if trying to add the same element twice" do
-      refute_nil Nutella.runlist.add? "run1"
-      assert_nil Nutella.runlist.add? "run1"
+
+    should 'return false if trying to add the same element twice' do
+      assert Nutella.runlist.add?( 'run1', '/path/to/my/run1' )
+      refute Nutella.runlist.add?( 'run1', '/path/to/my/run1' )
     end
-    
-    should "return properly when deleting an item" do
-      refute_nil Nutella.runlist.add? "run1"
-      refute_nil Nutella.runlist.delete? "run1"
-      assert_nil Nutella.runlist.delete? "run1"
+
+    should 'return properly when deleting an item' do
+      assert Nutella.runlist.add?( 'run1', '/path/to/my/run1' )
+      assert Nutella.runlist.delete? 'run1'
+      refute Nutella.runlist.delete? 'run1'
+    end
+
+    should 'properly indicate if an item is in the list' do
+      refute Nutella.runlist.include? 'run1'
+      assert Nutella.runlist.add?( 'run1', '/path/to/my/run1' )
+      assert Nutella.runlist.include? 'run1'
+      assert Nutella.runlist.delete? 'run1'
+      refute Nutella.runlist.include? 'run1'
     end
     
     def teardown

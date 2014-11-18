@@ -37,9 +37,9 @@ module Nutella
     
     
     def addToRunsList(runid)
-      if !Nutella.runlist.add?(runid)
+      unless Nutella.runlist.add? runid
         console.error 'Impossible to start project: an instance of this project with the same name is already running!'
-        console.error "You might want to kill it with 'nutella stop "+ runid + "'"
+        console.error "You might want to kill it with 'nutella stop #{runid}'"
         return false
       end
       return true

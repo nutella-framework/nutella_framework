@@ -2,7 +2,6 @@
 # The list is uniquely maintained inside a file
 require 'singleton'
 require 'json'
-require 'set'
 
 module Nutella
   
@@ -11,32 +10,40 @@ module Nutella
     RUN_LIST_FILE=File.dirname(__FILE__)+"/../../runlist.json"
     
     include Singleton
-    
-    def add?(runid)
+
+    # Adds a run to the list
+    # Returns false if the run already exists
+    def add?(run_id, prj_path)
       begin
-        result = JSON.parse(IO.read(RUN_LIST_FILE)).to_set.add? runid
+        file_h = JSON.parse(IO.read(RUN_LIST_FILE))
+        return false if file_h.key? run_id
+        file_h[run_id] = prj_path
       rescue
         # No file, create one
-        result = [runid].to_set
+        file_h = Hash[run_id, prj_path]
       end
-      writeFile(result)
+      write_hash_to_file file_h
     end
 
-    def delete?(runid)
+    def delete?(run_id)
       begin
-        result = JSON.parse(IO.read(RUN_LIST_FILE)).to_set.delete? runid
+        file_h = JSON.parse(IO.read(RUN_LIST_FILE))
+        return false if file_h.delete(run_id).nil?
+        write_hash_to_file file_h
       rescue
+        # No file or empty file, so delete is never successful
         removeRunListFile
-        result = nil # List is empty, so nil
+        false
       end
-      writeFile(result)
     end
 
-    def include?(runid)
+    def include?(run_id)
       begin
-        return JSON.parse(IO.read(RUN_LIST_FILE)).include? runid
+        file_h = JSON.parse(IO.read(RUN_LIST_FILE))
+        file_h.key? run_id
       rescue
-        false # There is no file so it doens't include runid
+        # No file, so doesn't include anything
+        false
       end
     end
 
@@ -53,9 +60,9 @@ module Nutella
         list = JSON.parse(IO.read(RUN_LIST_FILE))
         # filter by project
         if projectName == nil
-          return list
+          return list.keys
         else
-          return list.select { |run| run.start_with?(projectName) }
+          return list.keys.select { |run| run.start_with?(projectName) }
         end
       rescue
         Array.new # There is no file or something went wrong
@@ -67,7 +74,7 @@ module Nutella
     end
     
     def extractRunId(run)
-      run.to_s.empty? ? Nutella.currentProject.config["name"] : Nutella.currentProject.config["name"] + "_" + run
+      run.to_s.empty? ? Nutella.currentProject.config['name'] : "#{Nutella.currentProject.config['name']}_#{run}"
     end
     
     private 
@@ -76,14 +83,14 @@ module Nutella
       File.delete(RUN_LIST_FILE) if File.exist?(RUN_LIST_FILE)
     end
     
-    def writeFile(result)
+    def write_hash_to_file(result)
       if result!=nil
         File.open(RUN_LIST_FILE, "w+") do |f|
-          f.write(JSON.pretty_generate(result.to_a))
+          f.write(JSON.pretty_generate(result))
         end
         File.chmod(0777, RUN_LIST_FILE)
       end
-      result
+      true
     end
     
   end

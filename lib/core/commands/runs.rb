@@ -24,9 +24,9 @@ module Nutella
     
     def displayGlobalRuns
       if Nutella.runlist.empty?
-        console.info "You are not running any projects"
+        console.info 'You are not running any projects'
       else
-        console.info "Currently running:"
+        console.info 'Currently running:'
         Nutella.runlist.to_a.each { |run| console.info " #{run}" }   
       end
     end
