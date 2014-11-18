@@ -10,18 +10,20 @@ module Nutella
         return
       end
       runid = Nutella.runlist.extractRunId args[0]
-      # Removes the run from the list of runs if it exists
-      return unless removeRunfromList(runid, args[0])
-      # Stop broker if needed
-      if Nutella.runlist.empty? and Nutella.config['broker'] == "localhost" 
-        stopBroker
-      end
       # Stops all the bots
-      Tmux.killSession(runid) 
+      Tmux.killSession(runid)
       # Deletes bots config file if it exists
       deleteBotsConfigFile
       # Delete .actors_list file if it exists
       delete_actors_list_file
+      # Removes the run from the list of runs if it exists
+      return unless removeRunfromList(runid, args[0])
+      # Stop nutella actors
+      stop_nutella_actors
+      # Stop broker if needed
+      if Nutella.runlist.empty? and Nutella.config['broker'] == "localhost" 
+        stopBroker
+      end
       # Output success message
       outputSuccessMessage(runid, args[0])
     end
@@ -51,6 +53,20 @@ module Nutella
         pidF.close()
         Process.kill("SIGKILL", pid)
         File.delete(pidFile)
+      end
+    end
+
+    def stop_nutella_actors
+      nutella_actors_dir = "#{Nutella.config['nutella_home']}/actors"
+      Dir.entries(nutella_actors_dir).select {|entry| File.directory?(File.join(nutella_actors_dir,entry)) && !(entry =='.' || entry == '..') }.each do |actor|
+        pid_file = "#{nutella_actors_dir}/#{actor}/.pid"
+        if File.exist?(pid_file)
+          pid_f = File.open(pidFile, "rb")
+          pid = pid_f.read.to_i
+          pid_f.close()
+          Process.kill("SIGKILL", pid)
+          File.delete(pid_file)
+        end
       end
     end
     

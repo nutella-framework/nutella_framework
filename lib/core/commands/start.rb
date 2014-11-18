@@ -164,8 +164,8 @@ module Nutella
     def start_nutella_actors
       nutella_actors_dir = "#{Nutella.config['nutella_home']}/actors"
       Dir.entries(nutella_actors_dir).select {|entry| File.directory?(File.join(nutella_actors_dir,entry)) && !(entry =='.' || entry == '..') }.each do |actor|
-        if File.exist?("#{nutella_actors_dir}#{actor}/startup")
-          start_actor "#{nutella_actors_dir}#{actor}"
+        if File.exist?("#{nutella_actors_dir}/#{actor}/startup")
+          start_actor "#{nutella_actors_dir}/#{actor}"
         end
       end
       # we need to pass:
