@@ -5,7 +5,7 @@ module Nutella
   class TestRunList < MiniTest::Test
     
     def setup
-      Nutella.runlist.send(:removeRunListFile)
+      Nutella.runlist.send(:removeFile)
     end
     
     should 'return true if the list is empty' do
@@ -18,13 +18,13 @@ module Nutella
     end
 
     should 'return empty array if the list is empty' do
-      assert_empty Nutella.runlist.to_a
+      assert_empty Nutella.runlist.runs_by_project
     end
 
     should 'return an array of runs in the list if not empty' do
       refute_nil Nutella.runlist.add?( 'run1', '/path/to/my/run1' )
       refute_nil Nutella.runlist.add?( 'run2', '/path/to/my/run2' )
-      assert_equal %w{run1 run2}, Nutella.runlist.to_a
+      assert_equal %w{run1 run2}, Nutella.runlist.runs_by_project
     end
 
     should 'return false if trying to add the same element twice' do
@@ -47,7 +47,7 @@ module Nutella
     end
     
     def teardown
-      Nutella.runlist.send(:removeRunListFile)
+      Nutella.runlist.send(:removeFile)
     end
     
   end

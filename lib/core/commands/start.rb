@@ -10,7 +10,7 @@ module Nutella
       return unless Nutella.currentProject.exist?
       # Extract project directory
       @prj_dir = Nutella.currentProject.dir
-      run_id = Nutella.runlist.extractRunId args[0]
+      run_id = Nutella.runlist.extract_run_id args[0]
       # Check the runId is unique and add to the list of runs
       return unless addToRunsList( run_id, @prj_dir)
       # If running on internal broker, start it

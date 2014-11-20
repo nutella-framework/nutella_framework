@@ -10,7 +10,8 @@ module Nutella
   home_dir = File.dirname(__FILE__)
   NUTELLA_HOME = home_dir[0..-4]
 
-  # Store some constants and defaults in the configuration file
+  # If the nutella configuration file (config.json) is empty (or doesn't exist) we're going to initialize it
+  # with nutella constants and defaults
   if Nutella.config.empty?
     Nutella.init
   end

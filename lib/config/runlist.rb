@@ -1,103 +1,32 @@
-# This handles the list of running instances of Nutella
-# The list is uniquely maintained inside a file
-require 'singleton'
-require 'json'
+require_relative 'persisted_hash'
 
 module Nutella
   
-  class RunList
-    
-    RUN_LIST_FILE=File.dirname(__FILE__)+"/../../runlist.json"
-    
-    include Singleton
+  class RunListHash < PersistedHash
 
-    # Adds a run to the list
-    # Returns false if the run already exists
-    def add?(run_id, prj_path)
-      begin
-        file_h = JSON.parse(IO.read(RUN_LIST_FILE))
-        return false if file_h.key? run_id
-        file_h[run_id] = prj_path
-      rescue
-        # No file, create one
-        file_h = Hash[run_id, prj_path]
-      end
-      write_hash_to_file file_h
+    # Returns the +run_id+ names for a certain project
+    # If no project is specified, +run_id+s for all projects are returned
+    # @param [String] project_name the name of the project we want to find run names for
+    # @return [Array<String>] list of +run_id+s associated to the specified project
+    def runs_by_project( project_name=nil )
+      (project_name == nil) ? keys : keys.select { |run| run.start_with?(project_name) }
     end
 
-    def delete?(run_id)
-      begin
-        file_h = JSON.parse(IO.read(RUN_LIST_FILE))
-        return false if file_h.delete(run_id).nil?
-        write_hash_to_file file_h
-      rescue
-        # No file or empty file, so delete is never successful
-        removeRunListFile
-        false
-      end
+    # Extracts the +run_id+ from the run name (specified at command line)
+    # @param [String] run_name
+    # @return [String] the +run_id+ which is either the +project_name+ (if no +run_name+
+    # was specified) or the concatenation of +project_name+ and +run_name+
+    def extract_run_id( run_name )
+      run_name.to_s.empty? ? Nutella.currentProject.config['name'] : "#{Nutella.currentProject.config['name']}_#{run_name}"
     end
+    
 
-    def include?(run_id)
-      begin
-        file_h = JSON.parse(IO.read(RUN_LIST_FILE))
-        file_h.key? run_id
-      rescue
-        # No file, so doesn't include anything
-        false
-      end
-    end
-
-    def empty?
-      begin
-        return JSON.parse(IO.read(RUN_LIST_FILE)).empty?
-      rescue
-        true # There is no file so list is empty
-      end
-    end
-
-    def to_a(projectName=nil)
-      begin
-        list = JSON.parse(IO.read(RUN_LIST_FILE))
-        # filter by project
-        if projectName == nil
-          return list.keys
-        else
-          return list.keys.select { |run| run.start_with?(projectName) }
-        end
-      rescue
-        Array.new # There is no file or something went wrong
-      end
-    end
-
-    def length
-      to_a.length
-    end
-    
-    def extractRunId(run)
-      run.to_s.empty? ? Nutella.currentProject.config['name'] : "#{Nutella.currentProject.config['name']}_#{run}"
-    end
-    
-    private 
-    
-    def removeRunListFile
-      File.delete(RUN_LIST_FILE) if File.exist?(RUN_LIST_FILE)
-    end
-    
-    def write_hash_to_file(result)
-      if result!=nil
-        File.open(RUN_LIST_FILE, "w+") do |f|
-          f.write(JSON.pretty_generate(result))
-        end
-        File.chmod(0777, RUN_LIST_FILE)
-      end
-      true
-    end
-    
   end
-  
-  
+
+  # Calling this method (Nutella.runlist) simply returns and instance of
+  # RunListHash linked to file runlist.json in the nutella home directory
   def Nutella.runlist
-    RunList.instance
+    RunListHash.new( "#{File.dirname(__FILE__)}/../../runlist.json" )
   end
   
 end

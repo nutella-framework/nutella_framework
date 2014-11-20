@@ -9,7 +9,7 @@ module Nutella
       if !Nutella.currentProject.exist? 
         return
       end
-      runid = Nutella.runlist.extractRunId args[0]
+      runid = Nutella.runlist.extract_run_id args[0]
       # Stops all the bots
       Tmux.killSession(runid)
       # Deletes bots config file if it exists

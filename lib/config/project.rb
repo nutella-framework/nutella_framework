@@ -29,7 +29,7 @@ module Nutella
     def config
       @prj_dir = Dir.pwd
       if File.exist? "#{@prj_dir}/conf/project.json" 
-        return ConfigHash.new "#{@prj_dir}/conf/project.json"
+        return PersistedHash.new "#{@prj_dir}/conf/project.json"
         else
           console.error "The current directory is not a Nutella project! Impossible to get project configuration file"
         end

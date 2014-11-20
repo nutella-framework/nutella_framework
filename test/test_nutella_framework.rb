@@ -22,7 +22,7 @@ module Nutella
     
     
     def teardown
-      Nutella.config.send(:removeConfigFile)
+      Nutella.config.send(:removeFile)
     end
     
   end
