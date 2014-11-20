@@ -6,7 +6,7 @@ module Nutella
   
     # Commands overload this method to execute
     def run (args=nil)
-      console.error("Running a generic command! POOP!")
+      console.error('Running the generic command!!! WAT?')
     end
   end
 end

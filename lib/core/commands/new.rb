@@ -44,10 +44,11 @@ module Nutella
       FileUtils.mkdir_p("#{cur_prj_dir}/interfaces")
       # Create nutella.json hash
       config_file_hash = {
-        'nutella_version' => File.open("#{NUTELLA_HOME}VERSION", 'rb').read,
         'name' => cur_prj_dir,
+        'version' => '0.1.0',
+        'nutella_version' => File.open("#{NUTELLA_HOME}VERSION", 'rb').read,
         'type' => 'project',
-        'version' => '0.1.0'
+        'description' => 'A quick description of your project'
       }
       # Write nutella.json hash
       File.open("#{cur_prj_dir}/nutella.json", 'w') do |f|
