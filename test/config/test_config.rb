@@ -5,7 +5,7 @@ module Nutella
   class TestNutellaConfig < MiniTest::Test
     
     def setup
-      Nutella.config.send(:removeFile)
+      Nutella.config.send(:remove_file)
     end
   
     should 'set a key value' do
@@ -36,7 +36,7 @@ module Nutella
     end
   
     def teardown
-      Nutella.config.send(:removeFile)
+      Nutella.config.send(:remove_file)
     end
   
   end

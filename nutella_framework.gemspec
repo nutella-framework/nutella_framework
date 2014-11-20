@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
     "bin/nutella",
     "lib/cli/nutella_cli.rb",
     "lib/config/config.rb",
-    "lib/config/project.rb",
+    "lib/config/current_project.rb",
     "lib/config/runlist.rb",
     "lib/core/command.rb",
     "lib/core/commands/broker.rb",

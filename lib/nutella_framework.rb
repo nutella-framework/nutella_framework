@@ -1,11 +1,10 @@
-# Nutella main script
+# Import all the modules
 require 'logging/nutella_logging'
 require 'core/nutella_core'
-require 'cli/nutella_cli'
-require 'config/persisted_hash'
 require 'config/config'
 require 'config/runlist'
-require 'config/project'
+require 'config/current_project'
+require 'cli/nutella_cli'
 
 module Nutella
   home_dir = File.dirname(__FILE__)

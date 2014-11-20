@@ -12,30 +12,30 @@ module Nutella
     end
 
     def []( key )
-      hash = loadHash
+      hash = load_hash
       hash[key]
     end
 
     def []=( key, val )
-      hash = loadHash
+      hash = load_hash
       hash[key]=val
-      storeHash hash
+      store_hash hash
     end
 
     def delete( key )
-      hash = loadHash
+      hash = load_hash
       return_value = hash.delete key
-      storeHash hash
+      store_hash hash
       return_value
     end
 
     def empty?
-      hash = loadHash
+      hash = load_hash
       hash.empty?
     end
 
     def has_key?( key )
-      hash = loadHash
+      hash = load_hash
       hash.has_key? key
     end
 
@@ -44,22 +44,22 @@ module Nutella
     end
 
     def to_s
-      hash = loadHash
+      hash = load_hash
       hash.to_s
     end
 
     def to_h
-      hash = loadHash
+      hash = load_hash
       hash
     end
 
     def keys
-      hash = loadHash
+      hash = load_hash
       hash.keys
     end
 
     def length
-      hash = loadHash
+      hash = load_hash
       hash.length
     end
 
@@ -70,10 +70,10 @@ module Nutella
     # @return [Boolean] false if the key already exists, true if the
     # <key, value> pair was added successfully
     def add?(key, val)
-      hash = loadHash
+      hash = load_hash
       return false if hash.key? key
       hash[key] = val
-      storeHash hash
+      store_hash hash
       true
     end
 
@@ -82,22 +82,22 @@ module Nutella
     # @return [Boolean] false if there is no value associated with
     # the specified key, true otherwise
     def delete?( key )
-      hash = loadHash
+      hash = load_hash
       return false if hash.delete(key).nil?
-      storeHash hash
+      store_hash hash
       true
     end
 
     private
 
-    def storeHash(hash)
+    def store_hash(hash)
       File.open(@config_file, 'w+') do |f|
         f.write(JSON.pretty_generate(hash))
       end
       File.chmod(0777, @config_file)
     end
 
-    def loadHash
+    def load_hash
       begin
         return JSON.parse IO.read @config_file
       rescue
@@ -106,7 +106,7 @@ module Nutella
       end
     end
 
-    def removeFile
+    def remove_file
       File.delete(@config_file) if File.exist?(@config_file)
     end
 

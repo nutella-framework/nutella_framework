@@ -5,7 +5,7 @@ module Nutella
   class TestRunList < MiniTest::Test
     
     def setup
-      Nutella.runlist.send(:removeFile)
+      Nutella.runlist.send(:remove_file)
     end
     
     should 'return true if the list is empty' do
@@ -47,7 +47,7 @@ module Nutella
     end
     
     def teardown
-      Nutella.runlist.send(:removeFile)
+      Nutella.runlist.send(:remove_file)
     end
     
   end

@@ -1,4 +1,4 @@
-require_relative 'persisted_hash'
+require 'config/persisted_hash'
 
 module Nutella
 
