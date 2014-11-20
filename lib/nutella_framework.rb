@@ -2,6 +2,7 @@
 require 'logging/nutella_logging'
 require 'core/nutella_core'
 require 'cli/nutella_cli'
+require 'config/persisted_hash'
 require 'config/config'
 require 'config/runlist'
 require 'config/project'

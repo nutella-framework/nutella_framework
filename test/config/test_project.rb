@@ -6,26 +6,27 @@ module Nutella
     
     def setup
       Dir.chdir NUTELLA_HOME
-      Nutella.executeCommand "new", ["test_project"]
-      Dir.chdir NUTELLA_HOME + "test_project"
+      Nutella.executeCommand 'new', ['test_project']
+      Dir.chdir "#{NUTELLA_HOME}test_project"
+    end
+
+
+    should 'return true if the dir is a nutella project' do
+      assert Nutella.current_project.exist?
     end
     
-    should "return true if the dir is a nutella project" do
-      assert Nutella.currentProject.exist?
-    end
-    
-    should "return false if the dir is not a nutella project" do
+    should 'return false if the dir is not a nutella project' do
       Dir.chdir NUTELLA_HOME
-      refute Nutella.currentProject.exist?
+      refute Nutella.current_project.exist?
     end
     
-    should "return the correct version of nutella as read from the project configuration file" do
-      assert_equal File.open(NUTELLA_HOME+"VERSION", "rb").read, Nutella.currentProject.config["nutella_version"]
+    should 'return the correct version of nutella as read from the project configuration file' do
+      assert_equal File.open("#{NUTELLA_HOME}VERSION", "rb").read, Nutella.current_project.config['nutella_version']
     end
     
     
     def teardown
-      FileUtils.rm_rf(NUTELLA_HOME + "test_project")
+      FileUtils.rm_rf "#{NUTELLA_HOME}test_project"
       Dir.chdir NUTELLA_HOME
     end
     

@@ -10,7 +10,7 @@ module Nutella
   
     def run(args=nil)
       # Is current directory a nutella prj?
-      return unless Nutella.currentProject.exist?
+      return unless Nutella.current_project.exist?
     
       # Check args
       if args.empty?
@@ -21,7 +21,7 @@ module Nutella
       destination_dir = args.length==2 ? args[1] : nil
       
       # Extract project directory
-      prj_dir = Nutella.currentProject.dir
+      prj_dir = Nutella.current_project.dir
 
       # What kind of template are we handling?
       if is_template_a_local_dir? template

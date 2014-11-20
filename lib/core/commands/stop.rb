@@ -6,7 +6,7 @@ module Nutella
     @description = "Stops all or some of the bots in the current project"
     # Is current directory a nutella prj?
     def run(args=nil)
-      if !Nutella.currentProject.exist? 
+      if !Nutella.current_project.exist?
         return
       end
       runid = Nutella.runlist.extract_run_id args[0]
@@ -35,7 +35,7 @@ module Nutella
     
     def removeRunfromList(runid, run) 
       unless Nutella.runlist.delete?(runid)
-        if runid == Nutella.currentProject.config['name']
+        if runid == Nutella.current_project.config['name']
           console.warn "Run #{runid} doesn't exist. Impossible to stop it."
         else
           console.warn "Run #{run} doesn't exist. Impossible to stop it."
@@ -71,23 +71,23 @@ module Nutella
     end
     
     def deleteBotsConfigFile
-      prj_dir = Nutella.currentProject.dir 
+      prj_dir = Nutella.current_project.dir
       if File.exist?("#{prj_dir}/.botsconfig.json")
         File.delete("#{prj_dir}/.botsconfig.json") 
       end
     end
 
     def delete_actors_list_file
-      prj_dir = Nutella.currentProject.dir
+      prj_dir = Nutella.current_project.dir
       actors_config_file = "#{prj_dir}/.actors_config.json"
       File.delete(actors_config_file) if File.exist?(actors_config_file)
     end
     
     def outputSuccessMessage(runid, run)
-      if runid == Nutella.currentProject.config["name"]
-        console.success "Project #{Nutella.currentProject.config["name"]} stopped"
+      if runid == Nutella.current_project.config["name"]
+        console.success "Project #{Nutella.current_project.config["name"]} stopped"
       else
-        console.success "Project #{Nutella.currentProject.config["name"]}, run #{run} stopped"
+        console.success "Project #{Nutella.current_project.config["name"]}, run #{run} stopped"
       end
     end
   

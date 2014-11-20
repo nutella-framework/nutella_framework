@@ -11,7 +11,7 @@ module Nutella
         displayGlobalRuns
       else
         # Is current directory a nutella prj?
-        if !Nutella.currentProject.exist?
+        if !Nutella.current_project.exist?
           return
         end
         displayProjectRuns     
@@ -33,7 +33,7 @@ module Nutella
     
     
     def displayProjectRuns
-      project_name = Nutella.currentProject.config["name"]
+      project_name = Nutella.current_project.config["name"]
       runs = Nutella.runlist.to_a project_name
       if runs.empty?
         console.info "Currently running #{runs.length} instances of project #{project_name}"

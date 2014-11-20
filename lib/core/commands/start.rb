@@ -7,12 +7,12 @@ module Nutella
   
     def run(args=nil)
       # Is current directory a nutella prj?
-      return unless Nutella.currentProject.exist?
+      return unless Nutella.current_project.exist?
       # Extract project directory
-      @prj_dir = Nutella.currentProject.dir
+      @cur_prj_dir = Nutella.current_project.dir
       run_id = Nutella.runlist.extract_run_id args[0]
       # Check the runId is unique and add to the list of runs
-      return unless addToRunsList( run_id, @prj_dir)
+      return unless addToRunsList( run_id, @cur_prj_dir)
       # If running on internal broker, start it
       if Nutella.config['broker'] == 'localhost' # Are we using the internal broker
         startBroker
@@ -80,20 +80,20 @@ module Nutella
     def createBotsConfig
       botsconfig = Nutella.config.to_h
       botsconfig.delete(:runs)
-      botsconfig[:prj_name] = Nutella.currentProject.config["name"]
-      File.open("#{@prj_dir}/.botsconfig.json", "w") do |f|
+      botsconfig[:prj_name] = Nutella.current_project.config["name"]
+      File.open("#{@cur_prj_dir}/.botsconfig.json", "w") do |f|
         f.write(JSON.pretty_generate(botsconfig))
       end
     end
 
 
     def deleteBotsConfig
-      File.delete("#{@prj_dir}/.botsconfig.json") if File.exist?("#{@prj_dir}/.botsconfig.json")
+      File.delete("#{@cur_prj_dir}/.botsconfig.json") if File.exist?("#{@cur_prj_dir}/.botsconfig.json")
     end
 
 
     def create_actors_list_file(pids_hash, interfaces_hash )
-      actors_config_file = "#{@prj_dir}/.actors_config.json"
+      actors_config_file = "#{@cur_prj_dir}/.actors_config.json"
       actors_hash = interfaces_hash
       File.open(actors_config_file, 'w') do |f|
         f.write(JSON.pretty_generate(actors_hash))
@@ -102,20 +102,20 @@ module Nutella
 
 
     def delete_actors_list_file
-      actors_config_file = "#{@prj_dir}/.actors_config.json"
+      actors_config_file = "#{@cur_prj_dir}/.actors_config.json"
       File.delete(actors_config_file) if File.exist?(actors_config_file)
     end
 
 
 
     def installBotsDependencies(runid)
-      Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
-        if !File.exist?("#{@prj_dir}/bots/#{bot}/dependencies")
+      Dir.entries("#{@cur_prj_dir}/bots").select {|entry| File.directory?(File.join("#{@cur_prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
+        if !File.exist?("#{@cur_prj_dir}/bots/#{bot}/dependencies")
           next
         end
         console.info "Installing dependencies for bot #{bot}."
         cur_dir = Dir.pwd
-        Dir.chdir "#{@prj_dir}/bots/#{bot}"
+        Dir.chdir "#{@cur_prj_dir}/bots/#{bot}"
         system "./dependencies"
         Dir.chdir cur_dir
       end
@@ -123,13 +123,13 @@ module Nutella
 
 
     def compileBots(runid)
-      Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
-        if !File.exist?("#{@prj_dir}/bots/#{bot}/compile")
+      Dir.entries("#{@cur_prj_dir}/bots").select {|entry| File.directory?(File.join("#{@cur_prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
+        if !File.exist?("#{@cur_prj_dir}/bots/#{bot}/compile")
           next
         end
         console.info "Compiling bot #{bot}."
         cur_dir = Dir.pwd
-        Dir.chdir "#{@prj_dir}/bots/#{bot}"
+        Dir.chdir "#{@cur_prj_dir}/bots/#{bot}"
         system "./compile"
         Dir.chdir cur_dir
       end
@@ -138,8 +138,8 @@ module Nutella
 
     def startBots(runid)
       @tmux = Tmux.new(runid)
-      Dir.entries("#{@prj_dir}/bots").select {|entry| File.directory?(File.join("#{@prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
-        if !File.exist?("#{@prj_dir}/bots/#{bot}/startup")
+      Dir.entries("#{@cur_prj_dir}/bots").select {|entry| File.directory?(File.join("#{@cur_prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
+        if !File.exist?("#{@cur_prj_dir}/bots/#{bot}/startup")
           console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
           next
         end
@@ -150,8 +150,8 @@ module Nutella
 
     def start_interfaces
       urls = Hash.new
-      Dir.entries("#{@prj_dir}/interfaces").select {|entry| File.directory?(File.join("#{@prj_dir}/interfaces",entry)) and !(entry =='.' || entry == '..') }.each do |iface|
-        if !File.exist?("#{@prj_dir}/interfaces/#{iface}/index.html")
+      Dir.entries("#{@cur_prj_dir}/interfaces").select {|entry| File.directory?(File.join("#{@cur_prj_dir}/interfaces",entry)) and !(entry =='.' || entry == '..') }.each do |iface|
+        if !File.exist?("#{@cur_prj_dir}/interfaces/#{iface}/index.html")
           console.warn "Impossible to start interface #{iface}. Couldn't locate 'index.html' file."
           next
         end
@@ -201,10 +201,10 @@ module Nutella
 
 
     def outputSuccessMessage(run_id, run)
-      if run_id == Nutella.currentProject.config['name']
-        console.success "Project #{Nutella.currentProject.config['name']} started!"
+      if run_id == Nutella.current_project.config['name']
+        console.success "Project #{Nutella.current_project.config['name']} started!"
       else
-        console.success "Project #{Nutella.currentProject.config['name']}, run #{run} started!"
+        console.success "Project #{Nutella.current_project.config['name']}, run #{run} started!"
       end
       console.success "Do `tmux attach-session -t #{run_id}` to monitor your bots."
       console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{run_id} to access your interfaces"

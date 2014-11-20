@@ -1,4 +1,4 @@
-require_relative 'persisted_hash'
+require 'config/persisted_hash'
 
 module Nutella
   
@@ -17,7 +17,7 @@ module Nutella
     # @return [String] the +run_id+ which is either the +project_name+ (if no +run_name+
     # was specified) or the concatenation of +project_name+ and +run_name+
     def extract_run_id( run_name )
-      run_name.to_s.empty? ? Nutella.currentProject.config['name'] : "#{Nutella.currentProject.config['name']}_#{run_name}"
+      run_name.to_s.empty? ? Nutella.current_project.config['name'] : "#{Nutella.current_project.config['name']}_#{run_name}"
     end
     
 
