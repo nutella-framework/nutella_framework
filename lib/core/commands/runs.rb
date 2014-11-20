@@ -12,7 +12,7 @@ module Nutella
         display_all_runs
       else
         # If current dir is not a nutella project, return
-        return if !Nutella.current_project.exist?
+        return unless Nutella.current_project.exist?
         # Display list of runs for current nutella project
         display_project_runs
       end
