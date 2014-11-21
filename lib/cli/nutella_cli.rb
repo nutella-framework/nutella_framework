@@ -32,7 +32,7 @@ module Nutella
       end
 
       # Execute the appropriate command
-      Nutella.executeCommand command, args
+      Nutella.execute_command command, args
       exit 0
     end
 

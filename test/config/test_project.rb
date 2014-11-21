@@ -6,7 +6,7 @@ module Nutella
     
     def setup
       Dir.chdir NUTELLA_HOME
-      Nutella.executeCommand 'new', ['test_project']
+      Nutella.execute_command( 'new', ['test_project'] )
       Dir.chdir "#{NUTELLA_HOME}test_project"
     end
 

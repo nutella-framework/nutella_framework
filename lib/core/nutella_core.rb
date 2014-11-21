@@ -9,10 +9,10 @@ module Nutella
     # This method executes a particular command
     # @param command [String] the name of the command
     # @param args [Array<String>] command line parameters passed to the command
-    def Nutella.executeCommand (command, args=nil) 
+    def Nutella.execute_command (command, args=nil)
       # Check that the command exists and if it does,
       # execute its run method passing the args parameters
-      if commandExists?(command)
+      if command_exists?(command)
         Object::const_get("Nutella::#{command.capitalize}").new.run(args)
       else
         console.error "Unknown command #{command}"
@@ -21,7 +21,7 @@ module Nutella
     
     # This method checks that a particular command exists
     # @return [Boolean] true if the command exists, false otherwise
-    def Nutella.commandExists?(command)
+    def Nutella.command_exists?(command)
       return Nutella.const_get("Nutella::#{command.capitalize}").is_a?(Class)
     rescue NameError
       return false

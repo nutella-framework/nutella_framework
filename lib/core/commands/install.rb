@@ -91,7 +91,7 @@ module Nutella
       # If all is good, copy the template to dest_dir...
       FileUtils.copy_entry template_dir, dest_dir
 
-      # ... and remove nutella.json, .git folder and .gitignore file if they exist
+      # ... and remove nutella.json and .git folder if they exist
       File.delete "#{dest_dir}/nutella.json" if File.exist? "#{dest_dir}/nutella.json"
       FileUtils.rm_rf "#{dest_dir}/.git"
 

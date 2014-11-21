@@ -7,12 +7,15 @@ module Nutella
   
     def run(args=nil)
 
+      # Check that the run name passed as parameter is not nil
+      run = args.nil? ? nil : args[0]
+
       # If the current directory is not a nutella project, return
       return unless Nutella.current_project.exist?
 
       # Extract project directory and run_id
       cur_prj_dir = Nutella.current_project.dir
-      run_id = Nutella.runlist.extract_run_id args[0]
+      run_id = args.nil? ? Nutella.runlist.extract_run_id( '' ) : Nutella.runlist.extract_run_id( args[0] )
 
       # Check that the run_id is unique and add it to the list of runs
       # If it's not, return (without adding the run_id to the list of course)
@@ -29,11 +32,10 @@ module Nutella
       # Install dependencies, compile and start all bots
       return unless install_bots_dependencies cur_prj_dir
       return unless compile_bots cur_prj_dir
-      pids = start_bots( cur_prj_dir, run_id )
-      return if pids.empty?
+      return unless start_bots( cur_prj_dir, run_id )
 
       # Output success message
-      output_success_message( run_id, args[0] )
+      output_success_message( run_id, run)
     end
     
     
@@ -46,12 +48,12 @@ module Nutella
         console.error "You might want to kill it with 'nutella stop #{run_id}'"
         return false
       end
-      return true
+      true
     end
   
   
     def start_internal_broker
-      pid_file_path = "#{Nutella.config['broker_dir']}/bin/.pid"
+      pid_file_path = "#{Nutella.config['broker_dir']}bin/.pid"
       # Does the broker pid file exist?
       # If it does we try to see if the process with that pid is still alive
       if File.exist? pid_file_path
@@ -67,6 +69,7 @@ module Nutella
           # The process is dead but we have a stale pid file so we remove the pid
           File.delete pid_file_path
         end
+      end
         # Broker is not running and there is no file so we try to start
         # and create a new pid file. Note that the pid file is created by
         # the startup script!
@@ -75,7 +78,7 @@ module Nutella
         sleep(0.5)
         # All went well so we return true
         true
-      end
+
     end
 
 
@@ -83,7 +86,7 @@ module Nutella
       nutella_actors_dir = "#{Nutella.config['nutella_home']}actors"
       Dir.entries(nutella_actors_dir).select {|entry| File.directory?(File.join(nutella_actors_dir, entry)) && !(entry =='.' || entry == '..') }.each do |actor|
         if File.exist? "#{nutella_actors_dir}/#{actor}/startup"
-          unless start_actor "#{nutella_actors_dir}/#{actor}"
+          unless start_nutella_actor "#{nutella_actors_dir}/#{actor}"
             return false
           end
         end
@@ -91,7 +94,7 @@ module Nutella
       true
     end
 
-    def start_actor( actor_dir )
+    def start_nutella_actor( actor_dir )
       pid_file_path = "#{actor_dir}/.pid"
       # Does the actor pid file exist?
       # If it does we try to see if the process with that pid is still alive
@@ -102,7 +105,7 @@ module Nutella
         begin
           # If this statement doesn't throw an exception then a process with
           # this pid is still alive so we do nothing and just return true
-          Process.getpgid pid #PID is still alive
+          Process.getpgid pid
           return true
         rescue
           # The process is dead but we have a stale pid file so we remove the pid
