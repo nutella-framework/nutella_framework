@@ -1,6 +1,7 @@
 # Require all commands by iterating through all the files
 # in the commands directory
 Dir["#{File.dirname(__FILE__)}/commands/*.rb"].each do |file|
+  # noinspection RubyResolve
   require "core/commands/#{File.basename(file, File.extname(file))}"
 end
 

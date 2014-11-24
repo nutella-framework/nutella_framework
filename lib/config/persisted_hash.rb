@@ -49,8 +49,7 @@ module Nutella
     end
 
     def to_h
-      hash = load_hash
-      hash
+      load_hash
     end
 
     def keys

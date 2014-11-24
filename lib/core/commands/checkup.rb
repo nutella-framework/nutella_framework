@@ -35,7 +35,7 @@ module Nutella
   
     def install_local_broker
       # Clone, cd and npm install
-      out1 = system "git clone git://github.com/mcollina/mosca.git #{Nutella.config["broker_dir"]} > /dev/null 2>&1"
+      out1 = system "git clone git://github.com/mcollina/mosca.git #{Nutella.config['broker_dir']} > /dev/null 2>&1"
       Dir.chdir(Nutella.config['broker_dir'])
       out2 = system 'npm install > /dev/null 2>&1'
     
@@ -45,7 +45,7 @@ module Nutella
     
       # Write configuration into config.json
       Nutella.config['broker'] = 'localhost'
-      return out1 && out2
+      out1 && out2
     end
     
     

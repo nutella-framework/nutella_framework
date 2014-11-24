@@ -8,9 +8,9 @@ module Nutella
     include Singleton
     
     def initialize
-      console = NutellaLogger.new("console")
-      log = NutellaLoggerRemote.new("log")
-      @loggers = {"log" => log, "console" => console}
+      console = NutellaLogger.new('console')
+      log = NutellaLoggerRemote.new('log')
+      @loggers = {:log => log, :console => console}
     end
     
     def logger(name)
@@ -25,11 +25,11 @@ end
 module Kernel
   
   def console
-    Nutella::NutellaLogging.instance.logger('console')
+    Nutella::NutellaLogging.instance.logger(:console)
   end
   
   def log
-    Nutella::NutellaLogging.instance.logger('log')
+    Nutella::NutellaLogging.instance.logger(:log)
   end
   
 end

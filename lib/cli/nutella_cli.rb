@@ -40,11 +40,11 @@ module Nutella
     # Print nutella logo
     def self.print_nutella_logo
       console.info(NUTELLA_LOGO)
-      nutella_version = File.open("#{Nutella.config['nutella_home']}VERSION", "rb").read
+      nutella_version = File.open("#{Nutella.config['nutella_home']}VERSION", 'rb').read
       console.info("Welcome to nutella version #{nutella_version}! For a complete lists of available commands type 'nutella help'\n")
       # If nutella is not ready to be used (i.e. nobody has invoked the "nutella checkup" command yet),
       # append warning/reminder message
-      if  Nutella.config["ready"].nil?
+      if  Nutella.config['ready'].nil?
         console.warn 'Looks like this is a fresh installation of nutella. Please run \'nutella checkup\' to check all dependencies are installed.'
       end
     end
