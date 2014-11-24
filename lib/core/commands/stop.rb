@@ -3,29 +3,38 @@ require 'core/tmux'
 
 module Nutella
   class Stop < Command
-    @description = "Stops all or some of the bots in the current project"
-    # Is current directory a nutella prj?
+    @description = 'Stops all or some of the bots in the current project'
+
     def run(args=nil)
-      if !Nutella.current_project.exist?
-        return
-      end
-      runid = Nutella.runlist.extract_run_id args[0]
+
+      # Check that the run name passed as parameter is not nil
+      run = args.nil? ? nil : args[0]
+
+      # If the current directory is not a nutella project, return
+      return unless Nutella.current_project.exist?
+
+      # Extract run_id
+      run_id = args.nil? ? Nutella.runlist.extract_run_id( '' ) : Nutella.runlist.extract_run_id( args[0] )
+
+      # Check that the run_id exists in the list and, if it is not,
+      # return false
+      return unless remove_from_run_list run_id
+
       # Stops all the bots
-      Tmux.killSession(runid)
-      # Deletes bots config file if it exists
-      deleteBotsConfigFile
-      # Delete .actors_list file if it exists
-      delete_actors_list_file
-      # Removes the run from the list of runs if it exists
-      return unless removeRunfromList(runid, args[0])
-      # Stop nutella actors
-      stop_nutella_actors
-      # Stop broker if needed
-      if Nutella.runlist.empty? and Nutella.config['broker'] == "localhost" 
-        stopBroker
+      Tmux.kill_session run_id
+
+      # Stop all nutella internal actors, if needed
+      if Nutella.runlist.empty?
+        stop_nutella_actors
       end
+
+      # If running on the internal broker, stop it if needed
+      if Nutella.runlist.empty? and Nutella.config['broker'] == 'localhost'
+        stop_broker
+      end
+
       # Output success message
-      outputSuccessMessage(runid, args[0])
+      output_success_message( run_id, run )
     end
   
     
@@ -33,63 +42,56 @@ module Nutella
     
     
     
-    def removeRunfromList(runid, run) 
-      unless Nutella.runlist.delete?(runid)
-        if runid == Nutella.current_project.config['name']
-          console.warn "Run #{runid} doesn't exist. Impossible to stop it."
-        else
-          console.warn "Run #{run} doesn't exist. Impossible to stop it."
-        end
+    def remove_from_run_list( run_id )
+      unless Nutella.runlist.delete? run_id
+        console.warn "Run #{run_id} doesn't exist. Impossible to stop it."
         return false
       end
-      return true
+      true
     end
-  
-    def stopBroker
-      pidFile = "#{Nutella.config["broker_dir"]}/bin/.pid"
-      if File.exist?(pidFile) # Does the broker pid file exist?
-        pidF = File.open(pidFile, "rb")
-        pid = pidF.read.to_i
-        pidF.close()
-        Process.kill("SIGKILL", pid)
-        File.delete(pidFile)
-      end
-    end
+
 
     def stop_nutella_actors
-      nutella_actors_dir = "#{Nutella.config['nutella_home']}/actors"
+      nutella_actors_dir = "#{Nutella.config['nutella_home']}actors"
       Dir.entries(nutella_actors_dir).select {|entry| File.directory?(File.join(nutella_actors_dir,entry)) && !(entry =='.' || entry == '..') }.each do |actor|
-        pid_file = "#{nutella_actors_dir}/#{actor}/.pid"
-        if File.exist?(pid_file)
-          pid_f = File.open(pid_file, "rb")
-          pid = pid_f.read.to_i
-          pid_f.close()
-          Process.kill("SIGKILL", pid)
-          File.delete(pid_file)
-        end
-      end
-    end
-    
-    def deleteBotsConfigFile
-      prj_dir = Nutella.current_project.dir
-      if File.exist?("#{prj_dir}/.botsconfig.json")
-        File.delete("#{prj_dir}/.botsconfig.json") 
+        pid_file_path = "#{nutella_actors_dir}/#{actor}/.pid"
+        kill_process_with_pid pid_file_path
       end
     end
 
-    def delete_actors_list_file
-      prj_dir = Nutella.current_project.dir
-      actors_config_file = "#{prj_dir}/.actors_config.json"
-      File.delete(actors_config_file) if File.exist?(actors_config_file)
+
+    def stop_broker
+      pid_file_path = "#{Nutella.config['broker_dir']}/bin/.pid"
+      kill_process_with_pid pid_file_path
     end
-    
-    def outputSuccessMessage(runid, run)
-      if runid == Nutella.current_project.config["name"]
-        console.success "Project #{Nutella.current_project.config["name"]} stopped"
-      else
-        console.success "Project #{Nutella.current_project.config["name"]}, run #{run} stopped"
+
+
+    # Does the process pid file exist?
+    # If it does we send a SIGKILL to the process with that pid
+    # to stop the process and delete the pid file
+    def kill_process_with_pid( pid_file_path )
+      if File.exist? pid_file_path
+        pid_file = File.open( pid_file_path, 'rb' )
+        pid = pid_file.read.to_i
+        pid_file.close
+        begin
+          Process.kill( 'SIGKILL', pid )
+        rescue
+          # Pid file exists but process is dead. Do nothing
+        end
+        File.delete pid_file_path
       end
     end
+
+
+    def output_success_message(run_id, run)
+      if run_id == Nutella.current_project.config['name']
+        console.success "Project #{Nutella.current_project.config['name']} stopped"
+      else
+        console.success "Project #{Nutella.current_project.config['name']}, run #{run} stopped"
+      end
+    end
+
   
   end
 end

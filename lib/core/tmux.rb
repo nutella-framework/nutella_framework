@@ -39,7 +39,7 @@ module Nutella
       url
     end
 
-    def self.killSession(runId)
+    def self.kill_session( runId )
       `tmux kill-session -t #{runId} &> /dev/null`
     end
       

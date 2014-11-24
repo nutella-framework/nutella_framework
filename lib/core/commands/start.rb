@@ -19,14 +19,14 @@ module Nutella
 
       # Check that the run_id is unique and add it to the list of runs
       # If it's not, return (without adding the run_id to the list of course)
-      return unless add_to_run_list( run_id, cur_prj_dir)
+      return unless add_to_run_list( run_id, cur_prj_dir )
 
-      # If running on the internal broker, start it
+      # If running on the internal broker, start it if needed
       if Nutella.config['broker'] == 'localhost'
         return unless start_internal_broker
       end
 
-      # Start all nutella internal actors
+      # Start all nutella internal actors, if needed
       return unless start_nutella_actors
 
       # Install dependencies, compile and start all bots
@@ -189,50 +189,6 @@ module Nutella
       console.success "Do `tmux attach-session -t #{run_id}` to monitor your bots."
       console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{run_id} to access your interfaces"
     end
-
-
-    # def createBotsConfig
-    #   botsconfig = Nutella.config.to_h
-    #   botsconfig.delete(:runs)
-    #   botsconfig[:prj_name] = Nutella.current_project.config["name"]
-    #   File.open("#{@cur_prj_dir}/.botsconfig.json", "w") do |f|
-    #     f.write(JSON.pretty_generate(botsconfig))
-    #   end
-    # end
-    #
-    #
-    # def deleteBotsConfig
-    #   File.delete("#{@cur_prj_dir}/.botsconfig.json") if File.exist?("#{@cur_prj_dir}/.botsconfig.json")
-    # end
-    #
-    #
-    # def create_actors_list_file(pids_hash, interfaces_hash )
-    #   actors_config_file = "#{@cur_prj_dir}/.actors_config.json"
-    #   actors_hash = interfaces_hash
-    #   File.open(actors_config_file, 'w') do |f|
-    #     f.write(JSON.pretty_generate(actors_hash))
-    #   end
-    # end
-    #
-    #
-    # def delete_actors_list_file
-    #   actors_config_file = "#{@cur_prj_dir}/.actors_config.json"
-    #   File.delete(actors_config_file) if File.exist?(actors_config_file)
-    # end
-    #
-    #
-    # def start_interfaces
-    #   urls = Hash.new
-    #   Dir.entries("#{@cur_prj_dir}/interfaces").select {|entry| File.directory?(File.join("#{@cur_prj_dir}/interfaces",entry)) and !(entry =='.' || entry == '..') }.each do |iface|
-    #     if !File.exist?("#{@cur_prj_dir}/interfaces/#{iface}/index.html")
-    #       console.warn "Impossible to start interface #{iface}. Couldn't locate 'index.html' file."
-    #       next
-    #     end
-    #     urls[iface] = @tmux.new_interface_window iface
-    #   end
-    #   urls
-    # end
-
 
   end
   
