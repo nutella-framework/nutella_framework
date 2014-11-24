@@ -2,26 +2,27 @@ module Nutella
   
   class Tmux
   
-    def initialize(runId)
-      @runId = runId
+    def initialize( run_id )
+      @run_id = run_id
     end
   
-    def new_bot_window(bot)
-      if !defined?(@sessions)
-        # If there is no sessions, let's create one and, at the same time, create a new window for the bot
-        `tmux new-session -d -s #{@runId} -n #{bot} &> /dev/null`
-        @sessions = [bot]
+    def new_bot_window( bot )
+      if defined? @sessions
+        # If a session already exists,
+        # simply create a new window for 'bot'.
+        # -k destroys the window if it can't be created
+        # Print info about creation of window
+        `tmux new-window -kP -n #{bot} &> /dev/null`
+        @sessions.push bot
       else
-        # Create new window for `bot`
-        # -k destroys it if it can't be created
-        # Pring info about creation of window
-      	`tmux new-window -kP -n #{bot} &> /dev/null` 
-        @sessions.push(bot)
+        # If there is no sessions, let's create one and, at the same time, create a new window for the bot
+        `tmux new-session -d -s #{@run_id} -n #{bot} &> /dev/null`
+        @sessions = [bot]
       end
       # Select window
-    	`tmux select-window -t #{@runId}:#{@sessions.length-1} &> /dev/null`
+    	`tmux select-window -t #{@run_id}:#{@sessions.length-1} &> /dev/null`
       # Start bot
-      `tmux send-keys "cd bots/#{bot};./startup #{@runId} #{Nutella.config["broker"]}" C-m`
+      `tmux send-keys "cd bots/#{bot};./startup #{@run_id} #{Nutella.config['broker']}" C-m`
     end
 
     def new_interface_window( iface )
@@ -31,7 +32,7 @@ module Nutella
       `tmux new-window -kP -n #{iface} &> /dev/null`
       @sessions.push(iface)
       # Select window
-      `tmux select-window -t #{@runId}:#{@sessions.length-1} &> /dev/null`
+      `tmux select-window -t #{@run_id}:#{@sessions.length-1} &> /dev/null`
       port = Nutella.config['main_interface_port'] + @sessions.length
       url = "http://localhost:#{port}/index.html"
       # Start serving interface
