@@ -3,7 +3,7 @@ require 'helper'
 module Nutella
   
   class TestProject < MiniTest::Test
-    
+
     def setup
       Dir.chdir NUTELLA_HOME
       Nutella.execute_command( 'new', ['test_project'] )
@@ -29,6 +29,6 @@ module Nutella
       FileUtils.rm_rf "#{NUTELLA_HOME}test_project"
       Dir.chdir NUTELLA_HOME
     end
-    
+
   end
 end

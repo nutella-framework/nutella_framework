@@ -1,7 +1,9 @@
 # Nutella
 config.json
+runlist.json
 broker/
 .tmp/
+.pid
 
 # Jeweler / Gem / Bundler/ Coverage
 pkg/

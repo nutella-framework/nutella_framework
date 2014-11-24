@@ -3,7 +3,7 @@ require 'helper'
 module Nutella
   
   class TestRunList < MiniTest::Test
-    
+
     def setup
       Nutella.runlist.send(:remove_file)
     end
@@ -49,6 +49,6 @@ module Nutella
     def teardown
       Nutella.runlist.send(:remove_file)
     end
-    
+
   end
 end

@@ -3,11 +3,12 @@ require 'helper'
 module Nutella
   
   class TestNutellaConfig < MiniTest::Test
-    
+
     def setup
       Nutella.config.send(:remove_file)
     end
-  
+
+
     should 'set a key value' do
       assert_equal 'value1', Nutella.config['key1']='value1'
     end
@@ -34,14 +35,14 @@ module Nutella
       Nutella.config['key5']={'k55' => 'v55'}
       assert_equal 'v55', Nutella.config['key5']['k55']
     end
-  
+
+
     def teardown
       Nutella.config.send(:remove_file)
     end
   
   end
-  
-  
+
 end
 
 
