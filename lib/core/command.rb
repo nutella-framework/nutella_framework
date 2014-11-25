@@ -5,8 +5,8 @@ module Nutella
     class << self; attr_accessor :description end
   
     # Commands overload this method to execute
-    def run (args=nil)
-      console.error('Running the generic command!!! WAT?')
+    def run( args=nil )
+      console.error 'Running the generic command!!! WAT?'
     end
   end
 end

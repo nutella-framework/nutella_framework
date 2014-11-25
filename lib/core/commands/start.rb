@@ -1,21 +1,19 @@
-require 'core/command'
+require 'core/run_command'
 require 'core/tmux'
 
 module Nutella
-  class Start < Command
+  class Start < RunCommand
     @description = 'Starts all or some of the bots in the current project'
-  
-    def run(args=nil)
 
-      # Check that the run name passed as parameter is not nil
-      run = args.nil? ? nil : args[0]
+    def run(args=nil)
 
       # If the current directory is not a nutella project, return
       return unless Nutella.current_project.exist?
 
+      # Extract run (passed run name) and run_id
+      run, run_id = extract_names args
       # Extract project directory and run_id
       cur_prj_dir = Nutella.current_project.dir
-      run_id = args.nil? ? Nutella.runlist.extract_run_id( '' ) : Nutella.runlist.extract_run_id( args[0] )
 
       # Check that the run_id is unique and add it to the list of runs
       # If it's not, return (without adding the run_id to the list of course)
@@ -30,18 +28,19 @@ module Nutella
       return unless start_nutella_actors
 
       # Install dependencies, compile and start all bots
-      return unless install_bots_dependencies cur_prj_dir
-      return unless compile_bots cur_prj_dir
+      return unless prepare_bot( cur_prj_dir, 'dependencies', 'Installing dependencies for' )
+      return unless prepare_bot( cur_prj_dir, 'compile', 'Compiling' )
       return unless start_bots( cur_prj_dir, run_id )
 
       # Output success message
-      output_success_message( run_id, run)
+      output_success_message( run_id, run, 'started' )
+      output_monitoring_details run_id
     end
-    
-    
+
+
     private
-    
-    
+
+
     def add_to_run_list(run_id, prj_dir)
       unless Nutella.runlist.add?( run_id, prj_dir )
         console.error 'Impossible to start project: an instance of this project with the same run_id is already running!'
@@ -50,11 +49,28 @@ module Nutella
       end
       true
     end
-  
-  
+
+
     def start_internal_broker
       pid_file_path = "#{Nutella.config['broker_dir']}bin/.pid"
-      # Does the broker pid file exist?
+      return true if sanitize_pid_file pid_file_path
+      # Broker is not running and there is no file so we try to start
+      # and create a new pid file. Note that the pid file is created by
+      # the startup script!
+      pid = fork
+      exec("#{Nutella.config['broker_dir']}/startup") if pid.nil?
+      # Sleep a bit to give the chance to the broker to actually start up
+      sleep(0.5)
+      # All went well so we return true
+      true
+    end
+
+
+    # Cleans the pid file of a given process
+    # @param [String] pid_file_path the file storing the pid file of the process
+    # @return [Boolean] true if the pid file exists AND the process with that pid is still alive
+    def sanitize_pid_file( pid_file_path )
+      # Does the pid file exist?
       # If it does we try to see if the process with that pid is still alive
       if File.exist? pid_file_path
         pid_file = File.open(pid_file_path, 'rb')
@@ -66,25 +82,20 @@ module Nutella
           Process.getpgid pid
           return true
         rescue
-          # The process is dead but we have a stale pid file so we remove the pid
+          # If there is an exception, there is no process with this pid
+          # so we have a stale pid file that we need to remove
           File.delete pid_file_path
+          return false
         end
       end
-        # Broker is not running and there is no file so we try to start
-        # and create a new pid file. Note that the pid file is created by
-        # the startup script!
-        pid = fork
-        exec("#{Nutella.config['broker_dir']}/startup") if pid.nil?
-        sleep(0.5)
-        # All went well so we return true
-        true
-
+      # If there is no pid file, there is no process running
+      false
     end
 
 
     def start_nutella_actors
       nutella_actors_dir = "#{Nutella.config['nutella_home']}actors"
-      Dir.entries(nutella_actors_dir).select {|entry| File.directory?(File.join(nutella_actors_dir, entry)) && !(entry =='.' || entry == '..') }.each do |actor|
+      for_each_actor_in_dir nutella_actors_dir do |actor|
         if File.exist? "#{nutella_actors_dir}/#{actor}/startup"
           unless start_nutella_actor "#{nutella_actors_dir}/#{actor}"
             return false
@@ -96,22 +107,7 @@ module Nutella
 
     def start_nutella_actor( actor_dir )
       pid_file_path = "#{actor_dir}/.pid"
-      # Does the actor pid file exist?
-      # If it does we try to see if the process with that pid is still alive
-      if File.exist? pid_file_path
-        pid_file = File.open(pid_file_path, 'rb')
-        pid = pid_file.read.to_i
-        pid_file.close
-        begin
-          # If this statement doesn't throw an exception then a process with
-          # this pid is still alive so we do nothing and just return true
-          Process.getpgid pid
-          return true
-        rescue
-          # The process is dead but we have a stale pid file so we remove the pid
-          File.delete pid_file_path
-        end
-      end
+      return true if sanitize_pid_file pid_file_path
       # Actor is not running and there is no pid file so we try to start
       # the actor and create a new pid file. Note that the pid file is created by
       # the startup script!
@@ -128,34 +124,16 @@ module Nutella
     end
 
 
-    def install_bots_dependencies( cur_prj_dir )
-      # Go through all the bots directories
-      Dir.entries("#{cur_prj_dir}/bots").select {|entry| File.directory?(File.join("#{cur_prj_dir}/bots", entry)) and !(entry =='.' || entry == '..') }.each do |bot|
-        # Skip bot if there is no 'dependencies' script
-        next unless File.exist? "#{cur_prj_dir}/bots/#{bot}/dependencies"
+    def prepare_bot( cur_prj_dir, script, message )
+      for_each_actor_in_dir cur_prj_dir do |bot|
+        # Skip bot if there is no '' script
+        next unless File.exist? "#{cur_prj_dir}/bots/#{bot}/#{script}"
         # Output message
-        console.info "Installing dependencies for bot #{bot}."
+        console.info "#{message} bot #{bot}."
         # Execute 'dependencies' script
         cur_dir = Dir.pwd
         Dir.chdir "#{cur_prj_dir}/bots/#{bot}"
-        system './dependencies'
-        Dir.chdir cur_dir
-      end
-      true
-    end
-
-
-    def compile_bots( cur_prj_dir )
-      # Go through all the bots directories
-      Dir.entries("#{cur_prj_dir}/bots").select {|entry| File.directory?(File.join("#{cur_prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
-        # Skip bot if there is no 'compile' script
-        next unless File.exist? "#{cur_prj_dir}/bots/#{bot}/compile"
-        # Output message
-        console.info "Compiling bot #{bot}."
-        # Execute 'compile' script
-        cur_dir = Dir.pwd
-        Dir.chdir "#{cur_prj_dir}/bots/#{bot}"
-        system './compile'
+        system "./#{script}"
         Dir.chdir cur_dir
       end
       true
@@ -163,13 +141,13 @@ module Nutella
 
 
     def start_bots( cur_prj_dir, run_id )
+      bots_dir = "#{cur_prj_dir}/bots/"
       # Create a new tmux instance for this run
       tmux = Tmux.new run_id
-      # Go through all the bots directories
-      Dir.entries("#{cur_prj_dir}/bots").select {|entry| File.directory?(File.join("#{cur_prj_dir}/bots",entry)) and !(entry =='.' || entry == '..') }.each do |bot|
+      for_each_actor_in_dir bots_dir do |bot|
         # If there is no 'startup' script output a warning (because
         # startup is mandatory) and skip the bot
-        unless File.exist?("#{cur_prj_dir}/bots/#{bot}/startup")
+        unless File.exist?("#{bots_dir}#{bot}/startup")
           console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
           next
         end
@@ -180,15 +158,11 @@ module Nutella
     end
 
 
-    def output_success_message(run_id, run)
-      if run_id == Nutella.current_project.config['name']
-        console.success "Project #{Nutella.current_project.config['name']} started!"
-      else
-        console.success "Project #{Nutella.current_project.config['name']}, run #{run} started!"
-      end
+    def output_monitoring_details( run_id )
       console.success "Do `tmux attach-session -t #{run_id}` to monitor your bots."
       console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{run_id} to access your interfaces"
     end
+
 
   end
   
