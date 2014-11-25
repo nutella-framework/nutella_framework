@@ -40,7 +40,7 @@ module Nutella
       out2 = system 'npm install > /dev/null 2>&1'
     
       # Add startup script and make it executable
-      File.open('startup', 'w') { |file| file.write('#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 &\necho $! > $BASEDIR/bin/.pid\n') }
+      File.open('startup', 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 &\necho $! > $BASEDIR/bin/.pid\n") }
       File.chmod( 0755, 'startup' )
     
       # Write configuration into config.json
