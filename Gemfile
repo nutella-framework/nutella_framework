@@ -6,11 +6,12 @@ gem 'logging', '~> 1.8', '>=1.8.2'
 gem 'git', '~> 1.2', '>=1.2.8'
 gem 'thin', '~> 1.6.3', '>= 1.6.3'
 gem 'sinatra', '~>1.4.5', '>=1.4.5'
-gem 'erubis', '~>2.7.0', '>=2.7.0'
+gem 'nokogiri', '~>1.6.3', '>=1.6.3'
+
 
 group :development do
   gem 'shoulda', '~> 3', '>= 3'
-  gem "yard", '~> 0.8', '>= 0.8.7'
+  gem 'yard', '~> 0.8', '>= 0.8.7'
   gem 'rdoc', '~> 4.0', '>= 4.0'
   gem 'bundler', '~> 1.0', '>= 1.0'
   gem 'jeweler', '~> 2.0.1', '>= 2.0.1'
@@ -18,5 +19,5 @@ group :development do
 end
 
 group :test do
-  gem "rake"
+  gem 'rake'
 end

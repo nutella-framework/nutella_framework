@@ -60,7 +60,7 @@ module Nutella
       pid = fork
       exec("#{Nutella.config['broker_dir']}/startup") if pid.nil?
       # Sleep a bit to give the chance to the broker to actually start up
-      sleep(0.5)
+      sleep(0.8)
       # All went well so we return true
       true
     end

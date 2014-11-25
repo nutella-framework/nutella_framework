@@ -1,5 +1,6 @@
 require 'json'
 require 'sinatra'
+require 'nokogiri'
 
 # Configuration file and runlist (runlist as global)
 config_file = ARGV[0]
@@ -20,40 +21,80 @@ set :port, config_h['main_interface_port']
 
 # Display the form to input the run_id
 get '/' do
-  File.read(File.join("#{config_h['nutella_home']}/actors/main_interface/public", 'index.html'))
+  send_file File.join("#{config_h['nutella_home']}/actors/main_interface/public", 'index.html')
 end
 
 
 # Renders the run template
 get '/:run_id' do
 
-  # Parse the run_id from URL
+  # Parse the run_id from URL and extract the run path from runlist.json
   @run_id = params[:run_id]
+  @run_path = get_run_path @run_id
+  @project_name = @run_path[@run_path.rindex('/')+1..@run_path.length] unless @run_path.nil?
 
-  # Check inside the runlist, if there is no run with this name display error page
-  @run_path = get_run_path(@run_id)
-  if @run_path.nil?
-    # render error page:
-    # File.read(File.join("#{config_h['nutella_home']}/actors/main_interface/public", 'index.html'))
-    # something like, no run_id like this
-    File.read(File.join("#{config_h['nutella_home']}/actors/main_interface/public", '404.html'))
-  end
+  # If there is no run with this name, render error page
+  return erb( :not_found_404, :locals => {:not_found_type => 'run'} ) if @run_path.nil?
 
-  # TODO # 2. If there is a run with that run_id we need to load the run filepath and check if there is an index.erb inside the interfaces folder and if there is, render that
-  # 3. If there is no erb template, we need to generate one. We need to load, for all interfaces in the run, name, description, id, port/address
-  # 4. This info (id, port/address) is stored inside the .interfaces_config file inside the run folder.
-  # 5. Finally we need to load the broker name and compose the interfaces links as such.
-  # http://localhost:57883/index.html?run_id=roomquake&broker=ltg.evl.uic.edu
-  # Makes sure we sanitize the parameters with sensible defaults and humor (e.g. no description)
-  # This should be the only instance variable
-  @interfaces = Array.new
-  @interfaces.push({ 'name' => 'Seismograph', 'description' => 'Draws the seismograph continuously', 'url' => 'http://localhost:myport/index.html?run_id=roomquake&broker=ltg.evl.uic.edu' })
-  @interfaces.push({ 'name' => 'Teacher administration panel', 'description' => 'Administration panel for the teacher that allows them to configure the room, schedule quakes and manag the run', 'url' => 'http://localhost:my_other_port/index.html?run_id=roomquake&broker=ltg.evl.uic.edu' })
+  # If there is an 'index.erb' file inside the 'interfaces' folder, render it
+  custom_index_file = "#{@run_path}/interfaces/index.erb"
+  return erb(File.read( custom_index_file )) if File.exist? custom_index_file
+
+  # If no 'index.erb' is provided we need to generate one
+  # In order to do so we need to load a bunch of details
+  # (folder, title/name, description) for each interface
+  @interfaces = load_interfaces_details
+
+  # Finally render the interfaces summary page
   erb :index
 end
 
-# Utility functions
 
+# Serves the index.html file for each individual interface augmented with nutella query string parameters
+get '/:run_id/:interface' do
+
+  # Parse the run_id and the interface name from URL
+  run_id = params[:run_id]
+  interface = params[:interface]
+
+  # Extract the run path from runlist.json
+  run_path = get_run_path run_id
+
+  # Compose the path of interface index file
+  index_file_path = "#{run_path}/interfaces/#{interface}/index.html"
+
+  # If the index file doesn't exist, render error page
+  return erb( :not_found_404, :locals => {:not_found_type => 'idx'} ) unless File.exist? index_file_path
+
+  # If the index file exists, compose query string and redirect
+  index_with_query_url = "#{request.path}/index.html?run_id=#{run_id}&broker=#{config_h['broker']}"
+  redirect index_with_query_url
+end
+
+
+# Serves the files contained in each interface folder
+get '/:run_id/:interface/*' do
+
+  # Parse the run_id, the interface name and the file_path from URL
+  run_id = params[:run_id]
+  interface = params[:interface]
+  relative_file_path = params[:splat][0]
+
+  # Extract the run path from runlist.json
+  run_path = get_run_path run_id
+
+  # Compose the path of the file we are trying to serve
+  file_path = "#{run_path}/interfaces/#{interface}/#{relative_file_path}"
+
+  # If the file we are trying to serve doesn't exist, render error page
+  return erb( :not_found_404, :locals => {:not_found_type => 'file'} ) unless File.exist? file_path
+
+  # If the file exists, render it
+  send_file file_path
+end
+
+
+# Utility function:
 # Gets the path associated with a certain run
 def get_run_path (run_id)
   begin
@@ -62,4 +103,38 @@ def get_run_path (run_id)
   rescue
     nil
   end
+end
+
+# Utility function:
+# Loads all the details for all interfaces and stores them into an array of hashes
+def load_interfaces_details
+  interfaces = Array.new
+  interfaces_path = "#{@run_path}/interfaces/"
+  Dir.entries(interfaces_path).select {|entry| File.directory?(File.join(interfaces_path, entry)) && !(entry =='.' || entry == '..') }.each do |iface_dir|
+    interfaces.push extract_interface_info( interfaces_path, iface_dir )
+  end
+  interfaces
+end
+
+# Utility function:
+# Extracts name, description and folder for a single interface
+def extract_interface_info( interfaces_path, iface_dir )
+  iface_props = Hash.new
+
+  index_path = "#{interfaces_path}#{iface_dir}/index.html"
+
+  unless File.exist? index_path
+    iface_props[:name] = iface_dir
+    iface_props[:description] = 'My designer was a lazy ass and didn\'t include an index.html file in the main interface directory'
+    return iface_props
+  end
+
+  # If file exists, parse it and extract info
+  f = File.open index_path
+  doc = Nokogiri::HTML f
+  f.close
+  iface_props[:name] = doc.css('title').text
+  iface_props[:description] = doc.css("meta[name='description']").attribute('content').text
+  iface_props[:url] = "#{@run_id}/#{iface_dir}"
+  iface_props
 end
