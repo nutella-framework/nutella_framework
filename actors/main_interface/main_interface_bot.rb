@@ -133,8 +133,16 @@ def extract_interface_info( interfaces_path, iface_dir )
   f = File.open index_path
   doc = Nokogiri::HTML f
   f.close
-  iface_props[:name] = doc.css('title').text
-  iface_props[:description] = doc.css("meta[name='description']").attribute('content').text
+  iface_props[:name] = doc.css('title').empty? ? iface_dir : doc.css('title').text
+  if doc.css("meta[name='description']").empty?
+    iface_props[:description] = 'My designer was a lazy ass and didn\'t include a &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file'
+  else
+    if doc.css("meta[name='description']").attribute('content').nil?
+      iface_props[:description] = 'There was no attribute content in &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file'
+    else
+      iface_props[:description] = doc.css("meta[name='description']").attribute('content').text
+    end
+  end
   iface_props[:url] = "#{@run_id}/#{iface_dir}"
   iface_props
 end
