@@ -10,6 +10,7 @@ Nutella is a framework to build and run ClassroomStories. It's still _very_ unde
 
 # Before installing
 Nutella is written in ruby but it leverages lots of technologies that already exists. Therefore, before you can successfully install nutella, you need to:
+
 1. Install _ruby_ (if you don't have it already). Do yourself a favor and use [RVM](https://rvm.io/rvm/install).
 1. Install _git_ (if you don't have it already). Do yourself a favor and use [Homebrew](http://brew.sh/) if you are on OSX.
 1. Install _tmux_ (if you don't have it already). Do yourself a favor and use [Homebrew](http://brew.sh/) if you are on OSX.
@@ -23,7 +24,7 @@ gem install nutella_framework
 ```
 Once the installation is complete you should be able to type `nutella` in your shell and get a welcome message. 
 
-## `nutella checkup`
+## nutella checkup
 If you are reading this you probably already saw the "Looks like this is a fresh installation of nutella. Please run 'nutella checkup' to check all dependencies are installed." warning.
 
 Nutella is written in ruby but is designed to run bots and interfaces written in virtually any programming language. All communications among these components are routed through an _MQTT broker_ which needs to be installed (together with its dependencies) before nutella can actually work correctly. Therefore **right after your install nutella** you should run: 
