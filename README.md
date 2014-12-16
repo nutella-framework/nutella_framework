@@ -15,7 +15,7 @@ Nutella is written in ruby but it leverages lots of technologies that already ex
 1. _tmux_ (version >= 1.8.0). Do yourself a favor and use [Homebrew](http://brew.sh/) if you are on OSX.
 1. _node.js_ (version >= 0.10.0). Yes, really, you need to install node becaue we use it to run the broker that handles all communications between all the pieces of the framework. Do yourself a favor and use [nvm](https://github.com/creationix/nvm).
 
- To install nutella, simply do:
+Once you have all the pieces that you need, to install nutella simply do:
 ```
 gem install nutella_framework
 ```
