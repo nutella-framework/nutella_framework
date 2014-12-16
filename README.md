@@ -7,17 +7,14 @@
 # Nutella 
 Nutella is a framework to build and run ClassroomStories. It's still _very_ under development so any help [finding and fixing bugs](https://github.com/nutella-framework/nutella_framework/issues) will be greatly appreciated!
 
-
-# Before installing
-Nutella is written in ruby but it leverages lots of technologies that already exists. Therefore, before you can successfully install nutella, you need to:
-
-1. Install _ruby_ (if you don't have it already). Do yourself a favor and use [RVM](https://rvm.io/rvm/install).
-1. Install _git_ (if you don't have it already). Do yourself a favor and use [Homebrew](http://brew.sh/) if you are on OSX.
-1. Install _tmux_ (if you don't have it already). Do yourself a favor and use [Homebrew](http://brew.sh/) if you are on OSX.
-1. Install _node.js_ (if you don't have it already). Yes, really, you need to install node becaue we use it to run the broker that handles all communications between all the pieces of the framework. Do yourself a favor and use [nvm](https://github.com/creationix/nvm).
-
-
 # Installing
+Nutella is written in ruby but it leverages lots of technologies that already exists. Therefore, before you can successfully install nutella, you need to install (if you don't have them already):
+
+1. _ruby_ (version >= 2.1.0). Do yourself a favor and use [RVM](https://rvm.io/rvm/install).
+1. _git_ (version >= 1.8.0). Do yourself a favor and use [Homebrew](http://brew.sh/) if you are on OSX.
+1. _tmux_ (version >= 1.8.0). Do yourself a favor and use [Homebrew](http://brew.sh/) if you are on OSX.
+1. _node.js_ (version >= 0.10.0). Yes, really, you need to install node becaue we use it to run the broker that handles all communications between all the pieces of the framework. Do yourself a favor and use [nvm](https://github.com/creationix/nvm).
+
  To install nutella, simply do:
 ```
 gem install nutella_framework
@@ -25,15 +22,15 @@ gem install nutella_framework
 Once the installation is complete you should be able to type `nutella` in your shell and get a welcome message. 
 
 ## nutella checkup
-If you are reading this you probably already saw the "Looks like this is a fresh installation of nutella. Please run 'nutella checkup' to check all dependencies are installed." warning.
+If you are reading this you probably already saw the warning: "Looks like this is a fresh installation of nutella. Please run 'nutella checkup' to check all dependencies are installed".
 
 Nutella is written in ruby but is designed to run bots and interfaces written in virtually any programming language. All communications among these components are routed through an _MQTT broker_ which needs to be installed (together with its dependencies) before nutella can actually work correctly. Therefore **right after your install nutella** you should run: 
 ```
 nutella checkup
 ```
-This will install the [Mosca](http://www.mosca.io/) MQTT broker and make sure all the dependencies required by nutella have been correctly installed.
+This will install the [Mosca](http://www.mosca.io/) MQTT broker and make sure all the dependencies required by nutella are installed as well.
 
-Nutella is ready to use!
+Congratulations! Nutella is ready to use!
 
 
 # Hello world
