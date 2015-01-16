@@ -26,7 +26,7 @@ end
 
 
 # Renders the run template
-get '/:run_id' do
+get '/:run_id/?' do
 
   # Parse the run_id from URL and extract the run path from runlist.json
   @run_id = params[:run_id]
