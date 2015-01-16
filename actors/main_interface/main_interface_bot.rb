@@ -15,6 +15,9 @@ rescue
   abort 'Impossible to parse configuration and/or runlist files!'
 end
 
+# Set Sinatra to run in porduction mode
+set :environment, :production
+
 # Set Sinatra's port to nutella's main_interface_port
 set :port, config_h['main_interface_port']
 
