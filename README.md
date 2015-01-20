@@ -5,7 +5,7 @@
 [![Code Climate](https://codeclimate.com/github/nutella-framework/nutella_framework/badges/gpa.svg)](https://codeclimate.com/github/nutella-framework/nutella_framework)
 
 # Nutella 
-Nutella is a framework to build and run ClassroomStories. It's still _very_ under development so any help [finding and fixing bugs](https://github.com/nutella-framework/nutella_framework/issues) will be greatly appreciated!
+Nutella is a framework to build and run classroom narratives. It's still _very_ under development so any help [finding and fixing bugs](https://github.com/nutella-framework/nutella_framework/issues) will be greatly appreciated!
 
 # Installing
 Nutella is written in ruby but it leverages lots of technologies that already exists. Therefore, before you can successfully install nutella, you need to install (if you don't have them already):
@@ -33,27 +33,11 @@ This will install the [Mosca](http://www.mosca.io/) MQTT broker and make sure al
 Congratulations! Nutella is ready to use!
 
 
-# Hello world
-So what does nutella do for me? Suppose we want to create a new application called "crepe" (because I like nutella crêpes). Let's do that:
-```
-nutella new crepe
-```
-Nutella will create the basic project structure in a directory called `crepe`. Now that we have created a basic project, we can 
-```
-cd crepe
-``` 
-and start our new project by doing
-```
-nutella start
-```
-Pretty boring isn't it? Nothing is happeninig! Why? Well, because the project we just created is simply an empty shell. Let's spice things up a bit and throw some cinnamon into this crêpe!
+# Where next?
+If you already have a projects you want to tinker with (like [RoomQuake](https://github.com/ltg-uic/roomquake)) simply checkout the project to a local folder, `cd /to/my/local/folder` and start tinkering away. Not sure what to do? Check out our [nutella Command Line Tool man page](https://github.com/nutella-framework/nutella_framework/wiki/Nutella-Command-Line-Interface).
 
-## Templates
-What are templates? Templates are simply [boilerplate code](http://en.wikipedia.org/wiki/Boilerplate_code) that you don't have to write.  Templates are there to simplify your life. Let's see how. Our new application is a ...
-**This tutorial is a work in progress**
+If you want to create your own project, check out the [new project tutorial](https://github.com/nutella-framework/nutella_framework/wiki/New-project-tutorial).
 
 
-For a complete guide on how to use Nutella, please refer to [this wiki](https://github.com/nutella-framework/nutella_framework/wiki).
-
-# Building & contributing
-Clone the repo, `bundle install` to take care of the dependencies and then `rake` to run all the tests. If you want to perform some fancier task simply type `rake -T` for a list of awesomeness.
+# Contributing
+Check out our [contributing wiki page](https://github.com/nutella-framework/nutella_framework/wiki/Contributing)! Thanks!
