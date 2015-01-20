@@ -25,23 +25,12 @@ module Nutella
       `tmux send-keys "cd bots/#{bot};./startup #{@run_id} #{Nutella.config['broker']}" C-m`
     end
 
-    def new_interface_window( iface )
-      # Create new window for `iface`
-      # note: -k option destroys it if it can't be created
-      # hide window creation info
-      `tmux new-window -kP -n #{iface} &> /dev/null`
-      @sessions.push(iface)
-      # Select window
-      `tmux select-window -t #{@run_id}:#{@sessions.length-1} &> /dev/null`
-      port = Nutella.config['main_interface_port'] + @sessions.length
-      url = "http://localhost:#{port}/index.html"
-      # Start serving interface
-      `tmux send-keys "cd interfaces/#{iface};thin -R #{Nutella.config['nutella_home']}/lib/extra/config.ru -p #{port.to_s} start" C-m`
-      url
-    end
-
     def self.kill_session( run_id )
       `tmux kill-session -t #{run_id} &> /dev/null`
+    end
+
+    def self.session_exists?( run_id )
+      system( "tmux has-session -t #{run_id} &> /dev/null" )
     end
       
   end

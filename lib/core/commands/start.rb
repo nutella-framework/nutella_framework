@@ -43,9 +43,12 @@ module Nutella
 
     def add_to_run_list(run_id, prj_dir)
       unless Nutella.runlist.add?( run_id, prj_dir )
-        console.error 'Impossible to start project: an instance of this project with the same run_id is already running!'
-        console.error "You might want to kill it with 'nutella stop #{run_id}'"
-        return false
+        # If the run_id is already in the list, check that it's actually live
+        if Tmux.session_exists? run_id
+          console.error 'Impossible to start project: an instance of this project with the same run_id is already running!'
+          console.error "You might want to kill it with 'nutella stop #{run_id}'"
+          return false
+        end
       end
       true
     end
