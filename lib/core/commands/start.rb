@@ -57,6 +57,11 @@ module Nutella
     def start_internal_broker
       pid_file_path = "#{Nutella.config['broker_dir']}bin/.pid"
       return true if sanitize_pid_file pid_file_path
+      # Check that broker is not running unsupervised (check port)
+      unless broker_port_free?
+        console.error 'Impossible to start project: looks like a broker is already running on port 1883. Stop it before trying to start the project again'
+        return false
+      end
       # Broker is not running and there is no file so we try to start
       # and create a new pid file. Note that the pid file is created by
       # the startup script!
@@ -93,6 +98,19 @@ module Nutella
       end
       # If there is no pid file, there is no process running
       false
+    end
+
+
+    # Checks if port 1883 (MQTT broker port) is free
+    # or some other service is already listening on it
+    def broker_port_free?
+      begin
+        s = TCPServer.new('0.0.0.0', 1883)
+        s.close
+      rescue
+        return false
+      end
+      true
     end
 
 
