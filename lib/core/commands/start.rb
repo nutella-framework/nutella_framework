@@ -27,9 +27,7 @@ module Nutella
       # Start all nutella internal actors, if needed
       return unless start_nutella_actors
 
-      # Install dependencies, compile and start all bots
-      return unless prepare_bot( cur_prj_dir, 'dependencies', 'Installing dependencies for' )
-      return unless prepare_bot( cur_prj_dir, 'compile', 'Compiling' )
+      # Start all bots
       return unless start_bots( cur_prj_dir, run_id )
 
       # Output success message
@@ -141,22 +139,6 @@ module Nutella
       pid = fork
       exec(command) if pid.nil?
       # All went well so we return true
-      true
-    end
-
-
-    def prepare_bot( cur_prj_dir, script, message )
-      for_each_actor_in_dir cur_prj_dir do |bot|
-        # Skip bot if there is no '' script
-        next unless File.exist? "#{cur_prj_dir}/bots/#{bot}/#{script}"
-        # Output message
-        console.info "#{message} bot #{bot}."
-        # Execute 'dependencies' script
-        cur_dir = Dir.pwd
-        Dir.chdir "#{cur_prj_dir}/bots/#{bot}"
-        system "./#{script}"
-        Dir.chdir cur_dir
-      end
       true
     end
 

@@ -37,6 +37,22 @@ module Nutella
         console.success "Project #{Nutella.current_project.config['name']}, run #{run} #{action}!"
       end
     end
+    
+    
+    def prepare_bot( cur_prj_dir, script, message )
+      for_each_actor_in_dir cur_prj_dir do |bot|
+        # Skip bot if there is no script
+        next unless File.exist? "#{cur_prj_dir}/bots/#{bot}/#{script}"
+        # Output message
+        console.info "#{message} bot #{bot}."
+        # Execute 'dependencies' script
+        cur_dir = Dir.pwd
+        Dir.chdir "#{cur_prj_dir}/bots/#{bot}"
+        system "./#{script}"
+        Dir.chdir cur_dir
+      end
+      true
+    end
 
 
   end
