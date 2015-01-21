@@ -8,11 +8,17 @@ module Nutella
     def run(args=nil)
       message=''
       Dir["#{File.dirname(__FILE__)}/*.rb"].each do |file|
-        message += "#{File.basename(file, File.extname(file))}\t\t\t"
-        message += Object::const_get("Nutella::#{File.basename(file, File.extname(file)).capitalize}").description
+        command = File.basename(file, File.extname(file))
+        if command.length > 7
+          message += "#{command}\t"
+        else
+          message += "#{command}\t\t"
+        end
+        message += Object::const_get("Nutella::#{command.capitalize}").description
         message += "\n"
       end
       console.info message
+      console.info 'For more details on individual commands, see https://github.com/nutella-framework/nutella_framework/wiki/Nutella-Command-Line-Interface'
     end
     
   end
