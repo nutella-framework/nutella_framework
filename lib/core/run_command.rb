@@ -1,4 +1,5 @@
 require 'core/command'
+require 'slop'
 
 module Nutella
   # This class describes a run command which can be either start or stop.
@@ -9,16 +10,38 @@ module Nutella
       console.error 'Running generic RunCommand!!! WAT?'
     end
 
+
     # Extracts run name and run_id
     # @param [Array<String>] args command line arguments passed to the command
     # @return [String, String ]  the run name (cleaned of nils) and the run_id
     def extract_names( args )
-      # Check that the run name passed as parameter is not nil
-      run = args.nil? ? nil : args[0]
-      # Extract run_id
-      run_id = args.nil? ? Nutella.runlist.extract_run_id( '' ) : Nutella.runlist.extract_run_id( args[0] )
-      return run, run_id
+
+      # Simple `nutella start`
+      if args.nil? || args.empty?
+        run = nil
+        run_id = Nutella.runlist.extract_run_id( '' )
+        return run, run_id
+      end
+
+      # Check if the first argument is a parameter or a run name
+      if args[0].start_with? '-'
+        run = nil
+        run_id = Nutella.runlist.extract_run_id( '' )
+      else
+        # If it's a run name, store the run name and shift so we are left with only
+        # the parameters in args
+        run = args[0]
+        run_id = Nutella.runlist.extract_run_id( args[0] )
+        # It
+        args.shift
+      end
+
+      # Extract parameters
+      params = extract_parameters args
+
+      return run, run_id, params
     end
+
 
     # Executes a code block for each actor in a certain directory
     # @param [String] actors_dir directory where we are iterating
@@ -52,6 +75,20 @@ module Nutella
         Dir.chdir cur_dir
       end
       true
+    end
+
+
+    private
+
+
+    def extract_parameters( args )
+      opts = Slop::Options.new
+      opts.array '-a', '--app', 'A list of application level actors'
+      opts.array '-wo', '--without', 'A list of actors NOT to start'
+      opts.array '-w', '--with', 'A list of actors that needs to be started'
+      parser = Slop::Parser.new(opts)
+      result = parser.parse(args)
+      result.to_hash
     end
 
 

@@ -11,7 +11,10 @@ module Nutella
       return unless Nutella.current_project.exist?
 
       # Extract run (passed run name) and run_id
-      run, run_id = extract_names args
+      run, run_id, params = extract_names args
+      p run
+      p run_id
+      p params.to_h
       # Extract project directory and run_id
       cur_prj_dir = Nutella.current_project.dir
 
@@ -26,6 +29,9 @@ module Nutella
 
       # Start all nutella internal actors, if needed
       return unless start_nutella_actors
+
+      # Start all project level actors, if any
+      return unless start_project_actors( run_id, cur_prj_dir, args )
 
       # Start all bots
       return unless start_bots( cur_prj_dir, run_id )
@@ -123,6 +129,13 @@ module Nutella
       end
       true
     end
+
+
+    def start_project_actors( run_id, cur_prj_dir, args )
+      # Extract parameters
+
+    end
+
 
     def start_nutella_actor( actor_dir )
       pid_file_path = "#{actor_dir}/.pid"
