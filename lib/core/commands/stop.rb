@@ -21,7 +21,7 @@ module Nutella
       Tmux.kill_session run_id
 
       # Stop all project level actors (if any) if needed
-      stop_project_bots run_id
+      stop_project_bots
 
       # Stop all nutella internal actors, if needed
       if Nutella.runlist.empty?
@@ -50,7 +50,15 @@ module Nutella
     end
 
 
-    def stop_project_bots( run_id )
+    def stop_project_bots
+      project_name = Nutella.current_project.config['name']
+      tmux_session_name = "#{project_name}-project-bots"
+      if Tmux.session_exist? tmux_session_name
+        # Are there any runs of this project hinging on the project bots?
+        if Nutella.runlist.runs_by_project(project_name).empty?
+          Tmux.kill_session tmux_session_name
+        end
+      end
       true
     end
 

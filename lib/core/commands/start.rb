@@ -43,7 +43,7 @@ module Nutella
       return unless start_nutella_actors
 
       # Start all project level actors, if any
-      return unless start_project_bots( cur_prj_dir, params )
+      return unless start_project_bots cur_prj_dir
 
       # Start all bots
       return unless start_bots( cur_prj_dir, run_id, params )
@@ -162,16 +162,35 @@ module Nutella
     end
 
 
-    def start_project_bots( cur_prj_dir, params )
-      # # If project bots have been started already, then do nothing
-      # if Tmux.session_exist? "#{run_id}-project-bots"
-      #   return true
-      # end
+    def start_project_bots( cur_prj_dir )
+      project_bots_list = Nutella.current_project.config['project_bots']
+      project_name = Nutella.current_project.config['name']
+      tmux_session_name = "#{project_name}-project-bots"
+      bots_dir = "#{cur_prj_dir}/bots/"
+      # If project bots have been started already, then do nothing
+      unless Tmux.session_exist? tmux_session_name
+        # Start all project bots in the list into a new tmux session
+        tmux = Tmux.new tmux_session_name
+        for_each_actor_in_dir bots_dir do |bot|
+          if project_bots_list.include? bot
+            # If there is no 'startup' script output a warning (because
+            # startup is mandatory) and skip the bot
+            unless File.exist?("#{bots_dir}#{bot}/startup")
+              console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
+              next
+            end
+            # Create a new window in the session for this run
+            tmux.new_bot_window bot
+          end
+        end
+      end
       true
     end
 
 
     def start_bots( cur_prj_dir, run_id, params )
+      # Fetch the list of project bots
+      project_bots_list = Nutella.current_project.config['project_bots']
       # Extract which mode we are in (starting all bots, starting only some, excluding some)
       mode = 'all'
       unless params[:with].empty?
@@ -186,13 +205,13 @@ module Nutella
       # Start all the appropriate bots
       for_each_actor_in_dir bots_dir do |bot|
         if mode=='all'
-          start_bot( bots_dir, bot, tmux )
+          start_bot(bots_dir, bot, tmux) unless project_bots_list.include?(bot)
         end
         if mode=='w'
-          start_bot( bots_dir, bot, tmux ) if params[:with].include? bot
+          start_bot( bots_dir, bot, tmux ) if (params[:with].include?(bot) && !project_bots_list.include?(bot))
         end
         if mode=='wo'
-          start_bot( bots_dir, bot, tmux ) unless params[:without].include? bot
+          start_bot( bots_dir, bot, tmux ) if (!params[:without].include?(bot) && !project_bots_list.include?(bot))
         end
       end
       true
