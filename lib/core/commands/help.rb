@@ -8,11 +8,11 @@ module Nutella
     def run(args=nil)
       message=''
       Dir["#{File.dirname(__FILE__)}/*.rb"].each do |file|
-        message += "#{File.basename(file, File.extname(file))}\t\t"
+        message += "#{File.basename(file, File.extname(file))}\t\t\t"
         message += Object::const_get("Nutella::#{File.basename(file, File.extname(file)).capitalize}").description
         message += "\n"
       end
-      console.info message, 200
+      console.info message
     end
     
   end
