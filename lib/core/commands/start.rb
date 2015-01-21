@@ -11,10 +11,22 @@ module Nutella
       return unless Nutella.current_project.exist?
 
       # Extract run (passed run name) and run_id
-      run, run_id, params = extract_names args
-      p run
-      p run_id
-      p params.to_h
+      run, run_id = extract_names args
+
+      # Extract parameters
+      begin
+        params = extract_parameters args
+      rescue
+        console.warn 'The only supported parameters are --with (-w) and --without (-wo)'
+        return
+      end
+
+      # Check that we are not using 'with' and 'without' options at the same time
+      unless params[:with].empty? || params[:without].empty?
+        console.warn "You can't use both --with and --without at the same time"
+        return
+      end
+
       # Extract project directory and run_id
       cur_prj_dir = Nutella.current_project.dir
 
@@ -31,10 +43,10 @@ module Nutella
       return unless start_nutella_actors
 
       # Start all project level actors, if any
-      return unless start_project_actors( run_id, cur_prj_dir, args )
+      return unless start_project_bots( cur_prj_dir, params )
 
       # Start all bots
-      return unless start_bots( cur_prj_dir, run_id )
+      return unless start_bots( cur_prj_dir, run_id, params )
 
       # Output success message
       output_success_message( run_id, run, 'started' )
@@ -48,7 +60,7 @@ module Nutella
     def add_to_run_list(run_id, prj_dir)
       unless Nutella.runlist.add?( run_id, prj_dir )
         # If the run_id is already in the list, check that it's actually live
-        if Tmux.session_exists? run_id
+        if Tmux.session_exist? run_id
           console.error 'Impossible to start project: an instance of this project with the same run_id is already running!'
           console.error "You might want to kill it with 'nutella stop #{run_id}'"
           return false
@@ -131,12 +143,6 @@ module Nutella
     end
 
 
-    def start_project_actors( run_id, cur_prj_dir, args )
-      # Extract parameters
-
-    end
-
-
     def start_nutella_actor( actor_dir )
       pid_file_path = "#{actor_dir}/.pid"
       return true if sanitize_pid_file pid_file_path
@@ -156,21 +162,52 @@ module Nutella
     end
 
 
-    def start_bots( cur_prj_dir, run_id )
+    def start_project_bots( cur_prj_dir, params )
+      # # If project bots have been started already, then do nothing
+      # if Tmux.session_exist? "#{run_id}-project-bots"
+      #   return true
+      # end
+      true
+    end
+
+
+    def start_bots( cur_prj_dir, run_id, params )
+      # Extract which mode we are in (starting all bots, starting only some, excluding some)
+      mode = 'all'
+      unless params[:with].empty?
+        mode = 'w'
+      end
+      unless params[:without].empty?
+        mode = 'wo'
+      end
       bots_dir = "#{cur_prj_dir}/bots/"
       # Create a new tmux instance for this run
       tmux = Tmux.new run_id
+      # Start all the appropriate bots
       for_each_actor_in_dir bots_dir do |bot|
-        # If there is no 'startup' script output a warning (because
-        # startup is mandatory) and skip the bot
-        unless File.exist?("#{bots_dir}#{bot}/startup")
-          console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
-          next
+        if mode=='all'
+          start_bot( bots_dir, bot, tmux )
         end
-        # Create a new window in the session for this run
-        tmux.new_bot_window bot
+        if mode=='w'
+          start_bot( bots_dir, bot, tmux ) if params[:with].include? bot
+        end
+        if mode=='wo'
+          start_bot( bots_dir, bot, tmux ) unless params[:without].include? bot
+        end
       end
       true
+    end
+
+
+    def start_bot( bots_dir, bot, tmux )
+      # If there is no 'startup' script output a warning (because
+      # startup is mandatory) and skip the bot
+      unless File.exist?("#{bots_dir}#{bot}/startup")
+        console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
+        return
+      end
+      # Create a new window in the session for this run
+      tmux.new_bot_window bot
     end
 
 

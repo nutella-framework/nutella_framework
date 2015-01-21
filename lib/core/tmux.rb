@@ -29,7 +29,7 @@ module Nutella
       `tmux kill-session -t #{run_id} &> /dev/null`
     end
 
-    def self.session_exists?( run_id )
+    def self.session_exist?( run_id )
       system( "tmux has-session -t #{run_id} &> /dev/null" )
     end
       

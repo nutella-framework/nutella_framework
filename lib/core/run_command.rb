@@ -16,7 +16,7 @@ module Nutella
     # @return [String, String ]  the run name (cleaned of nils) and the run_id
     def extract_names( args )
 
-      # Simple `nutella start`
+      # Simple `nutella start/stop`
       if args.nil? || args.empty?
         run = nil
         run_id = Nutella.runlist.extract_run_id( '' )
@@ -32,14 +32,23 @@ module Nutella
         # the parameters in args
         run = args[0]
         run_id = Nutella.runlist.extract_run_id( args[0] )
-        # It
         args.shift
       end
 
-      # Extract parameters
-      params = extract_parameters args
+      return run, run_id
+    end
 
-      return run, run_id, params
+
+    # Extracts the command line parameters
+    # @param [Array<String>] args command line arguments passed to the command
+    # @return [Hash]  an hash containing the parameters
+    def extract_parameters( args )
+      opts = Slop::Options.new
+      opts.array '-wo', '--without', 'A list of actors NOT to start'
+      opts.array '-w', '--with', 'A list of actors that needs to be started'
+      parser = Slop::Parser.new(opts)
+      result = parser.parse(args)
+      result.to_hash
     end
 
 
@@ -68,27 +77,13 @@ module Nutella
         next unless File.exist? "#{cur_prj_dir}/bots/#{bot}/#{script}"
         # Output message
         console.info "#{message} bot #{bot}."
-        # Execute 'dependencies' script
+        # Execute 'script' script
         cur_dir = Dir.pwd
         Dir.chdir "#{cur_prj_dir}/bots/#{bot}"
         system "./#{script}"
         Dir.chdir cur_dir
       end
       true
-    end
-
-
-    private
-
-
-    def extract_parameters( args )
-      opts = Slop::Options.new
-      opts.array '-a', '--app', 'A list of application level actors'
-      opts.array '-wo', '--without', 'A list of actors NOT to start'
-      opts.array '-w', '--with', 'A list of actors that needs to be started'
-      parser = Slop::Parser.new(opts)
-      result = parser.parse(args)
-      result.to_hash
     end
 
 

@@ -20,6 +20,9 @@ module Nutella
       # Stops all the bots
       Tmux.kill_session run_id
 
+      # Stop all project level actors (if any) if needed
+      stop_project_bots run_id
+
       # Stop all nutella internal actors, if needed
       if Nutella.runlist.empty?
         stop_nutella_actors
@@ -43,6 +46,11 @@ module Nutella
         console.warn "Run #{run_id} doesn't exist. Impossible to stop it."
         return false
       end
+      true
+    end
+
+
+    def stop_project_bots( run_id )
       true
     end
 
