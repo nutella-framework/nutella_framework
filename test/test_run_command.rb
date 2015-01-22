@@ -45,10 +45,8 @@ module Nutella
       assert_equal ['botA', 'botB', 'botC'], params[:without]
     end
 
-    should 'return empty whenever trying to parse params that do not exist' do
-      params =  @@run_cmd.send( :extract_parameters, ['--wit=bot1,bot2,bot3', '-o=botA,botB,botC'] )
-      assert_empty params[:with]
-      assert_empty params[:without]
+    should 'raise an exception when trying to parse params that do not exist' do
+      assert_raises (Slop::UnknownOption) { @@run_cmd.send( :extract_parameters, ['--wit=bot1,bot2,bot3', '-o=botA,botB,botC'] ) }
     end
 
   end
