@@ -23,12 +23,19 @@ module Nutella
 
       # Check that we are not using 'with' and 'without' options at the same time
       unless params[:with].empty? || params[:without].empty?
-        console.warn "You can't use both --with and --without at the same time"
+        console.warn 'You can\'t use both --with and --without at the same time'
         return
       end
 
       # Extract project directory and run_id
       cur_prj_dir = Nutella.current_project.dir
+
+      # Check that there is at least a regular bot that will be started,
+      # otherwise it makes no sense to create a run
+      if run_bots_list_minus_project_bots(cur_prj_dir, params).empty? && project_bots_started?
+        console.warn "Run #{run} not created: your project bots are already started and you specified no regular bots exclusively for this run"
+        return
+      end
 
       # Check that the run_id is unique and add it to the list of runs
       # If it's not, return (without adding the run_id to the list of course)
@@ -50,11 +57,35 @@ module Nutella
 
       # Output success message
       output_success_message( run_id, run, 'started' )
-      output_monitoring_details run_id
+      output_monitoring_details( run_id, cur_prj_dir, params)
     end
 
 
     private
+
+
+    def run_bots_list_minus_project_bots( cur_prj_dir, params )
+      # Fetch the list of project bots
+      project_bots_list = Nutella.current_project.config['project_bots']
+      run_bots_list = run_actors_list("#{cur_prj_dir}/bots/")
+      # Depending on the mode we are in we want to start only some bots, exclude only some bots, start all bots
+      unless params[:with].empty?
+        return project_bots_list.nil? ? params[:with] : params[:with] - project_bots_list
+      end
+      unless params[:without].empty?
+        return project_bots_list.nil? ? run_bots_list - params[:without] : run_bots_list - params[:without] - project_bots_list
+      end
+      if params[:with].empty? && params[:without].empty?
+        return project_bots_list.nil? ? run_bots_list : run_bots_list - project_bots_list
+      end
+    end
+
+
+    def project_bots_started?
+      project_name = Nutella.current_project.config['name']
+      tmux_session_name = "#{project_name}-project-bots"
+      return Tmux.session_exist? tmux_session_name
+    end
 
 
     def add_to_run_list(run_id, prj_dir)
@@ -172,7 +203,7 @@ module Nutella
         # Start all project bots in the list into a new tmux session
         tmux = Tmux.new tmux_session_name
         for_each_actor_in_dir bots_dir do |bot|
-          if project_bots_list.include? bot
+          unless project_bots_list.nil? || !project_bots_list.include?( bot )
             # If there is no 'startup' script output a warning (because
             # startup is mandatory) and skip the bot
             unless File.exist?("#{bots_dir}#{bot}/startup")
@@ -189,31 +220,12 @@ module Nutella
 
 
     def start_bots( cur_prj_dir, run_id, params )
-      # Fetch the list of project bots
-      project_bots_list = Nutella.current_project.config['project_bots']
-      # Extract which mode we are in (starting all bots, starting only some, excluding some)
-      mode = 'all'
-      unless params[:with].empty?
-        mode = 'w'
-      end
-      unless params[:without].empty?
-        mode = 'wo'
-      end
-      bots_dir = "#{cur_prj_dir}/bots/"
       # Create a new tmux instance for this run
       tmux = Tmux.new run_id
-      # Start all the appropriate bots
-      for_each_actor_in_dir bots_dir do |bot|
-        if mode=='all'
-          start_bot(bots_dir, bot, tmux) unless project_bots_list.include?(bot)
-        end
-        if mode=='w'
-          start_bot( bots_dir, bot, tmux ) if (params[:with].include?(bot) && !project_bots_list.include?(bot))
-        end
-        if mode=='wo'
-          start_bot( bots_dir, bot, tmux ) if (!params[:without].include?(bot) && !project_bots_list.include?(bot))
-        end
-      end
+      # Fetch bots dir
+      bots_dir = "#{cur_prj_dir}/bots/"
+      # Start the appropriate bots
+      run_bots_list_minus_project_bots( cur_prj_dir, params ).each { |bot| start_bot(bots_dir, bot, tmux) }
       true
     end
 
@@ -230,9 +242,20 @@ module Nutella
     end
 
 
-    def output_monitoring_details( run_id )
-      console.success "Do `tmux attach-session -t #{run_id}` to monitor your bots."
+    def output_monitoring_details( run_id, cur_prj_dir, params )
+      project_bots_list = Nutella.current_project.config['project_bots']
+      project_name = Nutella.current_project.config['name']
+      tmux_session_name = "#{project_name}-project-bots"
+      unless project_bots_list.nil? || project_bots_list.empty?
+        console.success "Do `tmux attach-session -t #{tmux_session_name}` to monitor your project bots."
+      end
+      if run_bots_list_minus_project_bots(cur_prj_dir, params).empty?
+        console.success 'No tmux session was created for this run because you specified no regular bots exclusively for this run'
+      else
+        console.success "Do `tmux attach-session -t #{run_id}` to monitor your bots."
+      end
       console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{run_id} to access your interfaces"
+
     end
 
 

@@ -52,11 +52,17 @@ module Nutella
     end
 
 
+    # Returns all the actors in a certain directory
+    def run_actors_list( actors_dir )
+      Dir.entries(actors_dir).select {|entry| File.directory?(File.join(actors_dir, entry)) && !(entry =='.' || entry == '..') }
+    end
+
+
     # Executes a code block for each actor in a certain directory
     # @param [String] actors_dir directory where we are iterating
     # @yield [actor_dir] Gives the actor directory to the block
     def for_each_actor_in_dir( actors_dir, &block )
-      Dir.entries(actors_dir).select {|entry| File.directory?(File.join(actors_dir, entry)) && !(entry =='.' || entry == '..') }.each do |actor_dir|
+      run_actors_list(actors_dir).each do |actor_dir|
         block.call actor_dir
       end
     end
