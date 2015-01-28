@@ -40,7 +40,11 @@
         <script>
 					el = document.getElementById('run_id_input');
 					el.addEventListener('change', function() {
-						window.location = '/' + this.value
+						url = location.href
+						if (url.substr(url.length - 1)=="/")
+							window.location = url + this.value + '/';
+						else
+							window.location = url + '/' + this.value + '/';
 					});
         </script>
     </body>

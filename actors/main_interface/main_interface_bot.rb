@@ -28,8 +28,14 @@ get '/' do
 end
 
 
+# Redirect if there is no slash after the run_id
+get '/:run_id' do
+  redirect "#{request.url}/"
+end
+
+
 # Renders the run template
-get '/:run_id/?' do
+get '/:run_id/' do
 
   # Parse the run_id from URL and extract the run path from runlist.json
   @run_id = params[:run_id]
@@ -50,6 +56,12 @@ get '/:run_id/?' do
 
   # Finally render the interfaces summary page
   erb :index
+end
+
+
+# Redirect if there is a slash after the interface
+get '/:run_id/:interface/' do
+  redirect "#{request.url[0..-2]}"
 end
 
 
@@ -128,7 +140,7 @@ def extract_interface_info( interfaces_path, iface_dir )
 
   unless File.exist? index_path
     iface_props[:name] = iface_dir
-    iface_props[:description] = 'My designer was a lazy ass and didn\'t include an index.html file in the main interface directory'
+    iface_props[:description] = 'My designer was a bit lazy and didn\'t include an index.html file in the main interface directory :('
     return iface_props
   end
 
@@ -138,14 +150,14 @@ def extract_interface_info( interfaces_path, iface_dir )
   f.close
   iface_props[:name] = doc.css('title').empty? ? iface_dir : doc.css('title').text
   if doc.css("meta[name='description']").empty?
-    iface_props[:description] = 'My designer was a lazy ass and didn\'t include a &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file'
+    iface_props[:description] = 'My designer was a bit lazy and didn\'t include a &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file :('
   else
     if doc.css("meta[name='description']").attribute('content').nil?
-      iface_props[:description] = 'There was no attribute content in &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file'
+      iface_props[:description] = 'There was no attribute content in &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file :('
     else
       iface_props[:description] = doc.css("meta[name='description']").attribute('content').text
     end
   end
-  iface_props[:url] = "#{@run_id}/#{iface_dir}"
+  iface_props[:url] = "#{iface_dir}"
   iface_props
 end
