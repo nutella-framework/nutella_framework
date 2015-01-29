@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "nutella_framework"
   gem.homepage = "https://github.com/nutella-framework/nutella_framework"
   gem.license = "MIT"
-  gem.summary = %Q{IoT-like learning applications framework}
-  gem.description = %Q{Nutella is a framework to build and run "Internet of Things"-like learning applications}
+  gem.summary = %Q{A framework to create and run classroom narratives}
+  gem.description = %Q{Nutella is a framework to create and run classroom narratives}
   gem.email = "tebemis@gmail.com"
   gem.authors = ["Alessandro Gnoli"]
   # dependencies defined in Gemfile
