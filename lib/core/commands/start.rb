@@ -13,6 +13,12 @@ module Nutella
       # Extract run (passed run name) and run_id
       run, run_id = extract_names args
 
+      # Check that the run name is different than the project name
+      if run==Nutella.current_project.config['name']
+        console.warn 'Your run name should be different than your project name'
+        return
+      end
+
       # Extract parameters
       begin
         params = extract_parameters args
@@ -27,7 +33,7 @@ module Nutella
         return
       end
 
-      # Extract project directory and run_id
+      # Extract project directory
       cur_prj_dir = Nutella.current_project.dir
 
       # Check that there is at least a regular bot that will be started,

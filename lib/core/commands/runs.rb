@@ -8,7 +8,7 @@ module Nutella
     def run(args=nil)
 
       # If invoked with "all" it will show all the runs under this instance of nutella
-      if args[0]=='all'
+      if args[0]=='--all' || args[0]=='-a'
         display_all_runs
       else
         # If current dir is not a nutella project, return
@@ -38,10 +38,10 @@ module Nutella
       runs.each do |run|
         run_id = run.dup
         run_id.slice! "#{project_name}_"
-        if run_id.empty?
-          console.info " #{project_name}"
+        if run==project_name
+          console.info " #{project_name} (default instance)"
         else
-          console.info " #{run}"
+          console.info " #{run_id}"
         end
       end
     end
