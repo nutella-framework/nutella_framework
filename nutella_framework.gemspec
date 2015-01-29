@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Alessandro Gnoli"]
-  s.date = "2015-01-20"
+  s.date = "2015-01-29"
   s.description = "Nutella is a framework to build and run \"Internet of Things\"-like learning applications"
   s.email = "tebemis@gmail.com"
   s.executables = ["nutella"]
@@ -33,6 +33,8 @@ Gem::Specification.new do |s|
     "actors/main_interface/views/index.erb",
     "actors/main_interface/views/not_found_404.erb",
     "bin/nutella",
+    "data/index.html",
+    "data/startup",
     "lib/cli/nutella_cli.rb",
     "lib/config/config.rb",
     "lib/config/current_project.rb",
@@ -49,8 +51,10 @@ Gem::Specification.new do |s|
     "lib/core/commands/runs.rb",
     "lib/core/commands/start.rb",
     "lib/core/commands/stop.rb",
+    "lib/core/commands/template.rb",
     "lib/core/nutella_core.rb",
     "lib/core/run_command.rb",
+    "lib/core/template_command.rb",
     "lib/core/tmux.rb",
     "lib/logging/nutella_logger-remote.rb",
     "lib/logging/nutella_logger.rb",
@@ -61,7 +65,8 @@ Gem::Specification.new do |s|
     "test/config/test_project.rb",
     "test/config/test_runlist.rb",
     "test/helper.rb",
-    "test/logging/test_logging.rb"
+    "test/logging/test_logging.rb",
+    "test/test_run_command.rb"
   ]
   s.homepage = "https://github.com/nutella-framework/nutella_framework"
   s.licenses = ["MIT"]
@@ -78,6 +83,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<git>, [">= 1.2.8", "~> 1.2"])
       s.add_runtime_dependency(%q<sinatra>, [">= 1.4.5", "~> 1.4.5"])
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.6.3", "~> 1.6.3"])
+      s.add_runtime_dependency(%q<slop>, [">= 4.0.0", "~> 4.0.0"])
       s.add_development_dependency(%q<shoulda>, [">= 3", "~> 3"])
       s.add_development_dependency(%q<yard>, [">= 0.8.7", "~> 0.8"])
       s.add_development_dependency(%q<rdoc>, [">= 4.0", "~> 4.0"])
@@ -91,6 +97,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<git>, [">= 1.2.8", "~> 1.2"])
       s.add_dependency(%q<sinatra>, [">= 1.4.5", "~> 1.4.5"])
       s.add_dependency(%q<nokogiri>, [">= 1.6.3", "~> 1.6.3"])
+      s.add_dependency(%q<slop>, [">= 4.0.0", "~> 4.0.0"])
       s.add_dependency(%q<shoulda>, [">= 3", "~> 3"])
       s.add_dependency(%q<yard>, [">= 0.8.7", "~> 0.8"])
       s.add_dependency(%q<rdoc>, [">= 4.0", "~> 4.0"])
@@ -105,6 +112,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<git>, [">= 1.2.8", "~> 1.2"])
     s.add_dependency(%q<sinatra>, [">= 1.4.5", "~> 1.4.5"])
     s.add_dependency(%q<nokogiri>, [">= 1.6.3", "~> 1.6.3"])
+    s.add_dependency(%q<slop>, [">= 4.0.0", "~> 4.0.0"])
     s.add_dependency(%q<shoulda>, [">= 3", "~> 3"])
     s.add_dependency(%q<yard>, [">= 0.8.7", "~> 0.8"])
     s.add_dependency(%q<rdoc>, [">= 4.0", "~> 4.0"])
