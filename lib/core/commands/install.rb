@@ -1,11 +1,10 @@
-require 'core/command'
-require 'json'
+require 'core/template_command'
 require 'git'
 require 'net/http'
 
 module Nutella
   
-  class Install < Command
+  class Install < TemplateCommand
     @description = 'Copies an arbitrary template (from central DB, directory or URL) into the current project'
   
     def run(args=nil)
@@ -117,27 +116,6 @@ module Nutella
       clean_tmp_dir
       Dir.mkdir Nutella.config['tmp_dir']  unless Dir.exists? Nutella.config['tmp_dir']
       Git.clone(template, dest_dir, :path => Nutella.config['tmp_dir'])
-    end
-    
-    
-    def validate_template( dir )
-      # Parse the template's nutella.json file
-      begin
-        template_nutella_file_json = JSON.parse(IO.read("#{dir}/nutella.json"))
-      rescue
-        return false
-      end
-      # If template is a bot, perform the appropriate checks
-      if template_nutella_file_json['type']=='bot'
-        # Is there a mandatory 'startup' script and is it executable
-        return false unless File.executable? "#{dir}/startup"
-      end
-      # If template is an interface, perform the appropriate checks
-      if template_nutella_file_json['type']=='interface'
-        # Is there the mandatory index.html file
-        return false unless File.exist? "#{dir}/index.html"
-      end
-      true
     end
 
 
