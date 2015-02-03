@@ -47,8 +47,13 @@ module Nutella
   
   
     def is_template_a_git_repo?( template_git_url )
+      return false unless template_git_url =~ /\A#{URI::regexp(['http', 'https'])}\z/
       begin
-        tmp_dest_dir = template_git_url[template_git_url.rindex('/')+1 .. template_git_url.length-5]
+        if template_git_url.end_with? '.git'
+          tmp_dest_dir = template_git_url[template_git_url.rindex('/')+1 .. template_git_url.length-5]
+        else
+          tmp_dest_dir = template_git_url[template_git_url.rindex('/')+1 .. template_git_url.length]
+        end
         clone_template_from_repo_to( template_git_url, tmp_dest_dir )
         return validate_template "#{Nutella.config['tmp_dir']}/#{tmp_dest_dir}"
       rescue
