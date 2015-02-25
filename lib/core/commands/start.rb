@@ -38,7 +38,7 @@ module Nutella
 
       # Check that there is at least a regular bot that will be started,
       # otherwise it makes no sense to create a run
-      if run_bots_list_minus_project_bots(cur_prj_dir, params).empty? && project_bots_started?
+      if bots_list_wo_project(cur_prj_dir, params).empty? && project_bots_started?
         console.warn "Run #{run} not created: your project bots are already started and you specified no regular bots exclusively for this run"
         return
       end
@@ -48,7 +48,7 @@ module Nutella
       return unless add_to_run_list( run_id, cur_prj_dir )
 
       # If running on the internal broker, start it if needed
-      if Nutella.config['broker'] == 'localhost'
+      if running_on_internal_broker?
         return unless start_internal_broker
       end
 
@@ -70,7 +70,7 @@ module Nutella
     private
 
 
-    def run_bots_list_minus_project_bots( cur_prj_dir, params )
+    def bots_list_wo_project( cur_prj_dir, params )
       # Fetch the list of project bots
       project_bots_list = Nutella.current_project.config['project_bots']
       run_bots_list = run_actors_list("#{cur_prj_dir}/bots/")
@@ -90,7 +90,7 @@ module Nutella
     def project_bots_started?
       project_name = Nutella.current_project.config['name']
       tmux_session_name = "#{project_name}-project-bots"
-      return Tmux.session_exist? tmux_session_name
+      Tmux.session_exist? tmux_session_name
     end
 
 
@@ -104,6 +104,14 @@ module Nutella
         end
       end
       true
+    end
+
+
+    def running_on_internal_broker?
+      # If the broker is set to one of the current ip addresses,
+      # localhost or 127.0.0.1 return true.
+      broker = Nutella.config['broker']
+      Socket.ip_address_list.find_all{|a| a.ipv4? }.map{|a| a.ip_address}.include?(broker) || broker == 'localhost' || broker == '127.0.0.1'
     end
 
 
@@ -231,7 +239,7 @@ module Nutella
       # Fetch bots dir
       bots_dir = "#{cur_prj_dir}/bots/"
       # Start the appropriate bots
-      run_bots_list_minus_project_bots( cur_prj_dir, params ).each { |bot| start_bot(bots_dir, bot, tmux) }
+      bots_list_wo_project( cur_prj_dir, params ).each { |bot| start_bot(bots_dir, bot, tmux) }
       true
     end
 
@@ -255,7 +263,7 @@ module Nutella
       unless project_bots_list.nil? || project_bots_list.empty?
         console.success "Do `tmux attach-session -t #{tmux_session_name}` to monitor your project bots."
       end
-      if run_bots_list_minus_project_bots(cur_prj_dir, params).empty?
+      if bots_list_wo_project(cur_prj_dir, params).empty?
         console.success 'No tmux session was created for this run because you specified no regular bots exclusively for this run'
       else
         console.success "Do `tmux attach-session -t #{run_id}` to monitor your bots."
