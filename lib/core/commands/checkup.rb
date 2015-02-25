@@ -35,12 +35,13 @@ module Nutella
   
     def install_local_broker
       # Clone, cd and npm install
-      out1 = system "git clone git://github.com/mcollina/mosca.git #{Nutella.config['broker_dir']} > /dev/null 2>&1"
+      broker_version = 'v0.28.1'
+      out1 = system "git clone -b #{broker_version} --depth 1 git://github.com/mcollina/mosca.git #{Nutella.config['broker_dir']} > /dev/null 2>&1"
       Dir.chdir(Nutella.config['broker_dir'])
       out2 = system 'npm install > /dev/null 2>&1'
     
       # Add startup script and make it executable
-      File.open('startup', 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 &\necho $! > $BASEDIR/bin/.pid\n") }
+      File.open('startup', 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --http-port 1884 > /dev/null 2>&1 &\necho $! > $BASEDIR/bin/.pid\n") }
       File.chmod( 0755, 'startup' )
     
       # Write configuration into config.json
