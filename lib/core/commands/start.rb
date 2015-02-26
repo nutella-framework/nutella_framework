@@ -107,14 +107,6 @@ module Nutella
     end
 
 
-    def running_on_internal_broker?
-      # If the broker is set to one of the current ip addresses,
-      # localhost or 127.0.0.1 return true.
-      broker = Nutella.config['broker']
-      Socket.ip_address_list.find_all{|a| a.ipv4? }.map{|a| a.ip_address}.include?(broker) || broker == 'localhost' || broker == '127.0.0.1'
-    end
-
-
     def start_internal_broker
       pid_file_path = "#{Nutella.config['broker_dir']}bin/.pid"
       return true if sanitize_pid_file pid_file_path
@@ -194,8 +186,8 @@ module Nutella
       # Actor is not running and there is no pid file so we try to start
       # the actor and create a new pid file. Note that the pid file is created by
       # the startup script!
-      nutella_config_file = "#{Nutella.config['nutella_home']}config.json"
-      runs_list_file = "#{Nutella.config['nutella_home']}runlist.json"
+      nutella_config_file = "#{Nutella.config['config_dir']}config.json"
+      runs_list_file = "#{Nutella.config['config_dir']}runlist.json"
       if nutella_config_file==nil || runs_list_file==nil
         return false
       end

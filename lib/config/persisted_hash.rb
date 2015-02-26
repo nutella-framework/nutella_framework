@@ -1,4 +1,5 @@
 require 'json'
+require 'fileutils'
 
 module Nutella
 
@@ -90,6 +91,8 @@ module Nutella
     private
 
     def store_hash(hash)
+      dirname = File.dirname(@config_file)
+      FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
       File.open(@config_file, 'w+') do |f|
         f.write(JSON.pretty_generate(hash))
       end

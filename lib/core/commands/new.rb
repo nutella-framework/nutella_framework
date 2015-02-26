@@ -46,7 +46,7 @@ module Nutella
       config_file_hash = {
         :name => cur_prj_dir,
         :version => '0.1.0',
-        :nutella_version => File.open("#{NUTELLA_HOME}VERSION", 'rb').read,
+        :nutella_version => File.open("#{Nutella.config['nutella_home']}VERSION", 'rb').read,
         :type => 'project',
         :description => 'A quick description of your project'
       }

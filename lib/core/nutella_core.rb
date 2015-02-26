@@ -29,14 +29,16 @@ module Nutella
     end
     
     # This method initializes the nutella configuration file (config.json) with:
-    # - NUTELLA_HOME: the directory nutella is installed in
+    # - nutella_home: the directory nutella is installed in
     # - tmp_dir: temporary directory used when installing remote templates
+    # - config_dir: directory where the configuration files are stored in
     # - broker_dir: directory where the local broker is installed in
     # - main_interface_port: the port used to serve interfaces
     def Nutella.init
       Nutella.config['nutella_home'] = NUTELLA_HOME
       Nutella.config['tmp_dir'] = "#{NUTELLA_HOME}.tmp/"
-      Nutella.config['broker_dir'] = "#{NUTELLA_HOME}broker/"
+      Nutella.config['config_dir'] = "#{ENV['HOME']}/.nutella/"
+      Nutella.config['broker_dir'] = "#{Nutella.config['config_dir']}broker/"
       Nutella.config['main_interface_port'] = 57880
     end
 

@@ -93,6 +93,14 @@ module Nutella
     end
 
 
+    # If the broker is set to one of the current ip addresses,
+    # localhost or 127.0.0.1 return true.
+    def running_on_internal_broker?
+      broker = Nutella.config['broker']
+      Socket.ip_address_list.find_all{|a| a.ipv4? }.map{|a| a.ip_address}.include?(broker) || broker == 'localhost' || broker == '127.0.0.1'
+    end
+
+
   end
 
 end

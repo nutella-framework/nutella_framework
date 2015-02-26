@@ -29,7 +29,7 @@ module Nutella
       end
 
       # If running on the internal broker, stop it if needed
-      if Nutella.runlist.empty? and Nutella.config['broker'] == 'localhost'
+      if Nutella.runlist.empty? and running_on_internal_broker?
         stop_broker
       end
 

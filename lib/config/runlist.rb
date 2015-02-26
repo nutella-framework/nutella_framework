@@ -26,7 +26,7 @@ module Nutella
   # Calling this method (Nutella.runlist) simply returns and instance of
   # RunListHash linked to file runlist.json in the nutella home directory
   def Nutella.runlist
-    RunListHash.new( "#{File.dirname(__FILE__)}/../../runlist.json" )
+    RunListHash.new( "#{ENV['HOME']}/.nutella/runlist.json" )
   end
   
 end

@@ -7,6 +7,7 @@ require 'config/current_project'
 require 'cli/nutella_cli'
 
 module Nutella
+  # Initialize nutella home
   home_dir = File.dirname(__FILE__)
   NUTELLA_HOME = home_dir[0..-4]
 
