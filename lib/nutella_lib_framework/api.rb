@@ -16,6 +16,19 @@ module Nutella
   end
 
 
+  # Parse command line arguments for framework level components
+  #
+  # @param [Array] args command line arguments array
+  # @return [String] broker
+  def self.parse_f_component_args(args)
+    if args.length < 1
+      STDERR.puts 'Couldn\'t read broker address from the command line, impossible to initialize component!'
+      return
+    end
+    return args[0]
+  end
+
+
   module Net
 
     # Provides access to the net.app sub-module

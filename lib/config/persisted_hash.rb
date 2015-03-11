@@ -40,9 +40,9 @@ module Nutella
       hash.has_key? key
     end
 
-    # def include?( key )
-    #   has_key? key
-    # end
+    def include?( key )
+      has_key? key
+    end
 
     def to_s
       hash = load_hash
@@ -88,6 +88,12 @@ module Nutella
       true
     end
 
+
+    # Removes the file the hash is persisted to
+    def remove_file
+      File.delete(@file) if File.exist?(@file)
+    end
+
     private
 
     def store_hash(hash)
@@ -106,10 +112,6 @@ module Nutella
         # File doesn't exist, return new empty Hash
         Hash.new
       end
-    end
-
-    def remove_file
-      File.delete(@file) if File.exist?(@file)
     end
 
   end

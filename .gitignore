@@ -5,6 +5,9 @@ broker/
 .tmp/
 .pid
 
+# Test project
+test_project/
+
 # Jeweler / Gem / Bundler/ Coverage
 pkg/
 coverage/

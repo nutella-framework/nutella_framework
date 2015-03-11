@@ -1,8 +1,8 @@
 # Require all commands by iterating through all the files
 # in the commands directory
-Dir["#{File.dirname(__FILE__)}/commands/*.rb"].each do |file|
+Dir["#{File.dirname(__FILE__)}/../commands/*.rb"].each do |file|
   # noinspection RubyResolve
-  require "core/commands/#{File.basename(file, File.extname(file))}"
+  require "commands/#{File.basename(file, File.extname(file))}"
 end
 
 module Nutella
@@ -29,14 +29,10 @@ module Nutella
     end
     
     # This method initializes the nutella configuration file (config.json) with:
-    # - nutella_home: the directory nutella is installed in
-    # - tmp_dir: temporary directory used when installing remote templates
     # - config_dir: directory where the configuration files are stored in
     # - broker_dir: directory where the local broker is installed in
     # - main_interface_port: the port used to serve interfaces
     def Nutella.init
-      Nutella.config['nutella_home'] = NUTELLA_HOME
-      Nutella.config['tmp_dir'] = "#{NUTELLA_HOME}.tmp/"
       Nutella.config['config_dir'] = "#{ENV['HOME']}/.nutella/"
       Nutella.config['broker_dir'] = "#{Nutella.config['config_dir']}broker/"
       Nutella.config['main_interface_port'] = 57880

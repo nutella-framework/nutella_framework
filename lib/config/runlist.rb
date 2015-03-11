@@ -14,7 +14,12 @@ module Nutella
   #     "path": "/path/to/app/b/files/"
   #   }
   # }
-  class RunListHash < PersistedHash
+  class RunListHash
+
+    def initialize( file )
+      @ph = PersistedHash.new file
+    end
+
 
     # TODO not sure I need this method anymore
     # Extracts the +run_id+ from the run name (specified at command line)
@@ -30,7 +35,7 @@ module Nutella
     #
     # @return [Array<String>] list of +run_id+s associated to the specified app_id
     def all_runs
-      self.to_h
+      @ph.to_h
     end
 
 
@@ -39,7 +44,7 @@ module Nutella
     # @param [String] app_id the id of the application we want to find run_ids for
     # @return [Array<String>] list of +run_id+s associated to the specified app_id
     def runs_for_app( app_id )
-      runs = self[app_id]['runs']
+      runs = @ph[app_id]['runs']
       runs.nil? ? [] : runs
     end
 
@@ -55,19 +60,19 @@ module Nutella
       # If no run_id is specified, we are adding the "default" run
       run_id = 'default' if run_id.nil?
       # Check if we are adding the first run for a certain application
-      if add_key_value?(app_id, Hash.new)
-        t = self[app_id]
+      if @ph.add_key_value?(app_id, Hash.new)
+        t = @ph[app_id]
         # Add path and initialize runs
         t['path'] = path_to_app_files
         t['runs'] = [run_id]
       else
-        t = self[app_id]
+        t = @ph[app_id]
         # Check a run with this name doesn't already exist
         return false if t['runs'].include? run_id
         # Add the run_id to list of runs
         t['runs'].push(run_id)
       end
-      self[app_id] = t
+      @ph[app_id] = t
       true
     end
 
@@ -80,26 +85,58 @@ module Nutella
     #   and is successfully removed)
     def delete?( app_id, run_id )
       # If there is no app, then return false and do nothing
-      return false if self[app_id].nil?
-      t = self[app_id]
+      return false if @ph[app_id].nil?
+      t = @ph[app_id]
       result = t['runs'].delete run_id
       if t['runs'].empty?
         # If run_id was the last run for this app, remove the app as well
-        delete_key_value? app_id
+        @ph.delete_key_value? app_id
       else
         # otherwise write the hash back
-        self[app_id] = t
+        @ph[app_id] = t
       end
       result.nil? ? false : true
     end
 
 
+    # Returns true if the runs list is empty
+    # @return [Boolean] true if the list is empty, false otherwise
+    def empty?
+      @ph.empty?
+    end
+
+
+    # Removes the runs list file
+    def remove_file
+      @ph.remove_file
+    end
+
+
+    # This method checks that the list reflects the actual
+    # state of the system. It does so by checking that there is
+    # still a tmux session with the run name. If that's not the case,
+    # it removes the missing runs from the list.
+    def clean_list
+      puts 'cleaning run list'
+      all_runs.each do |app, _|
+        runs_for_app(app).each do |run|
+          unless Tmux.session_exist? "#{app}:#{run}"
+            delete? app, run
+            puts "Deleted run from runlist: #{app}:#{run}"
+          end
+        end
+      end
+    end
+
   end
+
 
   # Calling this method (Nutella.runlist) simply returns and instance of
   # RunListHash linked to file runlist.json in the nutella home directory
   def Nutella.runlist
-    RunListHash.new( "#{ENV['HOME']}/.nutella/runlist.json" )
+    rl = RunListHash.new( "#{ENV['HOME']}/.nutella/runlist.json" )
+    rl.clean_list
+    rl
   end
   
 end

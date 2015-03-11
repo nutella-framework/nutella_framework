@@ -39,7 +39,7 @@ module Nutella
     end
 
     def teardown
-      @runlist.send(:remove_file)
+      @runlist.remove_file
     end
 
   end
