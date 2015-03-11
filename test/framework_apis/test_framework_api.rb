@@ -1,11 +1,12 @@
 require 'helper'
+
 require_relative '../../lib/nutella_lib_framework/api'
 
 
 module Nutella
   class TestFrameworkApi < MiniTest::Test
 
-    nutella.init_as_f_component('localhost', 'my_component_id')
+    # nutella.init_as_f_component('localhost', 'my_component_id')
 
 
     # should 'pub_sub_on_framework_channels' do

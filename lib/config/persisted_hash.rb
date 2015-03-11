@@ -4,12 +4,12 @@ require 'fileutils'
 module Nutella
 
   # This class behaves *similarly* to a regular Hash but it persists every operation
-  # to the json file passed in the constructor. Not all Hash operations are supported
+  # to the file passed in the constructor. Not all Hash operations are supported
   # and we added some of our own.
   class PersistedHash
 
     def initialize(file)
-      @config_file=file
+      @file=file
     end
 
     def []( key )
@@ -40,9 +40,9 @@ module Nutella
       hash.has_key? key
     end
 
-    def include?( key )
-      has_key? key
-    end
+    # def include?( key )
+    #   has_key? key
+    # end
 
     def to_s
       hash = load_hash
@@ -69,7 +69,7 @@ module Nutella
     # there is currently no value associated with the specified key.
     # @return [Boolean] false if the key already exists, true if the
     # <key, value> pair was added successfully
-    def add?(key, val)
+    def add_key_value?(key, val)
       hash = load_hash
       return false if hash.key? key
       hash[key] = val
@@ -81,7 +81,7 @@ module Nutella
     # there is currently a value associated with the specified key.
     # @return [Boolean] false if there is no value associated with
     # the specified key, true otherwise
-    def delete?( key )
+    def delete_key_value?( key )
       hash = load_hash
       return false if hash.delete(key).nil?
       store_hash hash
@@ -91,17 +91,17 @@ module Nutella
     private
 
     def store_hash(hash)
-      dirname = File.dirname(@config_file)
+      dirname = File.dirname(@file)
       FileUtils.mkdir_p(dirname) unless File.directory?(dirname)
-      File.open(@config_file, 'w+') do |f|
+      File.open(@file, 'w+') do |f|
         f.write(JSON.pretty_generate(hash))
       end
-      File.chmod(0777, @config_file)
+      File.chmod(0777, @file)
     end
 
     def load_hash
       begin
-        return JSON.parse IO.read @config_file
+        return JSON.parse IO.read @file
       rescue
         # File doesn't exist, return new empty Hash
         Hash.new
@@ -109,7 +109,7 @@ module Nutella
     end
 
     def remove_file
-      File.delete(@config_file) if File.exist?(@config_file)
+      File.delete(@file) if File.exist?(@file)
     end
 
   end

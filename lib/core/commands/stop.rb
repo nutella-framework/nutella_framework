@@ -55,7 +55,7 @@ module Nutella
       tmux_session_name = "#{project_name}-project-bots"
       if Tmux.session_exist? tmux_session_name
         # Are there any runs of this project hinging on the project bots?
-        if Nutella.runlist.runs_by_project(project_name).empty?
+        if Nutella.runlist.runs_for_app(project_name).empty?
           Tmux.kill_session tmux_session_name
         end
       end

@@ -22,4 +22,5 @@ end
 
 group :test do
   gem 'rake'
+  gem 'fakefs', '~> 0.6.7', '>= 0.6'
 end

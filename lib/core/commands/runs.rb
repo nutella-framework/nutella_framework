@@ -27,13 +27,13 @@ module Nutella
         console.info 'You are not running any projects'
       else
         console.info 'Currently running:'
-        Nutella.runlist.runs_by_project.each { |run| console.info " #{run}" }
+        Nutella.runlist.runs_for_app.each { |run| console.info " #{run}" }
       end
     end
     
     def display_project_runs
       project_name = Nutella.current_project.config['name']
-      runs = Nutella.runlist.runs_by_project project_name
+      runs = Nutella.runlist.runs_for_app project_name
       console.info "Currently running #{runs.length} instances of project #{project_name}:"
       runs.each do |run|
         run_id = run.dup
