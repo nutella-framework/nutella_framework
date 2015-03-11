@@ -3,10 +3,11 @@ require 'helper'
 require_relative '../../lib/nutella_lib_framework/api'
 
 
+
 module Nutella
   class TestFrameworkApi < MiniTest::Test
 
-    # nutella.init_as_f_component('localhost', 'my_component_id')
+    nutella.init_as_f_component('localhost', 'my_component_id')
 
 
     # should 'pub_sub_on_framework_channels' do
@@ -46,7 +47,7 @@ module Nutella
     #   nutella.set_resource_id 'my_resource_id_5'
     #   cb = lambda do |message, app_id, run_id, from|
     #     puts "Received message from run_id #{from['run_id']} on #{app_id}/#{run_id}. Message: #{message}"
-    #     nutella.net.f.unsubscribe_from_all_runs 'demo5'
+    #     # nutella.net.f.unsubscribe_from_all_runs 'demo5'
     #   end
     #   nutella.net.f.subscribe_to_all_runs('demo5', cb)
     #   sleep 1
@@ -65,8 +66,7 @@ module Nutella
     #   nutella.net.f.async_request_to_all_runs('demo6', 'my request is a string', lambda do |response|
     #      puts response
     #   end)
-    #   # sleep 2
-    #   nutella.net.listen
+    #   sleep 2
     # end
     
   end

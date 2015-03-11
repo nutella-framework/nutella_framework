@@ -1,4 +1,5 @@
 require 'nutella_lib'
+require 'config/runlist'
 
 module Nutella
 
@@ -12,12 +13,6 @@ module Nutella
     @component_id = component_id
     @resource_id = nil
     @mqtt = SimpleMQTTClient.new broker_hostname
-  end
-
-
-  # Returns the run list
-  def self.runs_list
-  #   TODO how do we access the run list?
   end
 
 
@@ -228,28 +223,30 @@ module Nutella
 
 
       # Allows framework-level APIs to publish a message to a run-level channel *for ALL runs*
-      # TODO
+      #
       # @param [String] channel the run-level channel we want to publish the message to. *CANNOT* contain wildcard(s)!
       # @param [Object] message the message we are publishing. This can be,
       #   nil/empty (default), a string, a hash and, in general, anything with a .to_json method.
       def self.publish_to_all_runs( channel, message )
-        runs = ['run_1', 'run_2', 'run_3']
-        runs.each do |run_id|
-          Nutella::Net.publish_to(channel, message, 'my_app_id', run_id)
+        Nutella.runlist.all_runs.each do |app_id, _|
+          Nutella.runlist.runs_for_app(app_id).each do |run_id|
+            Nutella::Net.publish_to(channel, message, app_id, run_id)
+          end
         end
       end
 
 
       # Allows framework-level APIs to send a request to a run-level channel *for ALL runs*
-      # TODO
+      #
       # @param [String] channel the run-level channel we want to make the request to. *CANNOT* contain wildcard(s)!
       # @param [Object] request the body of request. This can be,
       #   nil/empty (default), a string, a hash and, in general, anything with a .to_json method.
       # @param [Proc] callback the callback that is fired whenever a response is received. It takes one parameter (response).
       def self.async_request_to_all_runs(channel, request, callback)
-        runs = ['run_1', 'run_2', 'run_3']
-        runs.each do |run_id|
-          Nutella::Net.async_request_to(channel, request, callback, 'my_app_id', run_id)
+        Nutella.runlist.all_runs.each do |app_id, _|
+          Nutella.runlist.runs_for_app(app_id).each do |run_id|
+            Nutella::Net.async_request_to(channel, request, callback, app_id, run_id)
+          end
         end
       end
 
@@ -296,11 +293,17 @@ module Nutella
       # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
       # @!group Framework-level APIs to communicate at the application-level
+
+      # TODO
+
       # @!endgroup
 
       # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
       # @!group Framework-level APIs to communicate at the application-level (broadcast)
+
+      # TODO
+
       # @!endgroup
 
       private
