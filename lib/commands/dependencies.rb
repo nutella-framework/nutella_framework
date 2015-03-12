@@ -3,18 +3,21 @@ require 'tmux/tmux'
 
 module Nutella
   class Dependencies < RunCommand
-    @description = 'Installs the dependencies for all actors in the project'
+    @description = 'Installs the dependencies for all actors in the application'
     
     def run(args=nil)
 
-      # If the current directory is not a nutella project, return
-      return unless Nutella.current_project.exist?
+      # If the current directory is not a nutella application, return
+      unless Nutella.current_app.exist?
+        console.warn 'The current directory is not a nutella application'
+        return
+      end
       
       # Install all dependencies
-      return unless prepare_bot( Nutella.current_project.dir, 'dependencies', 'Installing dependencies for' )
+      return unless run_script_for_all_bots_in( Dir.pwd, 'dependencies', 'Installing dependencies for' )
       
       # Output success message
-      console.success "All dependencies installed for #{Nutella.current_project.config['name']}"
+      console.success "All dependencies installed for #{Nutella.current_app.config['name']}"
     end
     
   end

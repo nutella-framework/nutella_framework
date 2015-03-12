@@ -11,14 +11,14 @@ module Nutella
       return unless Nutella.current_project.exist?
 
       # Extract run (passed run name) and run_id
-      run, run_id = extract_names args
+      run, run_id = parse_run_id_from args
 
       # Check that the run_id exists in the list and, if it is not,
       # return false
       return unless remove_from_run_list run_id
 
       # Stops all the bots
-      Tmux.kill_session run_id
+      Tmux.kill_run_session run_id
 
       # Stop all project level actors (if any) if needed
       stop_project_bots
@@ -56,7 +56,7 @@ module Nutella
       if Tmux.session_exist? tmux_session_name
         # Are there any runs of this project hinging on the project bots?
         if Nutella.runlist.runs_for_app(project_name).empty?
-          Tmux.kill_session tmux_session_name
+          Tmux.kill_run_session tmux_session_name
         end
       end
       true
@@ -64,8 +64,8 @@ module Nutella
 
 
     def stop_nutella_actors
-      nutella_actors_dir = "#{Nutella.config['nutella_home']}actors"
-      for_each_actor_in_dir nutella_actors_dir do |actor|
+      nutella_actors_dir = "#{Nutella::NUTELLA_HOME}framework_components"
+      for_each_component_in_dir nutella_actors_dir do |actor|
         pid_file_path = "#{nutella_actors_dir}/#{actor}/.pid"
         kill_process_with_pid pid_file_path
       end

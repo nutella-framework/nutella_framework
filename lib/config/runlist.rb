@@ -21,16 +21,6 @@ module Nutella
     end
 
 
-    # TODO not sure I need this method anymore
-    # Extracts the +run_id+ from the run name (specified at command line)
-    # @param [String] run_name the run name passed
-    # @return [String] the +run_id+ which is either the +project_name+ (if no +run_name+
-    # was specified) or the concatenation of +project_name+ and +run_name+
-    def extract_run_id( run_name )
-      run_name.to_s.empty? ? Nutella.current_project.config['name'] : "#{Nutella.current_project.config['name']}_#{run_name}"
-    end
-
-
     # Returns all the +run_id+s for ALL applications
     #
     # @return [Array<String>] list of +run_id+s associated to the specified app_id
@@ -44,6 +34,8 @@ module Nutella
     # @param [String] app_id the id of the application we want to find run_ids for
     # @return [Array<String>] list of +run_id+s associated to the specified app_id
     def runs_for_app( app_id )
+      # If there is no app, then return false and do nothing
+      return [] if @ph[app_id].nil?
       runs = @ph[app_id]['runs']
       runs.nil? ? [] : runs
     end
@@ -117,12 +109,10 @@ module Nutella
     # still a tmux session with the run name. If that's not the case,
     # it removes the missing runs from the list.
     def clean_list
-      puts 'cleaning run list'
       all_runs.each do |app, _|
         runs_for_app(app).each do |run|
-          unless Tmux.session_exist? "#{app}:#{run}"
+          unless Tmux.session_exist? Tmux.session_name(app, run)
             delete? app, run
-            puts "Deleted run from runlist: #{app}:#{run}"
           end
         end
       end

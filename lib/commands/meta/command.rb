@@ -11,7 +11,7 @@ module Nutella
   
     # Commands overload this method to execute
     def run( args=nil )
-      console.error 'Running the generic command!!! WAT?'
+      console.error 'Running the generic command!!! WAT? https://www.destroyallsoftware.com/talks/wat'
     end
 
   end

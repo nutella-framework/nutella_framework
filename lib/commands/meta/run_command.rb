@@ -7,97 +7,88 @@ module Nutella
   class RunCommand < Command
 
     def run (args=nil)
-      console.error 'Running generic RunCommand!!! WAT?'
+      console.error 'Running the generic RunCommand!!! WAT? https://www.destroyallsoftware.com/talks/wat'
     end
 
 
-    # Extracts run name and run_id
+    # Extracts the run_id from the parameters passed to the command line
     # @param [Array<String>] args command line arguments passed to the command
-    # @return [String, String ]  the run name (cleaned of nils) and the run_id
-    def extract_names( args )
-
-      # Simple `nutella start/stop`
+    # @return [String, String ] the run_id
+    def parse_run_id_from( args )
+      # Simple `nutella start/stop` (no args)
       if args.nil? || args.empty?
-        run = nil
-        run_id = Nutella.runlist.extract_run_id( '' )
-        return run, run_id
+        return 'default'
       end
-
-      # Check if the first argument is a parameter or a run name
+      # If the first argument is a parameter, set the run_id to default
       if args[0].start_with? '-'
-        run = nil
-        run_id = Nutella.runlist.extract_run_id( '' )
+        run_id =  'default'
       else
-        # If it's a run name, store the run name and shift so we are left with only
-        # the parameters in args
-        run = args[0]
-        run_id = Nutella.runlist.extract_run_id( args[0] )
+        # If the first argument is a run_id, check that it's not 'default' and return it
+        # and shift the arguments so we are left with only the parameters in args
+        run_id = args[0]
+        raise StandardError.new 'Unfortunately you can\'t use `default` as a run_id because it is reserved :(' if run_id=='default'
         args.shift
       end
-
-      return run, run_id
+      run_id
     end
 
 
-    # Extracts the command line parameters
+    # Parse the command line parameters
     # @param [Array<String>] args command line arguments passed to the command
     # @return [Hash]  an hash containing the parameters
-    def extract_parameters( args )
-      opts = Slop::Options.new
-      opts.array '-wo', '--without', 'A list of actors NOT to start'
-      opts.array '-w', '--with', 'A list of actors that needs to be started'
-      parser = Slop::Parser.new(opts)
-      result = parser.parse(args)
-      result.to_hash
+    def parse_cli_parameters( args )
+      begin
+        opts = Slop::Options.new
+        opts.array '-wo', '--without', 'A list of actors NOT to start'
+        opts.array '-w', '--with', 'A list of actors that needs to be started'
+        parser = Slop::Parser.new(opts)
+        result = parser.parse(args)
+        result.to_hash
+      rescue
+        raise StandardError.new 'The only supported parameters are --with (-w) and --without (-wo)'
+      end
     end
 
 
-    # Returns all the actors in a certain directory
-    def run_actors_list( actors_dir )
-      Dir.entries(actors_dir).select {|entry| File.directory?(File.join(actors_dir, entry)) && !(entry =='.' || entry == '..') }
+    # Returns all the components in a certain directory
+    def components_in_dir( dir )
+      Dir.entries(dir).select {|entry| File.directory?(File.join(dir, entry)) && !(entry =='.' || entry == '..') }
     end
 
 
     # Executes a code block for each actor in a certain directory
     # @param [String] actors_dir directory where we are iterating
     # @yield [actor_dir] Gives the actor directory to the block
-    def for_each_actor_in_dir( actors_dir, &block )
-      run_actors_list(actors_dir).each do |actor_dir|
+    def for_each_component_in_dir( actors_dir, &block )
+      components_in_dir(actors_dir).each do |actor_dir|
         block.call actor_dir
       end
     end
 
 
-    def output_success_message(run_id, run, action)
-      if run_id == Nutella.current_project.config['name']
-        console.success "Project #{Nutella.current_project.config['name']} #{action}!"
+    def output_success_message(app_id, run_id, action)
+      if run_id == 'default'
+        console.success "Project #{app_id} #{action}!"
       else
-        console.success "Project #{Nutella.current_project.config['name']}, run #{run} #{action}!"
+        console.success "Project #{app_id}, run #{run_id} #{action}!"
       end
     end
     
-    
-    def prepare_bot( cur_prj_dir, script, message )
-      for_each_actor_in_dir cur_prj_dir do |bot|
+    # Runs a script for each bot in a certain directory.
+    # Message is displayed in case something goes wrong
+    def run_script_for_all_bots_in( dir, script, message )
+      for_each_component_in_dir dir do |bot|
         # Skip bot if there is no script
-        next unless File.exist? "#{cur_prj_dir}/bots/#{bot}/#{script}"
+        next unless File.exist? "#{dir}/bots/#{bot}/#{script}"
         # Output message
         console.info "#{message} bot #{bot}."
         # Execute 'script' script
         cur_dir = Dir.pwd
-        Dir.chdir "#{cur_prj_dir}/bots/#{bot}"
+        Dir.chdir "#{dir}/bots/#{bot}"
         system "./#{script}"
         Dir.chdir cur_dir
       end
       true
-    end
-
-
-    # If the broker is set to one of the current ip addresses,
-    # localhost or 127.0.0.1 return true.
-    def running_on_internal_broker?
-      broker = Nutella.config['broker']
-      Socket.ip_address_list.find_all{|a| a.ipv4? }.map{|a| a.ip_address}.include?(broker) || broker == 'localhost' || broker == '127.0.0.1'
     end
 
 

@@ -3,18 +3,21 @@ require 'tmux/tmux'
 
 module Nutella
   class Compile < RunCommand
-    @description = 'Compiles all the actors that need compilation in the project'
+    @description = 'Compiles all the actors that need compilation in the application'
     
     def run(args=nil)
 
-      # If the current directory is not a nutella project, return
-      return unless Nutella.current_project.exist?
+      # If the current directory is not a nutella application, return
+      unless Nutella.current_app.exist?
+        console.warn 'The current directory is not a nutella application'
+        return
+      end
       
       # Compile all actors
-      return unless prepare_bot( Nutella.current_project.dir, 'compile', 'Compiling' )
+      return unless run_script_for_all_bots_in( Dir.pwd, 'compile', 'Compiling' )
       
       # Output success message
-      console.success "All actors compiled for #{Nutella.current_project.config['name']}"
+      console.success "All actors compiled for #{Nutella.current_app.config['name']}"
     end
     
   end

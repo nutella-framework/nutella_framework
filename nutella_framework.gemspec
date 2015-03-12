@@ -37,7 +37,7 @@ Gem::Specification.new do |s|
     "data/startup",
     "lib/cli/nutella_cli.rb",
     "lib/config/config.rb",
-    "lib/config/current_project.rb",
+    "lib/config/current_app_utils.rb",
     "lib/config/persisted_hash.rb",
     "lib/config/runlist.rb",
     "lib/core/command.rb",

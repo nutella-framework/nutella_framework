@@ -36,7 +36,7 @@ module Nutella
     def change_broker( new_broker )
       # Check that there are no runs hinging on this broker
       unless Nutella.runlist.empty?
-        console.warn 'You are currently running some projects on this broker. You can\'t change the broker while running.'
+        console.warn 'You are currently running some nutella applications on this broker. You can\'t change the broker while running.'
         return
       end
       # Try to parse the hostname and switch to the new broker

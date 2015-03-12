@@ -4,7 +4,7 @@ require 'core/nutella_core'
 require 'core/nutella_cli'
 require 'config/config'
 require 'config/runlist'
-require 'config/current_project'
+require 'config/current_app_utils'
 
 module Nutella
 

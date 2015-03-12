@@ -109,8 +109,8 @@ module Nutella
       File.open("#{template_dir}/nutella.json", 'w') { |f| f.write(JSON.pretty_generate json) }
       # Add bot/interface specific files
       bot_specific_file = nil
-      bot_specific_file = File.join( Nutella.config['nutella_home'], 'data/startup' ) if json['type']=='bot'
-      bot_specific_file = File.join( Nutella.config['nutella_home'], 'data/index.html' ) if json['type']=='interface'
+      bot_specific_file = File.join( Nutella::NUTELLA_HOME, 'data/startup' ) if json['type']=='bot'
+      bot_specific_file = File.join( Nutella::NUTELLA_HOME, 'data/index.html' ) if json['type']=='interface'
       FileUtils.copy( bot_specific_file, template_dir )
       console.success "Template #{json['name']} created successfully!"
     end
