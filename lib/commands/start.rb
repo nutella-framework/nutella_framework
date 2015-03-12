@@ -31,21 +31,21 @@ module Nutella
         return
       end
 
-      # Check that the run_id is unique and add it to the list of runs
-      # If it's not, return (without adding the run_id to the list of course)
+      # Check that the run is unique and add it to the list of runs
+      # If it's not, return (without adding the run to the list of course)
       return unless add_to_run_list( app_id, run_id, app_path )
 
       # Start the internal broker
       return unless start_internal_broker
 
       # Start all framework-level components (if needed)
-      return unless start_nutella_actors
+      return unless start_framework_components
 
-      # Start all app-level bots (if any)
+      # Start all app-level bots (if any, if needed)
       return unless start_app_bots(app_id, app_path)
 
       # Start all run-level bots
-      return unless start_bots( app_path, app_id, run_id, params )
+      return unless start_run_bots( app_path, app_id, run_id, params )
 
       # Output messages
       output_success_message(app_id, run_id, 'started' )
@@ -179,11 +179,11 @@ module Nutella
     end
 
 
-    def start_nutella_actors
-      nutella_actors_dir = "#{Nutella::NUTELLA_HOME}framework_components"
-      for_each_component_in_dir nutella_actors_dir do |actor|
-        if File.exist? "#{nutella_actors_dir}/#{actor}/startup"
-          unless start_framework_component "#{nutella_actors_dir}/#{actor}"
+    def start_framework_components
+      nutella_components_dir = "#{Nutella::NUTELLA_HOME}framework_components"
+      for_each_component_in_dir nutella_components_dir do |component|
+        if File.exist? "#{nutella_components_dir}/#{component}/startup"
+          unless start_framework_component "#{nutella_components_dir}/#{component}"
             return false
           end
         end
@@ -236,7 +236,7 @@ module Nutella
     end
 
 
-    def start_bots( app_path, app_id, run_id, params )
+    def start_run_bots( app_path, app_id, run_id, params )
       # Create a new tmux instance for this run
       tmux = Tmux.new app_id, run_id
       # Fetch bots dir

@@ -39,8 +39,8 @@ module Nutella
     def parse_cli_parameters( args )
       begin
         opts = Slop::Options.new
-        opts.array '-wo', '--without', 'A list of actors NOT to start'
-        opts.array '-w', '--with', 'A list of actors that needs to be started'
+        opts.array '-wo', '--without', 'A list of components NOT to start'
+        opts.array '-w', '--with', 'A list of components that needs to be started'
         parser = Slop::Parser.new(opts)
         result = parser.parse(args)
         result.to_hash
@@ -56,21 +56,21 @@ module Nutella
     end
 
 
-    # Executes a code block for each actor in a certain directory
-    # @param [String] actors_dir directory where we are iterating
-    # @yield [actor_dir] Gives the actor directory to the block
-    def for_each_component_in_dir( actors_dir, &block )
-      components_in_dir(actors_dir).each do |actor_dir|
-        block.call actor_dir
+    # Executes a code block for each component in a certain directory
+    # @param [String] dir directory where we are iterating
+    # @yield [component] Passes the component name to the block
+    def for_each_component_in_dir( dir, &block )
+      components_in_dir(dir).each do |component|
+        block.call component
       end
     end
 
 
     def output_success_message(app_id, run_id, action)
       if run_id == 'default'
-        console.success "Project #{app_id} #{action}!"
+        console.success "Application #{app_id} #{action}!"
       else
-        console.success "Project #{app_id}, run #{run_id} #{action}!"
+        console.success "Application #{app_id}, run #{run_id} #{action}!"
       end
     end
     

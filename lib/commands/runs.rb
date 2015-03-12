@@ -3,7 +3,7 @@ require 'commands/meta/command'
 
 module Nutella
   class Runs < Command
-    @description = 'Displays list of runs for current project or all projects'
+    @description = 'Displays list of runs for current application or all applications'
   
     def run(args=nil)
 
@@ -11,10 +11,10 @@ module Nutella
       if args[0]=='--all' || args[0]=='-a'
         display_all_runs
       else
-        # If current dir is not a nutella project, return
-        return unless Nutella.current_project.exist?
-        # Display list of runs for current nutella project
-        display_project_runs
+        # If current dir is not a nutella application, return
+        return unless Nutella.current_app.exist?
+        # Display list of runs for current nutella application
+        display_app_runs
       end
     end
     
@@ -24,25 +24,25 @@ module Nutella
     
     def display_all_runs
       if Nutella.runlist.empty?
-        console.info 'You are not running any projects'
+        console.info 'You are not running any nutella apps'
       else
         console.info 'Currently running:'
+        Nutella.runlist.all_runs.each do |app_id, _|
+          console.info "#{app_id}:"
+          Nutella.runlist.runs_for_app(app_id).each do |run_id|
+            console.info "  #{run_id}"
+          end
+        end
         Nutella.runlist.runs_for_app.each { |run| console.info " #{run}" }
       end
     end
     
-    def display_project_runs
-      project_name = Nutella.current_project.config['name']
-      runs = Nutella.runlist.runs_for_app project_name
-      console.info "Currently running #{runs.length} instances of project #{project_name}:"
-      runs.each do |run|
-        run_id = run.dup
-        run_id.slice! "#{project_name}_"
-        if run==project_name
-          console.info " #{project_name} (default instance)"
-        else
-          console.info " #{run_id}"
-        end
+    def display_app_runs
+      app_id = Nutella.current_app.config['name']
+      app_runs = Nutella.runlist.runs_for_app app_id
+      console.info "Currently running #{app_runs.length} instances of app '#{app_id}':"
+      app_runs.each do |run_id|
+        console.info "  #{run_id}"
       end
     end
     

@@ -3,7 +3,7 @@ require 'tmux/tmux'
 
 module Nutella
   class Dependencies < RunCommand
-    @description = 'Installs the dependencies for all actors in the application'
+    @description = 'Installs the dependencies for all components in the application'
     
     def run(args=nil)
 

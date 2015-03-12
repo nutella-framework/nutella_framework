@@ -3,7 +3,7 @@ require 'tmux/tmux'
 
 module Nutella
   class Compile < RunCommand
-    @description = 'Compiles all the actors that need compilation in the application'
+    @description = 'Compiles all the components that need compilation in the application'
     
     def run(args=nil)
 
@@ -13,11 +13,11 @@ module Nutella
         return
       end
       
-      # Compile all actors
+      # Compile all components
       return unless run_script_for_all_bots_in( Dir.pwd, 'compile', 'Compiling' )
       
       # Output success message
-      console.success "All actors compiled for #{Nutella.current_app.config['name']}"
+      console.success "All components compiled for #{Nutella.current_app.config['name']}"
     end
     
   end

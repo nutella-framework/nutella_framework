@@ -3,46 +3,49 @@ require 'tmux/tmux'
 
 module Nutella
   class Stop < RunCommand
-    @description = 'Stops all or some of the bots in the current project'
+    @description = 'Stops all the bots in the current application'
 
     def run(args=nil)
 
-      # If the current directory is not a nutella project, return
-      return unless Nutella.current_project.exist?
+      # If the current directory is not a nutella application, return
+      unless Nutella.current_app.exist?
+        console.warn 'The current directory is not a nutella application'
+        return
+      end
 
       # Extract run (passed run name) and run_id
-      run, run_id = parse_run_id_from args
+      run_id = parse_run_id_from args
+      app_id = Nutella.current_app.config['name']
 
-      # Check that the run_id exists in the list and, if it is not,
-      # return false
-      return unless remove_from_run_list run_id
+      # Check that the specified run exists in the list and, if it doesn't, return
+      return unless remove_from_run_list app_id, run_id
 
-      # Stops all the bots
-      Tmux.kill_run_session run_id
+      # Stops all run-level bots
+      Tmux.kill_run_session app_id, run_id
 
-      # Stop all project level actors (if any) if needed
-      stop_project_bots
+      # Stop all app-level bots (if any, if needed)
+      stop_app_bots app_id
 
-      # Stop all nutella internal actors, if needed
+      # Stop all framework-level components (if needed)
       if Nutella.runlist.empty?
-        stop_nutella_actors
+        stop_framework_components
       end
 
       # If running on the internal broker, stop it if needed
-      if Nutella.runlist.empty? and running_on_internal_broker?
-        stop_broker
+      if Nutella.runlist.empty?
+        stop_internal_broker
       end
 
       # Output success message
-      output_success_message( run_id, run, 'stopped' )
+      output_success_message( app_id, run_id, 'stopped' )
     end
   
     
     private
 
     
-    def remove_from_run_list( run_id )
-      unless Nutella.runlist.delete? run_id
+    def remove_from_run_list( app_id, run_id )
+      unless Nutella.runlist.delete? app_id, run_id
         console.warn "Run #{run_id} doesn't exist. Impossible to stop it."
         return false
       end
@@ -50,29 +53,28 @@ module Nutella
     end
 
 
-    def stop_project_bots
-      project_name = Nutella.current_project.config['name']
-      tmux_session_name = "#{project_name}-project-bots"
+    def stop_app_bots( app_id )
+      tmux_session_name = Tmux.app_bot_session_name app_id
       if Tmux.session_exist? tmux_session_name
-        # Are there any runs of this project hinging on the project bots?
-        if Nutella.runlist.runs_for_app(project_name).empty?
-          Tmux.kill_run_session tmux_session_name
+        # Are there any run of this app hinging on the app bots?
+        if Nutella.runlist.runs_for_app(app_id).empty?
+          Tmux.kill_app_session app_id
         end
       end
       true
     end
 
 
-    def stop_nutella_actors
-      nutella_actors_dir = "#{Nutella::NUTELLA_HOME}framework_components"
-      for_each_component_in_dir nutella_actors_dir do |actor|
-        pid_file_path = "#{nutella_actors_dir}/#{actor}/.pid"
+    def stop_framework_components
+      nutella_components_dir = "#{Nutella::NUTELLA_HOME}framework_components"
+      for_each_component_in_dir nutella_components_dir do |component|
+        pid_file_path = "#{nutella_components_dir}/#{component}/.pid"
         kill_process_with_pid pid_file_path
       end
     end
 
 
-    def stop_broker
+    def stop_internal_broker
       pid_file_path = "#{Nutella.config['broker_dir']}/bin/.pid"
       kill_process_with_pid pid_file_path
     end

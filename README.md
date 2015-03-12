@@ -33,9 +33,9 @@ Congratulations! Nutella is ready to use!
 
 
 # Where next?
-If you already have a projects you want to tinker with (like [RoomQuake](https://github.com/ltg-uic/roomquake)) simply checkout the project to a local folder, `cd /to/my/local/folder` and start tinkering away. Not sure what to do? Check out our [nutella Command Line Tool man page](https://github.com/nutella-framework/nutella_framework/wiki/Nutella-Command-Line-Interface).
+If you already have an application you want to tinker with (like [RoomQuake](https://github.com/ltg-uic/roomquake)) simply checkout the application to a local folder, `cd /to/my/local/folder` and start tinkering away. Not sure what to do? Check out our [nutella Command Line Tool man page](https://github.com/nutella-framework/nutella_framework/wiki/Nutella-Command-Line-Interface).
 
-If you want to create your own project, check out the [new project tutorial](https://github.com/nutella-framework/nutella_framework/wiki/New-project-tutorial).
+If you want to create your own application, check out the [new app tutorial](https://github.com/nutella-framework/nutella_framework/wiki/New-application-tutorial).
 
 
 # Contributing

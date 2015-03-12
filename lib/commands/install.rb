@@ -5,11 +5,11 @@ require 'net/http'
 module Nutella
   
   class Install < TemplateCommand
-    @description = 'Copies an arbitrary template (from central DB, directory or URL) into the current project'
+    @description = 'Copies an arbitrary template (from central DB, directory or URL) into the current application'
   
     def run(args=nil)
       # Is current directory a nutella prj?
-      return unless Nutella.current_project.exist?
+      return unless Nutella.current_app.exist?
     
       # Check args
       if args.empty?
@@ -19,16 +19,16 @@ module Nutella
       template = args[0]
       destination_dir = args.length==2 ? args[1] : nil
       
-      # Extract project directory
-      prj_dir = Nutella.current_project.dir
+      # Extract application directory
+      app_path =Dir.pwd
 
       # What kind of template are we handling?
       if is_template_a_local_dir? template
-        add_local_template( template, template, prj_dir, destination_dir )
+        add_local_template( template, template, app_path, destination_dir )
       elsif is_template_a_git_repo? template
-        add_remote_template( template, prj_dir, destination_dir)
+        add_remote_template( template, app_path, destination_dir)
       elsif is_template_in_db? template
-        add_central_template( template, prj_dir, destination_dir)
+        add_central_template( template, app_path, destination_dir)
       else
         console.warn 'The specified template is not a valid nutella template'
       end
@@ -55,7 +55,7 @@ module Nutella
           tmp_dest_dir = template_git_url[template_git_url.rindex('/')+1 .. template_git_url.length]
         end
         clone_template_from_repo_to( template_git_url, tmp_dest_dir )
-        return validate_template "#{Nutella.config['tmp_dir']}/#{tmp_dest_dir}"
+        return validate_template "#{Nutella::NUTELLA_TMP}/#{tmp_dest_dir}"
       rescue
         return false 
       end
@@ -106,21 +106,21 @@ module Nutella
   
     def add_remote_template ( template, prj_dir, dest_dir)
       template_name = template[template.rindex('/')+1 .. template.length-5]
-      template_dir = "#{Nutella.config['tmp_dir']}/#{template_name}"
+      template_dir = "#{Nutella::NUTELLA_TMP}/#{template_name}"
       add_local_template( template, template_dir, prj_dir, dest_dir )
     end
   
   
     def add_central_template( template_name, prj_dir, dest_dir)
-      template_dir = "#{Nutella.config['tmp_dir']}/#{template_name}"
+      template_dir = "#{Nutella::NUTELLA_TMP}/#{template_name}"
       add_local_template( template_name, template_dir, prj_dir, dest_dir )
     end
   
   
     def clone_template_from_repo_to(template, dest_dir)
       clean_tmp_dir
-      Dir.mkdir Nutella.config['tmp_dir']  unless Dir.exists? Nutella.config['tmp_dir']
-      Git.clone(template, dest_dir, :path => Nutella.config['tmp_dir'])
+      Dir.mkdir Nutella::NUTELLA_TMP  unless Dir.exists? Nutella::NUTELLA_TMP
+      Git.clone(template, dest_dir, :path => Nutella::NUTELLA_TMP)
     end
 
 
@@ -132,7 +132,7 @@ module Nutella
   
   
     def clean_tmp_dir
-      FileUtils.rm_rf "#{Nutella.config['tmp_dir']}"
+      FileUtils.rm_rf "#{Nutella::NUTELLA_TMP}"
     end
   
   end

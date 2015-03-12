@@ -24,7 +24,7 @@ set :port, config_h['main_interface_port']
 
 # Display the form to input the run_id
 get '/' do
-  send_file File.join("#{config_h['nutella_home']}/actors/main_interface/public", 'index.html')
+  send_file 'public/index.html'
 end
 
 

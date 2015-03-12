@@ -4,15 +4,15 @@ module Nutella
 
   class TestRunCommand < MiniTest::Test
 
-    # Create a fake project
-    New.new.run ['test_project']
-    Dir.chdir 'test_project'
+    # Create a fake app
+    New.new.run ['test_app']
+    Dir.chdir 'test_app'
     Nutella::Install.new.run ['basic-ruby-bot', 'bot1']
     Dir.chdir '..'
 
 
     should 'parse app long argument' do
-      Dir.chdir 'test_project'
+      Dir.chdir 'test_app'
       # File.open('nutella.json', 'r') do |f|
       #   f.each_line do |line|
       #     puts line
@@ -24,7 +24,7 @@ module Nutella
     end
 
     should 'parse without long argument' do
-      Dir.chdir 'test_project'
+      Dir.chdir 'test_app'
       # File.open('nutella.json', 'r') do |f|
       #   f.each_line do |line|
       #     puts line
@@ -69,7 +69,7 @@ module Nutella
 
 
     # Tear
-    MiniTest::Unit.after_tests { FileUtils.rm_r 'test_project' }
+    MiniTest::Unit.after_tests { FileUtils.rm_r 'test_app' }
 
   end
 
