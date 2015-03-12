@@ -10,7 +10,7 @@ module Nutella
     # Creates a new window (and session if necessary) to start a run-level bot
     def new_bot_window( bot )
       # Create session name
-      sn = self.session_name(@app_id, @run_id)
+      sn = Tmux.session_name(@app_id, @run_id)
       # Create session
       create_tmux_window(sn, bot)
       # Start bot
@@ -20,7 +20,7 @@ module Nutella
     # Creates a new window (and session if necessary) to start an app-level bot
     def new_app_bot_window( bot )
       # Create session name
-      sn = self.app_bot_session_name(@app_id)
+      sn = Tmux.app_bot_session_name(@app_id)
       # Create session
       create_tmux_window(sn, bot)
       # Start bot

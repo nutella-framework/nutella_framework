@@ -65,14 +65,6 @@ module Nutella
       end
     end
 
-
-    def output_success_message(app_id, run_id, action)
-      if run_id == 'default'
-        console.success "Application #{app_id} #{action}!"
-      else
-        console.success "Application #{app_id}, run #{run_id} #{action}!"
-      end
-    end
     
     # Runs a script for each bot in a certain directory.
     # Message is displayed in case something goes wrong

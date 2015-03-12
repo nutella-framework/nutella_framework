@@ -48,7 +48,6 @@ module Nutella
       return unless start_run_bots( app_path, app_id, run_id, params )
 
       # Output messages
-      output_success_message(app_id, run_id, 'started' )
       output_monitoring_details(run_id, params, app_id, app_path)
     end
 
@@ -218,7 +217,7 @@ module Nutella
       # If app bots have been started already, then do nothing
       unless Tmux.session_exist? Tmux.app_bot_session_name app_id
         # Start all app bots in the list into a new tmux session
-        tmux = Tmux.new app_id, _
+        tmux = Tmux.new app_id, nil
         for_each_component_in_dir bots_dir do |bot|
           unless app_bots_list.nil? || !app_bots_list.include?( bot )
             # If there is no 'startup' script output a warning (because
@@ -260,16 +259,27 @@ module Nutella
 
 
     def output_monitoring_details( run_id, params, app_id, app_path )
+      # If there are no run-level bots to start, do not create the run and error out
+      if run_level_bots_list(app_path, params).empty?
+        console.warn 'This run doesnt\'t seem to have any components. No run was created.'
+        return
+      end
+      # Output start message
+      if run_id == 'default'
+        console.success "Application #{app_id} started!"
+      else
+        console.success "Application #{app_id}, run #{run_id} started!"
+      end
+      # Output broker info
+      console.success "Application is running on broker: #{Nutella.config['broker']}"
+      # If some application bots were started, say it
       app_bots_list = Nutella.current_app.config['app_bots']
       unless app_bots_list.nil? || app_bots_list.empty?
         console.success "Do `tmux attach-session -t #{Tmux.app_bot_session_name(app_id)}` to monitor your app bots."
       end
-      if run_level_bots_list(app_path, params).empty?
-        console.success 'No tmux session was created for this run because you specified no regular bots for it'
-      else
-        console.success "Do `tmux attach-session -t #{Tmux.session_name(app_id,run_id)}` to monitor your bots."
-      end
-      console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{run_id} to access your interfaces"
+      # Output rest of monitoring info
+      console.success "Do `tmux attach-session -t #{Tmux.session_name(app_id,run_id)}` to monitor your bots."
+      console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{app_id}/#{run_id} to access your interfaces"
 
     end
 

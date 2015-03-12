@@ -37,7 +37,7 @@ module Nutella
       end
 
       # Output success message
-      output_success_message( app_id, run_id, 'stopped' )
+      output_success_message(app_id, run_id)
     end
   
     
@@ -94,6 +94,14 @@ module Nutella
           # Pid file exists but process is dead. Do nothing
         end
         File.delete pid_file_path
+      end
+    end
+
+    def output_success_message( app_id, run_id )
+      if run_id == 'default'
+        console.success "Application #{app_id} stopped!"
+      else
+        console.success "Application #{app_id}, run #{run_id} stopped!"
       end
     end
 

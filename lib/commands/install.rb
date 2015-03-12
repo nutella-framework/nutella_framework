@@ -8,8 +8,12 @@ module Nutella
     @description = 'Copies an arbitrary template (from central DB, directory or URL) into the current application'
   
     def run(args=nil)
-      # Is current directory a nutella prj?
-      return unless Nutella.current_app.exist?
+
+      # If the current directory is not a nutella application, return
+      unless Nutella.current_app.exist?
+        console.warn 'The current directory is not a nutella application'
+        return
+      end
     
       # Check args
       if args.empty?

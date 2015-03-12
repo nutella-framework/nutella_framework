@@ -11,7 +11,7 @@ module Nutella
         message += add_cmd_help(file)
       end
       console.info message
-      console.info 'For more details on individual commands, see https://github.com/nutella-framework/nutella_framework/wiki/Nutella-Command-Line-Interface'
+      console.success 'For more details on individual commands, see https://github.com/nutella-framework/nutella_framework/wiki/Nutella-Command-Line-Interface'
     end
 
     private

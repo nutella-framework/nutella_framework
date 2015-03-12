@@ -3,7 +3,7 @@ require 'semantic'
 
 module Nutella
   class Checkup < Command
-    @description = 'Checks that all the dependencies are installed and prepares nutella to run'
+    @description = 'Checks that all the framework dependencies are installed'
   
     def run( args=nil )
 

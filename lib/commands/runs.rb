@@ -3,7 +3,7 @@ require 'commands/meta/command'
 
 module Nutella
   class Runs < Command
-    @description = 'Displays list of runs for current application or all applications'
+    @description = 'Displays a list of runs for the current application or all applications'
   
     def run(args=nil)
 
@@ -11,8 +11,11 @@ module Nutella
       if args[0]=='--all' || args[0]=='-a'
         display_all_runs
       else
-        # If current dir is not a nutella application, return
-        return unless Nutella.current_app.exist?
+        # If the current directory is not a nutella application, return
+        unless Nutella.current_app.exist?
+          console.warn 'The current directory is not a nutella application'
+          return
+        end
         # Display list of runs for current nutella application
         display_app_runs
       end
@@ -33,7 +36,6 @@ module Nutella
             console.info "  #{run_id}"
           end
         end
-        Nutella.runlist.runs_for_app.each { |run| console.info " #{run}" }
       end
     end
     

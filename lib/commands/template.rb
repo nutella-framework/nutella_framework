@@ -3,7 +3,7 @@ require 'commands/meta/template_command'
 module Nutella
 
   class Template < TemplateCommand
-    @description = 'Helps create and validate templates'
+    @description = 'Creates and validates nutella components templates'
 
     def run(args=nil)
 
@@ -30,9 +30,9 @@ module Nutella
     private
 
     def display_help
-      console.info 'You need to specify a sub command.'
-      console.info 'create <template_name>    creates a template skeleton in the folder with the same name'
-      console.info 'validate  <temple_dir>    validates a template that already exists'
+      console.warn 'You need to specify a sub command.'
+      console.warn 'create <template_name>    creates a template skeleton in the folder with the same name'
+      console.warn 'validate  <temple_dir>    validates a template that already exists'
     end
 
 
@@ -70,17 +70,18 @@ module Nutella
     end
 
     def prompt_and_read_version
-      puts 'What is the version of your template?'
-      print "(#{ver_d}) "
-      c = $stdin.gets.chomp!
-      c.empty? ? ver_d : c
+      prompt_and_read 'What is the version of your template?', @default_version
     end
 
     def prompt_and_read_type
-      puts 'Are you creating a template for a "bot" or "interface"?'
-      print "(#{type_d}) "
+      prompt_and_read 'Are you creating a template for a "bot" or "interface"?', @default_type
+    end
+
+    def prompt_and_read( prompt, default )
+      puts prompt
+      print "(#{default}) "
       c = $stdin.gets.chomp!
-      c.empty? ? type_d : c
+      c.empty? ? default : c
     end
 
     def prompt_and_read_description(type)
