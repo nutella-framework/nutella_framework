@@ -22,99 +22,107 @@ set :environment, :production
 set :port, config_h['main_interface_port']
 
 
-# Display the form to input the run_id
+
+
+# Display the form to input the app_id and run_id
 get '/' do
   send_file 'public/index.html'
 end
 
-
 # Redirect if there is no slash after the run_id
-get '/:run_id' do
+get '/:app_id/:run_id' do
   redirect "#{request.url}/"
 end
 
 
-# Renders the run template
-get '/:run_id/' do
-
-  # Parse the run_id from URL and extract the run path from runlist.json
+# Renders the interfaces summary page for the run
+get '/:app_id/:run_id/' do
+  # Parse the app_id and run_id from URL and extract the run path from runlist.json
+  @app_id = params[:app_id]
   @run_id = params[:run_id]
-  @run_path = get_run_path @run_id
-  @project_name = @run_path[@run_path.rindex('/')+1..@run_path.length] unless @run_path.nil?
-
-  # If there is no run with this name, render error page
-  return erb( :not_found_404, :locals => {:not_found_type => 'run'} ) if @run_path.nil?
-
-  # If there is an 'index.erb' file inside the 'interfaces' folder, render it
-  custom_index_file = "#{@run_path}/interfaces/index.erb"
-  return erb(File.read( custom_index_file )) if File.exist? custom_index_file
-
-  # If no 'index.erb' is provided we need to generate one
-  # In order to do so we need to load a bunch of details
+  @app_path = get_app_path @app_id
+  # If there is no app with this name, render error page
+  return erb( :not_found_404, :locals => {:not_found_type => 'run'} ) if @app_path.nil?
+  # To generate the 'index.erb' we need to load a bunch of details
   # (folder, title/name, description) for each interface
-  @interfaces = load_interfaces_details
-
-  # Finally render the interfaces summary page
+  @interfaces = load_interfaces_details @app_path
+  @framework_interfaces = load_framework_interfaces
+  # Render the interfaces summary page
   erb :index
 end
 
-
 # Redirect if there is a slash after the interface
-get '/:run_id/:interface/' do
+get '/:app_id/:run_id/:interface/' do
   redirect "#{request.url[0..-2]}"
 end
 
 
 # Serves the index.html file for each individual interface augmented with nutella query string parameters
-get '/:run_id/:interface' do
-
-  # Parse the run_id and the interface name from URL
+get '/:app_id/:run_id/runs/:interface' do
+  # Parse the app_id and run_id from URL and extract the run path from runlist.json
+  app_id = params[:app_id]
   run_id = params[:run_id]
   interface = params[:interface]
-
-  # Extract the run path from runlist.json
-  run_path = get_run_path run_id
-
-  # Compose the path of interface index file
-  index_file_path = "#{run_path}/interfaces/#{interface}/index.html"
-
+  app_path = get_app_path app_id
+  # Compose the path of interface index file passing the nutella parameters
+  index_file_path = "#{app_path}/interfaces/#{interface}/index.html"
   # If the index file doesn't exist, render error page
   return erb( :not_found_404, :locals => {:not_found_type => 'idx'} ) unless File.exist? index_file_path
-
   # If the index file exists, compose query string and redirect
-  index_with_query_url = "#{request.path}/index.html?run_id=#{run_id}&broker=#{config_h['broker']}"
+  index_with_query_url = "#{request.path}/index.html?broker=#{config_h['broker']}&app_id=#{app_id}&run_id=#{run_id}"
   redirect index_with_query_url
 end
 
-
 # Serves the files contained in each interface folder
-get '/:run_id/:interface/*' do
-
+get '/:app_id/:run_id/runs/:interface/*' do
   # Parse the run_id, the interface name and the file_path from URL
-  run_id = params[:run_id]
+  app_id = params[:app_id]
   interface = params[:interface]
   relative_file_path = params[:splat][0]
-
-  # Extract the run path from runlist.json
-  run_path = get_run_path run_id
-
+  app_path = get_app_path app_id
   # Compose the path of the file we are trying to serve
-  file_path = "#{run_path}/interfaces/#{interface}/#{relative_file_path}"
-
+  file_path = "#{app_path}/interfaces/#{interface}/#{relative_file_path}"
   # If the file we are trying to serve doesn't exist, render error page
   return erb( :not_found_404, :locals => {:not_found_type => 'file'} ) unless File.exist? file_path
-
   # If the file exists, render it
   send_file file_path
 end
 
 
+# Serve the index file for a framework interface passing the nutella parameters
+get '/:app_id/:run_id/framework/:interface' do
+  app_id = params[:app_id]
+  run_id = params[:run_id]
+  # Filesystem path to the index file
+  index_file_path = "../#{params[:interface]}/index.html"
+  # If the index file doesn't exist, render error page
+  return erb( :not_found_404, :locals => {:not_found_type => 'idx'} ) unless File.exist? index_file_path
+  # If the index file exists, compose query string and redirect
+  index_with_query_url = "#{request.path}/index.html?broker=#{config_h['broker']}&app_id=#{app_id}&run_id=#{run_id}"
+  redirect index_with_query_url
+end
+
+# Serves the files contained in each framework interface folder
+get '/:app_id/:run_id/framework/:interface/*' do
+  # Fetch the relative file path
+  relative_file_path = params[:splat][0]
+  # Compose the path of the file we are trying to serve
+  file_path = "../#{params[:interface]}/#{relative_file_path}"
+  # If the file we are trying to serve doesn't exist, render error page
+  return erb( :not_found_404, :locals => {:not_found_type => 'file'} ) unless File.exist? file_path
+  # If the file exists, render it
+  send_file file_path
+end
+
+
+# Utility functions -------------------------------------------------------------------------
+
 # Utility function:
-# Gets the path associated with a certain run
-def get_run_path (run_id)
+# Gets the path associated with a certain application
+def get_app_path( app_id )
   begin
     runs_h = JSON.parse(IO.read($runlist_file))
-    runs_h[run_id]
+    runs_h[app_id]['path']
   rescue
     nil
   end
@@ -122,42 +130,53 @@ end
 
 # Utility function:
 # Loads all the details for all interfaces and stores them into an array of hashes
-def load_interfaces_details
+def load_interfaces_details( app_path )
   interfaces = Array.new
-  interfaces_path = "#{@run_path}/interfaces/"
+  interfaces_path = "#{app_path}/interfaces/"
   Dir.entries(interfaces_path).select {|entry| File.directory?(File.join(interfaces_path, entry)) && !(entry =='.' || entry == '..') }.each do |iface_dir|
     interfaces.push extract_interface_info( interfaces_path, iface_dir )
   end
   interfaces
 end
 
+
+def load_framework_interfaces
+  interfaces = Array.new
+  Dir.entries('../').select {|entry| File.directory?(File.join('../', entry)) && !(entry =='.' || entry == '..') }.each do |iface_dir|
+    interfaces.push(extract_interface_info( '../', iface_dir)) if File.exist?("../#{iface_dir}/index.html")
+  end
+  interfaces
+end
+
+
 # Utility function:
-# Extracts name, description and folder for a single interface
+# Extracts name, description and folder for a single interface from it's index.html
 def extract_interface_info( interfaces_path, iface_dir )
-  iface_props = Hash.new
-
+  iface_properties = Hash.new
   index_path = "#{interfaces_path}#{iface_dir}/index.html"
-
   unless File.exist? index_path
-    iface_props[:name] = iface_dir
-    iface_props[:description] = 'My designer was a bit lazy and didn\'t include an index.html file in the main interface directory :('
-    return iface_props
+    iface_properties[:name] = iface_dir
+    iface_properties[:description] = 'My designer was a bit lazy and didn\'t include an index.html file in the main interface directory :('
+    return iface_properties
   end
 
   # If file exists, parse it and extract info
   f = File.open index_path
   doc = Nokogiri::HTML f
   f.close
-  iface_props[:name] = doc.css('title').empty? ? iface_dir : doc.css('title').text
+  # Extract interface name from title
+  iface_properties[:name] = (doc.css('title').empty? || doc.css('title').text.empty? ) ? iface_dir : doc.css('title').text
+  # Extract description from meta description tag
   if doc.css("meta[name='description']").empty?
-    iface_props[:description] = 'My designer was a bit lazy and didn\'t include a &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file :('
+    iface_properties[:description] = 'My designer was a bit lazy and didn\'t include a &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file :('
   else
     if doc.css("meta[name='description']").attribute('content').nil?
-      iface_props[:description] = 'There was no attribute content in &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file :('
+      iface_properties[:description] = 'There was no attribute content in &lt;meta name="description" content="Description of this interface"&gt; tag in the index.html file :('
     else
-      iface_props[:description] = doc.css("meta[name='description']").attribute('content').text
+      iface_properties[:description] = doc.css("meta[name='description']").attribute('content').text
     end
   end
-  iface_props[:url] = "#{iface_dir}"
-  iface_props
+  # Extract URL from interface dir
+  iface_properties[:url] = iface_dir
+  iface_properties
 end
