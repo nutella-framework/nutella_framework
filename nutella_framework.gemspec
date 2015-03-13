@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Alessandro Gnoli"]
-  s.date = "2015-03-12"
+  s.date = "2015-03-13"
   s.description = "Nutella is a framework to create and run classroom narratives"
   s.email = "tebemis@gmail.com"
   s.executables = ["nutella"]
@@ -30,12 +30,14 @@ Gem::Specification.new do |s|
     "bin/nutella",
     "data/index.html",
     "data/startup",
+    "framework_components/example_framework_interface/dandelion-flowers-card.jpg",
+    "framework_components/example_framework_interface/index.html",
     "framework_components/main_interface/main_interface_bot.rb",
     "framework_components/main_interface/public/index.html",
     "framework_components/main_interface/startup",
     "framework_components/main_interface/views/index.erb",
     "framework_components/main_interface/views/not_found_404.erb",
-    "framework_components/order.json",
+    "framework_components/order.json.example",
     "framework_components/runs_list_bot/app_runs_list_bot.rb",
     "lib/commands/broker.rb",
     "lib/commands/checkup.rb",
@@ -64,7 +66,8 @@ Gem::Specification.new do |s|
     "lib/nutella_lib_framework/api.rb",
     "lib/tmux/tmux.rb",
     "nutella_framework.gemspec",
-    "test/commands/test_run_command.rb",
+    "test/commands/test_cmd_cli_params_parsing.rb",
+    "test/commands/test_command_template.rb",
     "test/config/test_current_app_utils.rb",
     "test/config/test_persisted_hash.rb",
     "test/config/test_runlist.rb",
