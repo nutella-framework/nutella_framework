@@ -13,7 +13,6 @@ module Nutella
         return
       end
 
-      # Parse the run_id and parameters from the command line
       begin
         run_id, params = parse_cli args
       rescue StandardError => e
@@ -21,35 +20,21 @@ module Nutella
         return
       end
 
-      # Extract the app_id and the path to the current app
       app_id, app_path = fetch_app_details
 
-      # Check that there is at least a regular bot that will be started,
-      # otherwise it makes no sense to create a run
-      if run_level_bots_list(app_path, params).empty? && app_bots_started?(app_id)
+      if no_bot_to_start(app_id, app_path, params)
         console.warn "Run #{run} not created: your application bots are already started and you specified no regular bots exclusively for this run"
         return
       end
 
-      # Check that the run is unique and add it to the list of runs
-      # If it's not, return (without adding the run to the list of course)
       return unless add_to_run_list( app_id, run_id, app_path )
 
-      # Start the internal broker
-      return unless start_internal_broker
-
-      # Start all framework-level components (if needed)
-      return unless start_framework_components
-
-      # Start all app-level bots (if any, if needed)
-      return unless start_app_bots(app_id, app_path)
-
-      # Start all run-level bots
-      return unless start_run_bots( app_path, app_id, run_id, params )
+      return unless start_all_components(app_id, app_path, run_id, params)
 
       # Output messages
-      output_monitoring_details(run_id, params, app_id, app_path)
+      print_confirmation(run_id, params, app_id, app_path)
     end
+
 
 
     private
@@ -77,28 +62,55 @@ module Nutella
     end
 
 
+    # Returns true if both the list of run level bots is empty and the app bots
+    # have been started already
+    def no_bot_to_start(app_id, app_path, params)
+      return run_level_bots_list(app_path, params).empty? && app_bots_started?(app_id)
+    end
+
+
     # Returns the list of run-level bots for this run
     # Depending on the mode we are in, we want to start only some bots, exclude only some bots or start all bots
     def run_level_bots_list( app_path, params )
-      # Fetch the list of app bots
-      app_bots_list = Nutella.current_app.config['app_bots']
       # Fetch the list of all components in the bots dir
-      bots_list = components_in_dir "#{app_path}/bots/"
-      # If we are in "with mode", we want to run only the bots in the "with list" (minus the ones in app_bots_list)
-      unless params[:with].empty?
-        return app_bots_list.nil? ? params[:with] : params[:with] - app_bots_list
+      all_bots = components_in_dir "#{app_path}/bots/"
+      # Fetch the list of app bots
+      app_bots = Nutella.current_app.config['app_bots']
+      # Return correct list based on the mode we are in
+      case start_mode(params)
+        when :WITH
+          return  get_with_bots_list params[:with], app_bots
+        when :WO
+          return get_wo_bots_list all_bots, app_bots, params[:without]
+        when :ALL
+          return get_all_bots_list all_bots, app_bots
+        else
+          # If we get here it means we are both in with and without mode and something went very wrong...
+          raise 'You are using simultaneously with and without modes. This should not happen. Please contact developers.'
       end
-      # If we are in "without mode", we want to run all the bots in the bots_list minus the ones in the "without list and in the app_bots_list
-      unless params[:without].empty?
-        return app_bots_list.nil? ? bots_list - params[:without] : bots_list - params[:without] - app_bots_list
-      end
-      # If we are in "all mode", we want to run all the bots in the bots_list (minus the ones in the app_bots_list)
-      if params[:with].empty? && params[:without].empty?
-        return app_bots_list.nil? ? bots_list : bots_list - app_bots_list
-      end
-      # If we get here it means we are both in with and without mode and something went very wrong...
-      raise 'You are using simultaneously with and without modes. This should not happen. Please contact developers.'
     end
+
+    def start_mode(params)
+      return :WITH unless params[:with].empty?
+      return :WO unless params[:without].empty?
+      :ALL if params[:with].empty? && params[:without].empty?
+    end
+
+    # If we are in "with mode", we want to run only the bots in the "with list" (minus the ones in app_bots_list)
+    def get_with_bots_list( incl_bots, app_bots)
+      return app_bots.nil? ? incl_bots : incl_bots - app_bots
+    end
+
+    # If we are in "without mode", we want to run all the bots in the bots_list minus the ones in the "without list" and in the "app bots list"
+    def get_wo_bots_list( all_bots, app_bots, excl_bots )
+      return app_bots.nil? ? all_bots - excl_bots : all_bots - excl_bots - app_bots
+    end
+
+    # If we are in "all mode", we want to run all the bots minus the ones in the "app bots list"
+    def get_all_bots_list( all_bots, app_bots )
+      return app_bots.nil? ? all_bots : all_bots - app_bots
+    end
+
 
 
     # Returns true if the app bots have been started already
@@ -107,6 +119,8 @@ module Nutella
     end
 
 
+    # Check that the run is unique and add it to the list of runs
+    # If it's not, return (without adding the run to the list of course)
     def add_to_run_list( app_id, run_id, prj_dir )
       unless Nutella.runlist.add?(app_id, run_id, prj_dir)
         # If the run_id is already in the list, check that it's actually live
@@ -117,6 +131,19 @@ module Nutella
         end
       end
       true
+    end
+
+
+    # Starts all the components at all levels for this run
+    def start_all_components( app_id, app_path, run_id, params )
+      # Start the internal broker
+      return false unless start_internal_broker
+      # Start all framework-level components (if needed)
+      return false unless start_framework_components
+      # Start all app-level bots (if any, if needed)
+      return false unless start_app_bots(app_id, app_path)
+      # Start all run-level bots
+      false unless start_run_bots( app_path, app_id, run_id, params )
     end
 
 
@@ -263,14 +290,18 @@ module Nutella
     end
 
 
-    def output_monitoring_details( run_id, params, app_id, app_path )
+    def print_confirmation( run_id, params, app_id, app_path )
       # If there are no run-level bots to start, do not create the run and error out
       if run_level_bots_list(app_path, params).empty?
         console.warn 'This run doesn\'t seem to have any components. No run was created.'
         return
       end
-      # Output start message
       print_success_message(app_id, run_id, 'started')
+      print_monitoring_details(app_id, run_id)
+    end
+
+
+    def print_monitoring_details( app_id, run_id )
       # Output broker info
       console.success "Application is running on broker: #{Nutella.config['broker']}"
       # If some application bots were started, say it
@@ -281,7 +312,6 @@ module Nutella
       # Output rest of monitoring info
       console.success "Do `tmux attach-session -t #{Tmux.session_name(app_id,run_id)}` to monitor your bots."
       console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{app_id}/#{run_id} to access your interfaces"
-
     end
 
 
