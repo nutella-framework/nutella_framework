@@ -84,6 +84,31 @@ module Nutella
     end
 
 
+    #  Prints a success message if the command completes correctly
+    def print_success_message(app_id, run_id, action)
+      if run_id == 'default'
+        console.success "Application #{app_id} #{action}!"
+      else
+        console.success "Application #{app_id}, run #{run_id} #{action}!"
+      end
+    end
+
+
+    def compile_and_dependencies( script , in_progress_message, complete_message)
+      # If the current directory is not a nutella application, return
+      unless Nutella.current_app.exist?
+        console.warn 'The current directory is not a nutella application'
+        return
+      end
+
+      # Run script
+      return unless run_script_for_all_bots_in( Dir.pwd, script, in_progress_message )
+
+      # Output success message
+      console.success "All #{complete_message} for #{Nutella.current_app.config['name']}"
+    end
+
+
   end
 
 end
