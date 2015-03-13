@@ -94,7 +94,7 @@ get '/:app_id/:run_id/framework/:interface' do
   app_id = params[:app_id]
   run_id = params[:run_id]
   # Filesystem path to the index file
-  index_file_path = "../#{params[:interface]}/index.html"
+  index_file_path = "#{File.dirname(__FILE__)}/../#{params[:interface]}/index.html"
   # If the index file doesn't exist, render error page
   return erb( :not_found_404, :locals => {:not_found_type => 'idx'} ) unless File.exist? index_file_path
   # If the index file exists, compose query string and redirect
@@ -107,7 +107,7 @@ get '/:app_id/:run_id/framework/:interface/*' do
   # Fetch the relative file path
   relative_file_path = params[:splat][0]
   # Compose the path of the file we are trying to serve
-  file_path = "../#{params[:interface]}/#{relative_file_path}"
+  file_path = "#{File.dirname(__FILE__)}/../#{params[:interface]}/#{relative_file_path}"
   # If the file we are trying to serve doesn't exist, render error page
   return erb( :not_found_404, :locals => {:not_found_type => 'file'} ) unless File.exist? file_path
   # If the file exists, render it
@@ -142,8 +142,9 @@ end
 
 def load_framework_interfaces
   interfaces = Array.new
-  Dir.entries('../').select {|entry| File.directory?(File.join('../', entry)) && !(entry =='.' || entry == '..') }.each do |iface_dir|
-    interfaces.push(extract_interface_info( '../', iface_dir)) if File.exist?("../#{iface_dir}/index.html")
+  components_directory = "#{File.dirname(__FILE__)}/../"
+  Dir.entries(components_directory).select {|entry| File.directory?(File.join(components_directory, entry)) && !(entry =='.' || entry == '..') }.each do |iface_dir|
+    interfaces.push(extract_interface_info( components_directory, iface_dir)) if File.exist?("#{components_directory}#{iface_dir}/index.html")
   end
   interfaces
 end

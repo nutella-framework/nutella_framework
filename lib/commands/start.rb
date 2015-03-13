@@ -180,7 +180,12 @@ module Nutella
 
     def start_framework_components
       nutella_components_dir = "#{Nutella::NUTELLA_HOME}framework_components"
-      for_each_component_in_dir nutella_components_dir do |component|
+      if File.exist? "#{nutella_components_dir}/order.json"
+        components_list = JSON.parse IO.read "#{nutella_components_dir}/order.json"
+      else
+        components_list = components_in_dir(nutella_components_dir)
+      end
+      components_list.each do |component|
         if File.exist? "#{nutella_components_dir}/#{component}/startup"
           unless start_framework_component "#{nutella_components_dir}/#{component}"
             return false
