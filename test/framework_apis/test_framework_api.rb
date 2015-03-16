@@ -1,6 +1,6 @@
 require 'helper'
 
-require_relative '../../lib/nutella_lib_framework/api'
+require_relative '../../nutella_lib/framework_core'
 
 
 

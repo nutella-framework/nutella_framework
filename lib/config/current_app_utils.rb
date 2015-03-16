@@ -13,7 +13,13 @@ module Nutella
       nutella_json_file = "#{cur_app_dir}/nutella.json"
       # Check that there is a nutella.json file in the main directory of the application
       if File.exist? nutella_json_file
-        conf = JSON.parse( IO.read(nutella_json_file) )
+        begin
+          conf = JSON.parse( IO.read(nutella_json_file) )
+        rescue
+          console.warn 'The nutella.json file for this application does not contain properly formatted JSON'
+          return false
+        end
+
         if conf['nutella_version'].nil?
           return false
         end

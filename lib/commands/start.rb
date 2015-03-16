@@ -144,6 +144,7 @@ module Nutella
       return false unless start_app_bots(app_id, app_path)
       # Start all run-level bots
       false unless start_run_bots( app_path, app_id, run_id, params )
+      true
     end
 
 
@@ -238,6 +239,8 @@ module Nutella
       command = "#{component_dir}/startup #{nutella_config_file} #{runs_list_file}"
       pid = fork
       exec(command) if pid.nil?
+      # Give it a second so they can start properly
+      sleep 1
       # All went well so we return true
       true
     end

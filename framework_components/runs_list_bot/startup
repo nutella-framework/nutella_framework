@@ -1,0 +1,8 @@
+#!/bin/sh
+
+BASEDIR=$(dirname $0)
+
+# Pass the configuration file and the runlist
+
+ruby $BASEDIR/app_runs_list_bot.rb $1 $2 > /dev/null 2>&1 &
+echo $! > $BASEDIR/.pid

@@ -1,4 +1,5 @@
 require 'config/persisted_hash'
+require 'tmux/tmux'
 
 module Nutella
 
@@ -21,9 +22,17 @@ module Nutella
     end
 
 
-    # Returns all the +run_id+s for ALL applications
+    # Returns a list of all the apps in the runlist
     #
-    # @return [Array<String>] list of +run_id+s associated to the specified app_id
+    # @return [Array<String>] an array containing the app_ids of all the apps in the runlist
+    def all_apps
+      @ph.to_h.keys
+    end
+
+
+    # Returns all the +run_id+s for ALL applications (i.e. the runslist)
+    #
+    # @return [Hash] the run list with all app_ids and run_ids
     def all_runs
       @ph.to_h
     end
@@ -31,7 +40,7 @@ module Nutella
 
     # Returns all the +run_id+s for a certain application
     #
-    # @param [String] app_id the id of the application we want to find run_ids for
+    # @param [String] app_id of the application we want to find run_ids for
     # @return [Array<String>] list of +run_id+s associated to the specified app_id
     def runs_for_app( app_id )
       # If there is no app, then return false and do nothing
