@@ -1,42 +1,47 @@
 require 'nutella_lib'
 require 'config/runlist'
+# APIs sub-modules
+require_relative 'net'
+
+
 
 module Nutella
 
-
-  # Initializes this component as a framework component
-  # @param [String] broker_hostname
-  # @param [String] component_id
-  def self.init_as_f_component( broker_hostname, component_id )
-    @app_id = nil
-    @run_id = nil
-    @component_id = component_id
-    @resource_id = nil
-    @mqtt = SimpleMQTTClient.new broker_hostname
+  # Accessor to the framework APIs sub-module
+  def Nutella.f
+    Nutella::Framework
   end
 
 
-  # Parse command line arguments for framework level components
-  #
-  # @param [Array] args command line arguments array
-  # @return [String] broker
-  def self.parse_f_component_args(args)
-    if args.length < 1
-      STDERR.puts 'Couldn\'t read broker address from the command line, impossible to initialize component!'
-      return
+  #  Framework-level APIs sub-module
+  module Framework
+
+    # Initializes this component as a framework component
+    # @param [String] broker_hostname
+    # @param [String] component_id
+    def self.init( broker_hostname, component_id )
+      @app_id = nil
+      @run_id = nil
+      @component_id = component_id
+      @resource_id = nil
+      @mqtt = SimpleMQTTClient.new broker_hostname
     end
-    return args[0]
-  end
 
 
-  module Net
+    # Parse command line arguments for framework level components
+    #
+    # @param [Array] args command line arguments array
+    # @return [String] broker
+    def self.parse_component_args(args)
+      if args.length < 1
+        STDERR.puts 'Couldn\'t read broker address from the command line, impossible to initialize component!'
+        return
+      end
+      return args[0]
+    end
 
-    # Provides access to the net.app sub-module
-    def Net.f; Nutella::Net::Framework end
 
-
-    # This module implements the pub/sub and request/response APIs at the framework-level
-    module Framework
+    module Net
 
 
       # @!group Framework-level communication APIs
@@ -326,8 +331,6 @@ module Nutella
         return sp[0], sp[2]
       end
 
-
-    end
-
-  end
-end
+    end # net
+  end # framework
+end # nutella
