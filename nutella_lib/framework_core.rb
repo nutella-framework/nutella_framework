@@ -3,6 +3,8 @@ require 'config/runlist'
 
 # APIs sub-modules
 require_relative 'framework_net'
+require_relative 'framework_log'
+require_relative 'framework_persist'
 
 
 module Nutella
@@ -11,7 +13,6 @@ module Nutella
   def Nutella.f
     Nutella::Framework
   end
-
 
 
   #  Framework-level APIs sub-module
@@ -25,6 +26,7 @@ module Nutella
       Nutella.run_id = nil
       Nutella.component_id = component_id
       Nutella.resource_id = nil
+      Nutella.mongo_host = broker_hostname
       Nutella.mqtt = SimpleMQTTClient.new broker_hostname
     end
 
@@ -35,19 +37,6 @@ module Nutella
 
 
     # Utility functions
-
-
-    # Parse command line arguments for framework level components
-    #
-    # @param [Array] args command line arguments array
-    # @return [String] broker
-    def self.parse_args(args)
-      if args.length < 1
-        STDERR.puts 'Couldn\'t read broker address from the command line, impossible to initialize component!'
-        return
-      end
-      return args[0]
-    end
 
     # Extracts the component name from the folder where the code for this component is located
     #
