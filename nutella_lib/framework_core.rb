@@ -31,6 +31,7 @@ module Nutella
     # Accessors for sub-modules
     def self.net; Nutella::Framework::Net; end
     def self.log; Nutella::Framework::Log; end
+    def self.persist; Nutella::Framework::Persist; end
 
 
     # Utility functions
