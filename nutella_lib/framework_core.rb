@@ -28,6 +28,8 @@ module Nutella
       Nutella.resource_id = nil
       Nutella.mongo_host = broker_hostname
       Nutella.mqtt = SimpleMQTTClient.new broker_hostname
+      # Start pinging
+      Nutella.net.start_pinging
     end
 
     # Accessors for sub-modules

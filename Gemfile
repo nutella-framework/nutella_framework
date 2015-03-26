@@ -7,7 +7,7 @@ gem 'sinatra', '~>1.4.5', '>=1.4.5'
 gem 'thin', '~>1.6.3', '>=1.6.3'
 gem 'nokogiri', '~>1.6.3', '>=1.6.3'
 gem 'slop', '~>4.0.0', '>=4.0.0'
-gem 'nutella_lib','~>0.4.5', '>=0.4.5'
+gem 'nutella_lib','~>0.4.6', '>=0.4.6'
 
 
 group :development do
