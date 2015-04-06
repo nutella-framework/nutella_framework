@@ -180,7 +180,7 @@ module Nutella
           rescue JSON::ParserError
             # Make sure the message is JSON, if not drop the message
             return
-          rescue
+          rescue ArgumentError
             # Check the passed callback has the right number of arguments
             STDERR.puts "The callback you passed to subscribe has the #{$!}: it needs 'payload', 'app_id', 'run_id' and 'from'"
           end
@@ -259,7 +259,7 @@ module Nutella
           rescue JSON::ParserError
             # Make sure that request contains JSON, if not drop the message
             return
-          rescue
+          rescue ArgumentError
             # Check the passed callback has the right number of arguments
             STDERR.puts "The callback you passed to subscribe has the #{$!}: it needs 'request', 'app_id', 'run_id' and 'from'"
           end
@@ -380,7 +380,7 @@ module Nutella
           rescue JSON::ParserError
             # Make sure the message is JSON, if not drop the message
             return
-          rescue
+          rescue ArgumentError
             # Check the passed callback has the right number of arguments
             STDERR.puts "The callback you passed to subscribe has the #{$!}: it needs 'payload', 'app_id' and 'from'"
           end
@@ -454,7 +454,7 @@ module Nutella
           rescue JSON::ParserError
             # Make sure that request contains JSON, if not drop the message
             return
-          rescue
+          rescue ArgumentError
             # Check the passed callback has the right number of arguments
             STDERR.puts "The callback you passed to subscribe has the #{$!}: it needs 'request', 'app_id' and 'from'"
           end
@@ -465,21 +465,20 @@ module Nutella
 
       # @!endgroup
 
+
       # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
       # Listens for incoming messages. All this function
       # does is to put the thread to sleep and wait for something to
       # happen over the network to wake up.
       def self.listen
-        begin
-          sleep
-        rescue Interrupt
-          # Simply returns once interrupted
-        end
+        Nutella::Net.listen
       end
 
 
       private
+
 
       def self.extract_run_id_and_app_id( mqtt_channel )
         sp =  mqtt_channel.sub('/nutella/apps/', '').split('/')
