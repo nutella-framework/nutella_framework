@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
     "framework_components/main_interface/views/index.erb",
     "framework_components/main_interface/views/not_found_404.erb",
     "framework_components/order.json.example",
-    "framework_components/runs_list_bot/app_runs_list_bot.rb",
+    "framework_components/runs_list_bot/runs_list_bot.rb",
     "framework_components/runs_list_bot/startup",
     "lib/commands/broker.rb",
     "lib/commands/checkup.rb",

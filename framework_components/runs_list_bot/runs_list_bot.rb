@@ -22,8 +22,13 @@ nutella.f.net.handle_requests_on_all_apps('app_runs_list', lambda do |req, app_i
   Nutella.runlist.runs_for_app app_id
 end)
 
+# Listen for runs_list requests (done by framework interfaces when they connect)
+nutella.f.net.handle_requests('runs_list', lambda do |req, from|
+  Nutella.runlist.all_runs
+end)
 
-# Whenever the runs list is updated, fire an updated runlist to all the apps
+
+# Whenever the runs list is updated, fire an updated runlist to all the apps and all framework components
 p = Nutella.runlist.all_runs
 while sleep .5
   n = Nutella.runlist.all_runs
@@ -31,6 +36,7 @@ while sleep .5
     all_apps.each do |app_id, _|
       nutella.f.net.publish_to_app(app_id, 'app_runs_list', Nutella.runlist.runs_for_app(app_id))
     end
+    nutella.f.net.publish 'runs_list', Nutella.runlist.all_runs
     p = n
   end
 end

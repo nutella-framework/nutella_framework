@@ -1,5 +1,5 @@
 #!/bin/sh
 
 BASEDIR=$(dirname $0)
-ruby $BASEDIR/app_runs_list_bot.rb > /dev/null 2>&1 &
+ruby $BASEDIR/runs_list_bot.rb > /dev/null 2>&1 &
 echo $! > $BASEDIR/.pid
