@@ -30,10 +30,10 @@ end)
 
 # Whenever the runs list is updated, fire an updated runlist to all the apps and all framework components
 p = Nutella.runlist.all_runs
-while sleep .5
+while sleep 0.25
   n = Nutella.runlist.all_runs
   if p!=n
-    all_apps.each do |app_id, _|
+    Nutella.runlist.all_apps.each do |app_id, _|
       nutella.f.net.publish_to_app(app_id, 'app_runs_list', Nutella.runlist.runs_for_app(app_id))
     end
     nutella.f.net.publish 'runs_list', Nutella.runlist.all_runs
