@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+				<!-- Your interface name here-->
+        <title>Beacon Cloud</title>
+				<!-- The description of this interfaces here -->
+        <meta name="description" content="">
+				<!-- Your CSS here -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/animation.css">
+		<link rel="stylesheet" href="css/cursor.css">
+		<link rel="stylesheet" href="css/page_layout.css">
+
+		<script src="http://fb.me/react-with-addons-0.12.2.js"></script>
+    	<script src="http://fb.me/JSXTransformer-0.12.2.js"></script>
+    	<script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+		<script src="js/lib/nutella_lib.js" type="text/javascript" charset="utf-8"></script>
+
+    </head>
+    <body>
+
+		<div class="page-header" style="height: 20%">
+			<h1 class="text-center">Beacon Cloud</h1>
+		</div>
+
+		<div class="vertical-center" id="beacon_table">
+		</div>
+
+		<!--
+		<div class="vertical-center">
+			<div class="table-responsive col-md-6 col-md-offset-3 col-sm-12">
+				<table class="table table-bordered table-striped table-hover">
+					<thead>
+					<tr>
+						<th class="col-md-2 col-sm-2 col-xs-2">Resource Id</th>
+						<th class="col-md-6 col-sm-6 col-xs-6">UUID</th>
+						<th class="col-md-2 col-sm-2 col-xs-2">Major</th>
+						<th class="col-md-2 col-sm-2 col-xs-2">Minor</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2">Giraffe</td>
+						<td class="col-md-6 col-sm-6 col-xs-6">550e8400-e29b-41d4-a716-446655440000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">30000</td>
+						<td class="col-md-2 col-sm-2 col-xs-2">15</td>
+					</tr>
+					<tr>
+						<td class="col-md-2 col-sm-2 col-xs-2"><input type="text" class="form-control" placeholder="ResourceId" /></td>
+						<td class="col-md-6 col-sm-6 col-xs-6"><input type="text" class="form-control" placeholder="UUID" /></td>
+						<td class="col-md-2 col-sm-2 col-xs-2"><input type="text" class="form-control" placeholder="Major" /></td>
+						<td class="col-md-2 col-sm-2 col-xs-2"><input type="text" class="form-control" placeholder="Minor" /></td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		-->
+
+		<script type="text/jsx" src="js/react/beacon.js"></script>
+		<script type="text/jsx" src="js/react/beacon-add.js"></script>
+		<script type="text/jsx" src="js/react/beacon-table.js"></script>
+
+		<script type="text/jsx">
+
+			// Parse the query parameters
+			var query_parameters = NUTELLA.parseURLParameters();
+
+			var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'beacon-cloud-interface');
+
+			//var nutella = NUTELLA.init(query_parameters.run_id, query_parameters.broker, 'beacon-cloud-interface');
+			
+			React.render(
+					<BeaconTable/>,
+					document.getElementById('beacon_table')
+			);
+			
+		</script>
+				
+    </body>
+</html>

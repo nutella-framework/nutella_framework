@@ -1,0 +1,4 @@
+#!/bin/sh
+
+BASEDIR=$(dirname $0)
+ruby $BASEDIR/beacon_cloud_bot.rb $1 $2 $3
