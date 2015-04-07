@@ -84,6 +84,9 @@ nutella.parseURLParameters = function () {
 };
 
 
+nutella.version = '0.4.3';
+
+
 // Exports nutella object
 module.exports = nutella;
 },{"./nutella_i_browser":10}],2:[function(require,module,exports){
@@ -2598,8 +2601,6 @@ var AbstractNet = require('./util/net');
  * @constructor
  */
 var AppNetSubModule = function(main_nutella) {
-    // Store a reference to the main module
-    this.nutella = main_nutella;
     this.net = new AbstractNet(main_nutella);
 };
 
@@ -2613,7 +2614,7 @@ var AppNetSubModule = function(main_nutella) {
  * @param done_callback
  */
 AppNetSubModule.prototype.subscribe = function(channel, callback, done_callback) {
-    this.net.subscribe_to(channel, callback, this.nutella.appId, undefined, done_callback);
+    this.net.subscribe_to(channel, callback, this.net.nutella.appId, undefined, done_callback);
 };
 
 
@@ -2625,7 +2626,7 @@ AppNetSubModule.prototype.subscribe = function(channel, callback, done_callback)
  * @param done_callback
  */
 AppNetSubModule.prototype.unsubscribe = function(channel, done_callback) {
-    this.net.unsubscribe_from(channel, this.nutella.appId, undefined, done_callback);
+    this.net.unsubscribe_from(channel, this.net.nutella.appId, undefined, done_callback);
 };
 
 
@@ -2637,7 +2638,7 @@ AppNetSubModule.prototype.unsubscribe = function(channel, done_callback) {
  * @param message
  */
 AppNetSubModule.prototype.publish = function(channel, message) {
-    this.net.publish_to(channel, message, this.nutella.appId, undefined);
+    this.net.publish_to(channel, message, this.net.nutella.appId, undefined);
 };
 
 
@@ -2650,7 +2651,7 @@ AppNetSubModule.prototype.publish = function(channel, message) {
  * @param callback
  */
 AppNetSubModule.prototype.request = function(channel, message, callback) {
-    this.net.request_to(channel, message, callback, this.nutella.appId, undefined);
+    this.net.request_to(channel, message, callback, this.net.nutella.appId, undefined);
 };
 
 
@@ -2662,10 +2663,206 @@ AppNetSubModule.prototype.request = function(channel, message, callback) {
  * @param callback
  * @param done_callback
  */
-AppNetSubModule.prototype.handle_requests = function(channel, callback, done_callback) {
-    this.net.handle_requests_on(channel, callback, this.nutella.appId, undefined, done_callback);
+AppNetSubModule.prototype.handle_requests = function (channel, callback, done_callback) {
+    this.net.handle_requests_on(channel, callback, this.net.nutella.appId, undefined, done_callback);
 };
 
+
+
+//----------------------------------------------------------------------------------------------------------------
+// Application-level APIs to communicate at the run-level
+//----------------------------------------------------------------------------------------------------------------
+
+/**
+ * Allows application-level APIs to subscribe to a run-level channel within a specific run
+ *
+ * @param run_id
+ * @param channel
+ * @param callback
+ * @param done_callback
+ */
+AppNetSubModule.prototype.subscribe_to_run = function(run_id, channel, callback, done_callback) {
+    this.net.subscribe_to(channel,callback,this.net.nutella.appId,run_id,done_callback);
+};
+
+
+/**
+ * Allows application-level APIs to unsubscribe from a run-level channel within a specific run
+ *
+ * @param run_id
+ * @param channel
+ * @param done_callback
+ */
+AppNetSubModule.prototype.unsubscribe_from_run = function(run_id, channel, done_callback) {
+    this.net.unsubscribe_from(channel,this.net.nutella.appId,run_id,done_callback);
+};
+
+
+/**
+ * Allows application-level APIs to publish to a run-level channel within a specific run
+ *
+ * @param run_id
+ * @param channel
+ * @param message
+ */
+AppNetSubModule.prototype.publish_to_run = function( run_id, channel, message ) {
+    this.net.publish_to(channel,message,this.net.nutella.appId, run_id);
+};
+
+
+/**
+ * Allows application-level APIs to make a request to a run-level channel within a specific run
+ *
+ * @param run_id
+ * @param channel
+ * @param request
+ * @param callback
+ */
+AppNetSubModule.prototype.request_to_run = function( run_id, channel, request, callback) {
+    this.net.request_to(channel,request,callback,this.net.nutella.appId,run_id);
+};
+
+
+/**
+ * Allows application-level APIs to handle requests on a run-level channel within a specific run
+ *
+ * @param run_id
+ * @param channel
+ * @param callback
+ * @param done_callback
+ */
+AppNetSubModule.prototype.handle_requests_on_run = function( run_id, channel, callback, done_callback ) {
+    this.net.handle_requests_on(channel,callback,this.net.nutella.appId,run_id,done_callback);
+};
+
+
+//----------------------------------------------------------------------------------------------------------------
+// Application-level APIs to communicate at the run-level (broadcast)
+//----------------------------------------------------------------------------------------------------------------
+
+/**
+ * Fired whenever a message is received on the specified channel for any of the runs in the application
+ *
+ * @callback all_runs_cb
+ * @param {string} message - the received message. Messages that are not JSON are discarded.
+ * @param {string} run_id - the run_id of the channel the message was sent on
+ * @param {Object} from - the sender's identifiers (run_id, app_id, component_id and optionally resource_id)
+ */
+
+/**
+ * Allows application-level APIs to subscribe to a run-level channel *for ALL runs*
+ *
+ * @param {string} channel - the run-level channel we are subscribing to. Can be wildcard
+ * @param {all_runs_cb} callback - the callback that is fired whenever a message is received on the channel
+ */
+AppNetSubModule.prototype.subscribe_to_all_runs = function(channel, callback, done_callback) {
+    var app_id = this.net.nutella.appId;
+    //Pad channel
+    var padded_channel = this.net.pad_channel(channel, app_id, '+');
+    var mqtt_cb = function(mqtt_message, mqtt_channel) {
+        try {
+            var f = JSON.parse(mqtt_message);
+            var run_id = extractRunId(app_id, mqtt_channel);
+            if(f.type==='publish')
+                callback(f.payload, run_id, f.from);
+        } catch(e) {
+            if (e instanceof SyntaxError) {
+                // Message is not JSON, drop it
+            } else {
+                // Bubble up whatever exception is thrown
+                throw e;
+            }
+        }
+    };
+    // Add to subscriptions, save mqtt callback and subscribe
+    this.net.subscriptions.push(padded_channel);
+    this.net.callbacks.push(mqtt_cb);
+    this.net.nutella.mqtt_client.subscribe(padded_channel, mqtt_cb, done_callback);
+    // Notify subscription
+    this.net.publish_to('subscriptions', {type: 'subscribe', channel:  padded_channel}, this.net.nutella.appId, undefined);
+};
+
+
+/**
+ * Allows application-level APIs to publish a message to a run-level channel *for ALL runs*
+ *
+ * @param channel
+ * @param message
+ */
+AppNetSubModule.prototype.publish_to_all_runs = function(channel, message) {
+  this.net.nutella.runs_list.forEach(function(run_id){
+      this.net.publish_to(channel,message,this.net.nutella.appId,run_id);
+  }.bind(this));
+};
+
+
+/**
+ * Allows application-level APIs to send a request to a run-level channel *for ALL runs*
+ *
+ * @param channel
+ * @param request
+ * @param callback
+ */
+AppNetSubModule.prototype.request_to_all_runs = function(channel, request, callback) {
+    this.net.nutella.runs_list.forEach(function(run_id){
+        this.net.request_to(channel,request,callback,this.net.nutella.appId,run_id);
+    }.bind(this));
+};
+
+
+/**
+ * This callback is used to handle all runs
+ * @callback handle_all_run
+ * @param {string} message - the received message. Messages that are not JSON are discarded.
+ * @param {string} run_id - the run_id of the channel the message was sent on
+ * @param {Object} from - the sender's identifiers (run_id, app_id, component_id and optionally resource_id)
+ * @return {Object} the response sent back to the client that performed the request. Whatever is returned by the callback is marshaled into a JSON string and sent via MQTT.
+ */
+
+/**
+ * Allows application-level APIs to handle requests to a run-level channel *for ALL runs*
+ *
+ * @param channel
+ * @param callback
+ * @param done_callback
+ */
+AppNetSubModule.prototype.handle_requests_on_all_runs = function(channel, callback, done_callback) {
+    var app_id = this.net.nutella.appId;
+    // Pad channel
+    var padded_channel = this.net.pad_channel(channel, app_id, '+');
+    var ln = this.net;
+    var mqtt_cb = function(mqtt_message, mqtt_channel) {
+        try {
+            var f = JSON.parse(mqtt_message);
+            var run_id = extractRunId(app_id, mqtt_channel);
+            // Only handle requests that have proper id set
+            if(f.type!=='request' || f.id===undefined) return;
+            // Execute callback and send response
+            var m = ln.prepare_message_for_response(callback(f.payload, run_id, f.from), f.id);
+            ln.nutella.mqtt_client.publish( padded_channel, m );
+        } catch(e) {
+            if (e instanceof SyntaxError) {
+                // Message is not JSON, drop it
+            } else {
+                // Bubble up whatever exception is thrown
+                throw e;
+            }
+        }
+    };
+    this.net.nutella.mqtt_client.subscribe( padded_channel, mqtt_cb, done_callback);
+    // Notify subscription
+    this.net.publish_to('subscriptions', {type: 'handle_requests', channel:  padded_channel}, this.net.nutella.appId, undefined);
+};
+
+
+
+// Utility function
+
+function extractRunId(app_id, mqtt_channel) {
+    var pc = '/nutella/apps/' + app_id + '/runs/';
+    var sp =  mqtt_channel.replace(pc, '').split('/');
+    return sp[0];
+}
 
 
 module.exports = AppNetSubModule;
@@ -2755,8 +2952,6 @@ var AbstractNet = require('./util/net');
  * @constructor
  */
 var FRNetSubModule = function(main_nutella) {
-    // Store a reference to the main module
-    this.nutella = main_nutella;
     this.net = new AbstractNet(main_nutella);
 };
 
@@ -2822,7 +3017,7 @@ FRNetSubModule.prototype.handle_requests = function(channel, callback, done_call
 
 
 //----------------------------------------------------------------------------------------------------------------
-// Framework-level APIs to communicate at the run-level
+// Framework-level APIs to communicate at the run-level to a specific run
 //----------------------------------------------------------------------------------------------------------------
 
 /**
@@ -2897,15 +3092,47 @@ FRNetSubModule.prototype.handle_requests_on_run = function( app_id, run_id, chan
 // Framework-level APIs to communicate at the run-level (broadcast)
 //----------------------------------------------------------------------------------------------------------------
 
+
+/**
+ * Callback for subscribing to all runs
+ * @callback allRunsCb
+ # @param {string} message - the received message. Messages that are not JSON are discarded
+ # @param {String} app_id - the app_id of the channel the message was sent on
+ # @param {String} run_id - the run_id of the channel the message was sent on
+ # @param {Object} from - the sender's identifiers (run_id, app_id, component_id and optionally resource_id)
+ */
+
 /**
  * Allows framework-level APIs to subscribe to a run-level channel *for ALL runs*
  *
  * @param channel
- * @param callback
+ * @param {allRunsCb} callback
  * @param done_callback
  */
 FRNetSubModule.prototype.subscribe_to_all_runs = function( channel, callback, done_callback ) {
-    // TODO
+    //Pad channel
+    var padded_channel = this.net.pad_channel(channel, '+', '+');
+    var mqtt_cb = function(mqtt_message, mqtt_channel) {
+        try {
+            var f = JSON.parse(mqtt_message);
+            var f1 = extractRunIdAndAppId(mqtt_channel);
+            if(f.type==='publish')
+                callback(f.payload, f1.appId, f1.runId, f.from);
+        } catch(e) {
+            if (e instanceof SyntaxError) {
+                // Message is not JSON, drop it
+            } else {
+                // Bubble up whatever exception is thrown
+                throw e;
+            }
+        }
+    };
+    // Add to subscriptions, save mqtt callback and subscribe
+    this.net.subscriptions.push(padded_channel);
+    this.net.callbacks.push(mqtt_cb);
+    this.net.nutella.mqtt_client.subscribe(padded_channel, mqtt_cb, done_callback);
+    // Notify subscription
+    this.net.publish_to('subscriptions', {type: 'subscribe', channel:  padded_channel}, undefined, undefined);
 };
 
 
@@ -2913,6 +3140,7 @@ FRNetSubModule.prototype.subscribe_to_all_runs = function( channel, callback, do
  * Allows framework-level APIs to unsubscribe from a run-level channel *for ALL runs*
  *
  * @param channel
+ * @param done_callback
  */
 FRNetSubModule.prototype.unsubscribe_from_all_runs = function(channel, done_callback) {
     this.net.unsubscribe_from(channel, '+', '+', done_callback);
@@ -2926,7 +3154,11 @@ FRNetSubModule.prototype.unsubscribe_from_all_runs = function(channel, done_call
  * @param message
  */
 FRNetSubModule.prototype.publish_to_all_runs = function( channel, message ) {
-    // TODO need runslist!!!!
+    Object.keys(this.net.nutella.runs_list).forEach(function(app_id) {
+        this.net.nutella.runs_list[app_id].runs.forEach(function(run_id){
+            this.net.publish_to(channel, message, app_id, run_id);
+        }.bind(this));
+    }.bind(this));
 };
 
 
@@ -2938,27 +3170,64 @@ FRNetSubModule.prototype.publish_to_all_runs = function( channel, message ) {
  * @param callback
  */
 FRNetSubModule.prototype.request_to_all_runs = function(channel, request, callback) {
-    // TODO need runlist!
+    Object.keys(this.net.nutella.runs_list).forEach(function(app_id) {
+        this.net.nutella.runs_list[app_id].runs.forEach(function(run_id){
+            this.net.publish_to(channel, message, app_id, run_id);
+            this.net.request_to(channel, request, callback, app_id, run_id);
+        }.bind(this));
+    }.bind(this));
 };
 
+/**
+ * Callback that is used to handle messages from all runs
+ * @callback handle_all_runs_cb
+ * @param {string} payload - the received message (request). Messages that are not JSON are discarded
+ * @param {string} app_id - the app_id of the channel the request was sent on
+ * @param {string} run_id - the run_id of the channel the request was sent on
+ * @param {Object} from - the sender's identifiers (from containing, run_id, app_id, component_id and optionally resource_id)
+ * @return {Object} the response sent back to the client that performed the request. Whatever is returned by the callback is marshaled into a JSON string and sent via MQTT.
+ */
 
 /**
  * Allows framework-level APIs to handle requests to a run-level channel *for ALL runs*
  *
  * @param channel
- * @param callback
+ * @param {handle_all_runs_cb} callback
  * @param done_callback
  */
 FRNetSubModule.prototype.handle_requests_on_all_runs = function(channel, callback, done_callback) {
-    // TODO
+    // Pad channel
+    var padded_channel = this.net.pad_channel(channel, '+', '+');
+    var ln = this.net;
+    var mqtt_cb = function(mqtt_message, mqtt_channel) {
+        try {
+            var f = JSON.parse(mqtt_message);
+            var f1 = extractRunIdAndAppId(mqtt_channel);
+            // Only handle requests that have proper id set
+            if(f.type!=='request' || f.id===undefined) return;
+            // Execute callback and send response
+            var m = ln.prepare_message_for_response(callback(f.payload, f1.appId, f1.runId, f.from), f.id);
+            ln.nutella.mqtt_client.publish( padded_channel, m );
+        } catch(e) {
+            if (e instanceof SyntaxError) {
+                // Message is not JSON, drop it
+            } else {
+                // Bubble up whatever exception is thrown
+                throw e;
+            }
+        }
+    };
+    this.net.nutella.mqtt_client.subscribe( padded_channel, mqtt_cb, done_callback);
+    // Notify subscription
+    this.net.publish_to('subscriptions', {type: 'handle_requests', channel:  padded_channel}, undefined, undefined);
 };
-
 
 
 
 //----------------------------------------------------------------------------------------------------------------
 // Framework-level APIs to communicate at the application-level
 //----------------------------------------------------------------------------------------------------------------
+
 
 /**
  * Allows framework-level APIs to subscribe to an app-level channel
@@ -3027,10 +3296,143 @@ FRNetSubModule.prototype.handle_requests_on_app = function(app_id, channel, call
 // Framework-level APIs to communicate at the application-level (broadcast)
 //----------------------------------------------------------------------------------------------------------------
 
+/**
+ * Callback used to handle all messages received when subscribing to all applications
+ * @callback subscribeToAllAppsCb
+ * @param {string} message - the received message. Messages that are not JSON are discarded
+ * @param {string} app_id - the app_id of the channel the message was sent on
+ * @param {Object} from - the sender's identifiers (run_id, app_id, component_id and optionally resource_id)
+ */
 
+/**
+ * Allows framework-level APIs to subscribe to an app-level channel *for ALL apps*
+ *
+ * @param channel
+ * @param {subscribeToAllAppsCb} callback
+ * @param done_callback
+ */
 FRNetSubModule.prototype.subscribe_to_all_apps = function(channel, callback, done_callback) {
-
+    //Pad channel
+    var padded_channel = this.net.pad_channel(channel, '+', undefined);
+    var mqtt_cb = function(mqtt_message, mqtt_channel) {
+        try {
+            var f = JSON.parse(mqtt_message);
+            var app_id = extractAppId(mqtt_channel);
+            if(f.type==='publish')
+                callback(f.payload, app_id, f.from);
+        } catch(e) {
+            if (e instanceof SyntaxError) {
+                // Message is not JSON, drop it
+            } else {
+                // Bubble up whatever exception is thrown
+                throw e;
+            }
+        }
+    };
+    // Add to subscriptions, save mqtt callback and subscribe
+    this.net.subscriptions.push(padded_channel);
+    this.net.callbacks.push(mqtt_cb);
+    this.net.nutella.mqtt_client.subscribe(padded_channel, mqtt_cb, done_callback);
+    // Notify subscription
+    this.net.publish_to('subscriptions', {type: 'subscribe', channel:  padded_channel}, undefined, undefined);
 };
+
+
+/**
+ * Allows framework-level APIs to unsubscribe from an app-level channel *for ALL apps*
+ *
+ * @param channel
+ * @param done_callback
+ */
+FRNetSubModule.prototype.unsubscribe_from_all_apps = function(channel, done_callback) {
+    this.net.unsubscribe_from(channel, '+', undefined, done_callback);
+};
+
+
+/**
+ * Allows framework-level APIs to publish a message to an app-level channel *for ALL apps*
+ *
+ * @param channel
+ * @param message
+ */
+FRNetSubModule.prototype.publish_to_all_apps = function(channel, message) {
+    Object.keys(this.net.nutella.runs_list).forEach(function(app_id) {
+        this.net.publish_to(channel, message, app_id, undefined);
+    }.bind(this));
+};
+
+
+/**
+ * Allows framework-level APIs to send a request to an app-level channel *for ALL apps*
+ *
+ * @param channel
+ * @param request
+ * @param callback
+ */
+FRNetSubModule.prototype.request_to_all_apps = function(channel, request, callback) {
+    Object.keys(this.net.nutella.runs_list).forEach(function(app_id) {
+        this.net.request_to(channel, request, callback, app_id, undefined);
+    }.bind(this));
+};
+
+
+/**
+ * This callback is used to handle messages coming from all applications
+ * @callback handleAllAppsCb
+ * @param {string} request - the received message (request). Messages that are not JSON are discarded.
+ * @param {string} app_id - the app_id of the channel the request was sent on
+ * @param {Object} from - the sender's identifiers (from containing, run_id, app_id, component_id and optionally resource_id)
+ * @return {Object} The response sent back to the client that performed the request. Whatever is returned by the callback is marshaled into a JSON string and sent via MQTT.
+ */
+
+/**
+ * Allows framework-level APIs to handle requests to app-level channel *for ALL runs*
+ *
+ * @param channel
+ * @param {handleAllAppsCb} callback
+ * @param done_callback
+ */
+FRNetSubModule.prototype.handle_requests_on_all_apps = function(channel, callback, done_callback) {
+    // Pad channel
+    var padded_channel = this.net.pad_channel(channel, '+', undefined);
+    var ln = this.net;
+    var mqtt_cb = function(mqtt_message, mqtt_channel) {
+        try {
+            var f = JSON.parse(mqtt_message);
+            var f1 = extractRunIdAndAppId(mqtt_channel);
+            // Only handle requests that have proper id set
+            if(f.type!=='request' || f.id===undefined) return;
+            // Execute callback and send response
+            var m = ln.prepare_message_for_response(callback(f.payload, f1.appId, f1.runId, f.from), f.id);
+            ln.nutella.mqtt_client.publish( padded_channel, m );
+        } catch(e) {
+            if (e instanceof SyntaxError) {
+                // Message is not JSON, drop it
+            } else {
+                // Bubble up whatever exception is thrown
+                throw e;
+            }
+        }
+    };
+    this.net.nutella.mqtt_client.subscribe( padded_channel, mqtt_cb, done_callback);
+    // Notify subscription
+    this.net.publish_to('subscriptions', {type: 'handle_requests', channel:  padded_channel}, undefined, undefined);
+};
+
+
+// Utility functions
+
+
+function extractRunIdAndAppId(mqtt_channel) {
+    var sp =  mqtt_channel.replace('/nutella/apps/', '').split('/');
+    return {appId: sp[0], runId: sp[2]};
+}
+
+function extractAppId(mqtt_channel) {
+    var sp =  mqtt_channel.replace('/nutella/apps/', '').split('/');
+    return sp[0];
+}
+
 
 
 
@@ -3067,6 +3469,10 @@ var RunNutellaInstance = function (broker_hostname, app_id, run_id, component_id
     // Initialized the various sub-modules
     this.net = new NetSubModule(this);
     this.log = new LogSubModule(this);
+    // Start pinging
+    setInterval(function(){
+        this.net.publish('pings', 'ping');
+    }.bind(this),5000);
 };
 
 /**
@@ -3093,6 +3499,20 @@ var AppNutellaInstance = function (broker_hostname, app_id, component_id) {
     this.componentId = component_id;
     // Initialized the various sub-modules
     this.app = new AppSubModule(this);
+    //Initialize the runs list
+    this.runs_list = [];
+    // Fetch the runs list
+    this.app.net.request('app_runs_list', undefined, function(response) {
+        this.runs_list = response;
+    }.bind(this));
+    // Subscribe to runs list updates
+    this.app.net.subscribe('app_runs_list', function(message, from) {
+        this.runs_list = message;
+    }.bind(this));
+    // Start pinging
+    setInterval(function(){
+        this.app.net.publish('pings', 'ping');
+    }.bind(this),5000);
 };
 
 /**
@@ -3115,8 +3535,22 @@ var FrNutellaInstance = function (broker_hostname, component_id) {
     //Initialize parameters
     this.mqtt_client = new SimpleMQTTClient(broker_hostname);
     this.componentId = component_id;
-    // Initialized the various sub-modules
+    // Initialize the various sub-modules
     this.f = new FrSubModule(this);
+    //Initialize the runs list
+    this.runs_list = {};
+    // Fetch the runs list
+    this.f.net.request('runs_list', undefined, function(response) {
+        this.runs_list = response;
+    }.bind(this));
+    // Subscribe to runs list updates
+    this.f.net.subscribe('runs_list', function(message, from) {
+        this.runs_list = message;
+    }.bind(this));
+    // Start pinging
+    setInterval(function(){
+        this.f.net.publish('pings', 'ping');
+    }.bind(this),5000);
 };
 
 /**
@@ -3124,7 +3558,7 @@ var FrNutellaInstance = function (broker_hostname, component_id) {
  *
  * @param {string} resource_id - the resource_id associated to this instance of nutella
  */
-AppNutellaInstance.prototype.setResourceId = function(resource_id){
+FrNutellaInstance.prototype.setResourceId = function(resource_id){
     this.resourceId = resource_id;
 };
 
@@ -3306,7 +3740,7 @@ var AbstractNet = function(main_nutella) {
  */
 AbstractNet.prototype.subscribe_to = function(channel, callback, appId, runId, done_callback) {
     // Pad channel
-    var padded_channel = pad_channel(channel, appId, runId);
+    var padded_channel = this.pad_channel(channel, appId, runId);
     // Maintain unique subscriptions
     if(this.subscriptions.indexOf(padded_channel)>-1)
         throw 'You can`t subscribe twice to the same channel`';
@@ -3316,9 +3750,9 @@ AbstractNet.prototype.subscribe_to = function(channel, callback, appId, runId, d
     if(this.nutella.mqtt_client.isChannelWildcard(padded_channel))
         mqtt_cb = function(mqtt_message, mqtt_channel) {
             try {
-                var f = extract_fields_from_message(mqtt_message);
+                var f = JSON.parse(mqtt_message);
                 if(f.type==='publish')
-                    callback(f.payload, un_pad_channel(mqtt_channel, appId, runId), f.from);
+                    callback(f.payload, this.un_pad_channel(mqtt_channel, appId, runId), f.from);
             } catch(e) {
                 if (e instanceof SyntaxError) {
                     // Message is not JSON, drop it
@@ -3331,7 +3765,7 @@ AbstractNet.prototype.subscribe_to = function(channel, callback, appId, runId, d
     else
         mqtt_cb = function(mqtt_message) {
             try {
-                var f = extract_fields_from_message(mqtt_message);
+                var f = JSON.parse(mqtt_message);
                 if(f.type==='publish')
                     callback(f.payload, f.from);
             } catch(e) {
@@ -3347,8 +3781,8 @@ AbstractNet.prototype.subscribe_to = function(channel, callback, appId, runId, d
     this.subscriptions.push(padded_channel);
     this.callbacks.push(mqtt_cb);
     this.nutella.mqtt_client.subscribe(padded_channel, mqtt_cb, done_callback);
-    // Notify subscriptions bot
-    this.publish_to('subscriptions', {channel:  padded_channel}, appId, runId);
+    // Notify subscription
+    this.publish_to('subscriptions', {type: 'subscribe', channel:  padded_channel}, appId, runId);
 };
 
 
@@ -3362,7 +3796,7 @@ AbstractNet.prototype.subscribe_to = function(channel, callback, appId, runId, d
  */
 AbstractNet.prototype.unsubscribe_from = function(channel, appId, runId, done_callback ) {
     // Pad channel
-    var padded_channel = pad_channel(channel, appId, run_id);
+    var padded_channel = this.pad_channel(channel, appId, run_id);
     var idx = this.subscriptions.indexOf(padded_channel);
     // If we are not subscribed to this channel, return (no error is given)
     if(idx===-1) return;
@@ -3385,10 +3819,10 @@ AbstractNet.prototype.unsubscribe_from = function(channel, appId, runId, done_ca
  */
 AbstractNet.prototype.publish_to = function(channel, message, appId, runId) {
     // Pad channel
-    var padded_channel = pad_channel(channel, appId, runId);
+    var padded_channel = this.pad_channel(channel, appId, runId);
     // Throw exception if trying to publish something that is not JSON
     try {
-        var m = prepare_message_for_publish(message, this.nutella);
+        var m = this.prepare_message_for_publish(message);
         this.nutella.mqtt_client.publish(padded_channel, m);
     } catch(e) {
         console.error('Error: you are trying to publish something that is not JSON');
@@ -3414,22 +3848,24 @@ AbstractNet.prototype.publish_to = function(channel, message, appId, runId) {
  * @param {string|undefined} runId - used to pad channels
  */
 AbstractNet.prototype.request_to = function( channel, message, callback, appId, runId ) {
+    // Save nutella reference
+    var nut = this.nutella;
     // Pad channel
-    var padded_channel = pad_channel(channel, appId, runId);
+    var padded_channel = this.pad_channel(channel, appId, runId);
     // Prepare message
-    var m = prepare_message_for_request(message, this.nutella);
+    var m = this.prepare_message_for_request(message);
     //Prepare callback
     var mqtt_cb = function(mqtt_message) {
-        var f = extract_fields_from_message(mqtt_message);
+        var f = JSON.parse(mqtt_message);
         if (f.id===m.id && f.type==='response') {
             callback(f.payload);
-            this.nutella.mqtt_client.unsubscribe(padded_channel, mqtt_cb);
+            nut.mqtt_client.unsubscribe(padded_channel, mqtt_cb);
         }
     };
     // Subscribe
     this.nutella.mqtt_client.subscribe(padded_channel, mqtt_cb, function() {
         // Publish message
-        this.nutella.mqtt_client.publish( padded_channel, m.message );
+        nut.mqtt_client.publish( padded_channel, m.message );
     });
 
 };
@@ -3454,17 +3890,19 @@ AbstractNet.prototype.request_to = function( channel, message, callback, appId, 
  * @param {function} done_callback - fired whenever we are ready to handle requests
  */
 AbstractNet.prototype.handle_requests_on = function( channel, callback, appId, runId, done_callback) {
+    // Save nutella reference
+    var nut = this.nutella;
     // Pad channel
-    var padded_channel = pad_channel(channel, appId, runId);
+    var padded_channel = this.pad_channel(channel, appId, runId);
     var mqtt_cb = function(request) {
         try {
             // Extract nutella fields
-            var f = extract_fields_from_message(request);
+            var f = JSON.parse(request);
             // Only handle requests that have proper id set
             if(f.type!=='request' || f.id===undefined) return;
             // Execute callback and send response
-            var m = prepare_message_for_response(callback(f.payload, f.from), f.id, this.nutella);
-            this.nutella.mqtt_client.publish( padded_channel, m );
+            var m = this.prepare_message_for_response(callback(f.payload, f.from), f.id);
+            nut.mqtt_client.publish( padded_channel, m );
         } catch(e) {
             if (e instanceof SyntaxError) {
                 // Message is not JSON, drop it
@@ -3475,30 +3913,41 @@ AbstractNet.prototype.handle_requests_on = function( channel, callback, appId, r
         }
     };
     // Subscribe to the channel
-    this.nutella.mqtt_client.subscribe(padded_channel, mqtt_cb, done_callback)
+    this.nutella.mqtt_client.subscribe(padded_channel, mqtt_cb, done_callback);
+    // Notify subscription
+    this.publish_to('subscriptions', {type: 'handle_requests', channel:  padded_channel}, appId, runId);
 };
 
 
 
-// -------------------------------------------------------------------------------------------------------------
-// Private utility functions
-
-function extract_fields_from_message(message) {
-    return JSON.parse(message);
-}
-
-function pad_channel(channel, app_id, run_id) {
+/**
+ * Pads the channel with app_id and run_id
+ *
+ * @param channel
+ * @param app_id
+ * @param run_id
+ * @return {string} the padded channel
+ */
+AbstractNet.prototype.pad_channel = function(channel, app_id, run_id) {
     if (run_id!==undefined && app_id===undefined)
         throw 'If the run_id is specified, app_id needs to also be specified';
     if (app_id===undefined && run_id===undefined)
         return '/nutella/' + channel;
     if (app_id!==undefined && run_id===undefined)
-        return '/nutella/apps/' + app_id + '/#{channel}';
+        return '/nutella/apps/' + app_id + '/' + channel;
     return '/nutella/apps/' + app_id + '/runs/' + run_id + '/' + channel;
+};
 
-}
 
-function un_pad_channel(channel, app_id, run_id) {
+/**
+ * Un-pads the channel with app_id and run_id
+ *
+ * @param channel
+ * @param app_id
+ * @param run_id
+ * @return {string} the un-padded channel
+ */
+AbstractNet.prototype.un_pad_channel = function(channel, app_id, run_id) {
     if (run_id!==undefined && app_id===undefined)
         throw 'If the run_id is specified, app_id needs to also be specified';
     if (app_id===undefined && run_id===undefined)
@@ -3506,53 +3955,81 @@ function un_pad_channel(channel, app_id, run_id) {
     if (app_id!==undefined && run_id===undefined)
         return channel.replace("/nutella/apps/" + app_id + "/", '');
     return channel.replace("/nutella/apps/" + app_id + "/runs/" + run_id + "/", '');
-}
+};
 
 
-function assemble_from(n) {
+/**
+ * Assembles the unique ID of the component, starting from app_id, run_id, component_id and resource_id
+ *
+ * @return {Object} an object containing the unique ID of the component sending the message
+ */
+AbstractNet.prototype.assemble_from = function() {
     var from = {};
-    if(n.run_id===undefined) {
-        if(n.appId===undefined) {
+    // Set type, run_id and app_id whenever appropriate
+    if(this.nutella.runId===undefined) {
+        if(this.nutella.appId===undefined) {
             from.type = 'framework';
         } else {
             from.type = 'app';
-            from.app_id = n.appId;
+            from.app_id = this.nutella.appId;
         }
     } else {
         from.type = 'run';
-        from.run_id = n.runId;
+        from.app_id = this.nutella.appId;
+        from.run_id = this.nutella.runId;
     }
-    from.component_id = n.componentId;
-    if (n.resourceId!==undefined)
-        from.resource_id = n.resourceId;
+    // Set the component_id
+    from.component_id = this.nutella.componentId;
+    // Set resource_id, if defined
+    if (this.nutella.resourceId!==undefined)
+        from.resource_id = this.nutella.resourceId;
     return from;
-}
+};
 
 
-function prepare_message_for_publish(message, n) {
+/**
+ * Prepares a message for a publish
+ *
+ * @param {Object} message - the message content
+ * @return {string} the serialized message, ready to be shipped over the net
+ */
+AbstractNet.prototype.prepare_message_for_publish = function (message) {
     if(message===undefined)
-        return JSON.stringify({type: 'publish', from: assemble_from(n)});
-    return JSON.stringify({type: 'publish', from: assemble_from(n), payload: message});
-}
+        return JSON.stringify({type: 'publish', from: this.assemble_from()});
+    return JSON.stringify({type: 'publish', from: this.assemble_from(), payload: message});
+};
 
 
-function prepare_message_for_request(message, n) {
+/**
+ * Prepares a message for a request
+ *
+ * @param {Object} message - the message content
+ * @return {Object} the serialized response, ready to be shipped over the net and the id of the response
+ */
+AbstractNet.prototype.prepare_message_for_request = function (message) {
     var id = Math.floor((Math.random() * 100000) + 1).toString();
     var m = {};
     m.id = id;
     if(message===undefined)
-        m.message = JSON.stringify({id: id, type: 'request', from: assemble_from(n)});
+        m.message = JSON.stringify({id: id, type: 'request', from: this.assemble_from()});
     else
-        m.message = JSON.stringify({id: id, type: 'request', from: assemble_from(n), payload: message});
+        m.message = JSON.stringify({id: id, type: 'request', from: this.assemble_from(), payload: message});
     return m;
-}
+};
 
 
-function prepare_message_for_response(message, id, n) {
-    if(message===undefined)
-        return JSON.stringify({id: id, type: 'response', from: assemble_from(n)});
-    return JSON.stringify({id: id, type: 'response', from: assemble_from(n), payload: message});
-}
+/**
+ * Prepares a message for a response
+ *
+ * @param {Object} response - the response content
+ * @param {string} id - the original request id
+ * @return {string} the serialized message, ready to be shipped over the net
+ */
+AbstractNet.prototype.prepare_message_for_response = function (response, id) {
+    if(response===undefined)
+        return JSON.stringify({id: id, type: 'response', from: this.assemble_from()});
+    return JSON.stringify({id: id, type: 'response', from: this.assemble_from(), payload: response});
+};
 
 
 

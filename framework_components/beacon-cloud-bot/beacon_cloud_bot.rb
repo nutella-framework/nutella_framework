@@ -1,18 +1,21 @@
 require 'nutella_lib'
 require 'json'
 
+require_relative '../../lib/config/runlist'
+require_relative '../../lib/config/config'
+require_relative '../../nutella_lib/framework_core'
 
 # Parse command line arguments
 broker, app_id, run_id = nutella.parse_args ARGV
 # Extract the component_id
 component_id = nutella.extract_component_id
 # Initialize nutella
-nutella.init(broker, app_id, run_id, component_id)
+nutella.f.init(Nutella.config['broker'], 'beacon-cloud-bot')
 
 puts "Beacon cloud initialization"
 
 # Open the resources database
-beacons = nutella.persist.get_json_object_store("beacons.json")
+beacons = nutella.f.persist.get_json_object_store("beacons")
 
 # Contains virtual beacon codes that are created for iPads
 virtualBeacons = {}
@@ -21,7 +24,7 @@ minor = 0
 uuid = '00000000-0000-0000-0000-000000000000'
 
 # Create new beacon
-nutella.net.subscribe("beacon/beacon/add", lambda do |message, from|
+nutella.f.net.subscribe("beacon/beacon/add", lambda do |message, from|
 										puts message
 										rid = message["rid"]
 										uuid = message["uuid"]
@@ -45,7 +48,7 @@ nutella.net.subscribe("beacon/beacon/add", lambda do |message, from|
 									end)
 
 # Create new beacon
-nutella.net.subscribe("beacon/beacon/remove", lambda do |message, from|
+nutella.f.net.subscribe("beacon/beacon/remove", lambda do |message, from|
 										puts message
 										rid = message["rid"]
 
@@ -64,17 +67,19 @@ nutella.net.subscribe("beacon/beacon/remove", lambda do |message, from|
 # Publish an added beacon
 def publishBeaconAdd(beacon)
 	puts beacon
-	nutella.net.publish("beacon/beacons/added", {:beacons => [beacon]});
+	nutella.f.net.publish("beacon/beacons/added", {:beacons => [beacon]})
+  nutella.f.net.publish_to_all_runs("beacon/beacons/added", {:beacons => [beacon]})
 end
 
 # Publish an remove beacon
 def publishBeaconRemove(beacon)
 	puts beacon
-	nutella.net.publish("beacon/beacons/removed", {:beacons => [beacon]});
+	nutella.f.net.publish("beacon/beacons/removed", {:beacons => [beacon]})
+  nutella.f.net.publish_to_all_runs("beacon/beacons/removed", {:beacons => [beacon]})
 end
 
 # Request all the beacons
-nutella.net.handle_requests("beacon/beacons", lambda do |request, from|
+nutella.f.net.handle_requests("beacon/beacons", lambda do |request, from|
 	puts "Send the beacon list"
 	beaconList = []
 
@@ -88,8 +93,23 @@ nutella.net.handle_requests("beacon/beacons", lambda do |request, from|
 	{:beacons => beaconList}
 end)
 
+# Request all the beacons
+nutella.f.net.handle_requests_on_all_runs("beacon/beacons", lambda do |request, app_id, run_id, from|
+  puts "Send the beacon list"
+  beaconList = []
+
+  beacons.to_h.each do |key, beacon|
+    beaconList.push(beacon)
+  end
+
+  virtualBeacons.each do |key, beacon|
+    beaconList.push(beacon)
+  end
+  {:beacons => beaconList}
+end)
+
 # Request all the UUIDs
-nutella.net.handle_requests("beacon/uuids", lambda do |request, from|
+nutella.f.net.handle_requests_on_all_runs("beacon/uuids", lambda do |request, app_id, run_id, from|
 	puts "Send the uuid list"
 	uuidList = []
   beacons.to_h.each do |key, beacon|
@@ -102,7 +122,7 @@ nutella.net.handle_requests("beacon/uuids", lambda do |request, from|
 end)
 
 # Request virtual beacon codes
-nutella.net.handle_requests("beacon/virtual_beacon", lambda do |request, from|
+nutella.f.net.handle_requests_on_all_runs("beacon/virtual_beacon", lambda do |request, app_id, run_id, from|
   if request["rid"] != nil
     rid = request["rid"]
     virtualBeacon = virtualBeacons[rid]
@@ -128,7 +148,7 @@ nutella.net.handle_requests("beacon/virtual_beacon", lambda do |request, from|
   end
 end)
 
-puts "Initialization completed"
+puts "Beacon cloud Initialization completed"
 
 # Just sit there waiting for messages to come
-nutella.net.listen
+nutella.f.net.listen

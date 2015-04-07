@@ -142,9 +142,9 @@
 			// Parse the query parameters
 			var query_parameters = NUTELLA.parseURLParameters();
 
-			var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'beacon-cloud-interface');
+			var nutella = NUTELLA.initFramework(query_parameters.broker, 'beacon-cloud-interface');
 
-			//var nutella = NUTELLA.init(query_parameters.run_id, query_parameters.broker, 'beacon-cloud-interface');
+			//var nutella = NUTELLA.init(query_parameters.run_id, query_parameters.broker, 'beacon-cloud-interface-interface');
 			
 			React.render(
 					<BeaconTable/>,
