@@ -1,0 +1,15 @@
+{
+  "name": "example_framework_web_interface",
+  "version": "0.1.0",
+  "description": "An example framework interface",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alessandro Gnoli",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "nutella_lib": "*"
+  }
+}

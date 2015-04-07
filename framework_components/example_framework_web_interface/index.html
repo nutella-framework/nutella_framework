@@ -8,8 +8,17 @@
 </head>
 <body>
 <h1>Example framework interface</h1>
-<p>This is an example of a framework interface. Use this template to write your own framework interface.
-WE NEED TO COMPLETE THIS TEMPLATE BUT IN ORDER FOR THAT TO HAPPEN, I NEED JAVASCRIPT APIs!!!</p>
 
+<script src="node_modules/nutella_lib/dist/nutella_lib.js"></script>
+<!-- Scripts -->
+<script>
+    var urlParams = NUTELLA.parseURLParameters();
+    //var nutella = NUTELLA.initFramework(urlParams.broker, 'example_framework_interface');
+    // Now you can go about your business and code happily!
+    // If you need to know what application and run this interface is executing within,
+    // simply access those values via url query parameters such as:
+    // urlParams.app_id
+    // urlParams.run_id
+</script>
 </body>
 </html>
