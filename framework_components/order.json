@@ -1,6 +1,5 @@
-// The file order.json contains an array of components name.
-// If this file exists, nutella will start the framework components in that order
 [
+  "logging_bot",
   "runs_list_bot",
   "main_interface"
 ]

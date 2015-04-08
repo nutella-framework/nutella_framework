@@ -39,11 +39,11 @@ module Nutella
       # Output success message
       print_success_message(app_id, run_id, 'stopped')
     end
-  
-    
+
+
     private
 
-    
+
     def remove_from_run_list( app_id, run_id )
       unless Nutella.runlist.delete? app_id, run_id
         console.warn "Run #{run_id} doesn't exist. Impossible to stop it."
@@ -67,7 +67,7 @@ module Nutella
 
     def stop_framework_components
       nutella_components_dir = "#{Nutella::NUTELLA_HOME}framework_components"
-      for_each_component_in_dir nutella_components_dir do |component|
+      ComponentsList.for_each_component_in_dir nutella_components_dir do |component|
         pid_file_path = "#{nutella_components_dir}/#{component}/.pid"
         kill_process_with_pid pid_file_path
       end
@@ -96,6 +96,6 @@ module Nutella
         File.delete pid_file_path
       end
     end
-  
+
   end
 end

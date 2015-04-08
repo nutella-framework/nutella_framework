@@ -51,9 +51,9 @@ class ComponentsStarter
     app_bots_list = Nutella.current_app.config['app_bots']
     bots_dir = "#{app_path}/bots/"
     # If app bots have been started already, then do nothing
-    unless Tmux.session_exist? Tmux.app_bot_session_name app_id
+    unless Nutella::Tmux.session_exist? Nutella::Tmux.app_bot_session_name app_id
       # Start all app bots in the list into a new tmux session
-      tmux = Tmux.new app_id, nil
+      tmux = Nutella::Tmux.new app_id, nil
       ComponentsList.for_each_component_in_dir bots_dir do |bot|
         unless app_bots_list.nil? || !app_bots_list.include?( bot )
           # If there is no 'startup' script output a warning (because
@@ -73,7 +73,7 @@ class ComponentsStarter
 
   def self.start_run_bots( bots_list, app_path, app_id, run_id )
     # Create a new tmux instance for this run
-    tmux = Tmux.new app_id, run_id
+    tmux = Nutella::Tmux.new app_id, run_id
     # Fetch bots dir
     bots_dir = "#{app_path}/bots/"
     # Start the appropriate bots
@@ -136,13 +136,9 @@ class ComponentsStarter
     # Component is not running and there is no pid file so we try to start it
     # and create a new pid file. Note that the pid file is created by
     # the startup script!
-    nutella_config_file = "#{Nutella.config['config_dir']}config.json"
-    runs_list_file = "#{Nutella.config['config_dir']}runlist.json"
-    if nutella_config_file==nil || runs_list_file==nil
-      return false
-    end
-    # We are passing the configuration file and the run list files paths to the framework components
-    command = "#{component_dir}/startup #{nutella_config_file} #{runs_list_file}"
+    # Framework components are started without any parameters passed to them because they have
+    # full access to config, runlist and framework APIs using 'require_relative'
+    command = "#{component_dir}/startup"
     pid = fork
     exec(command) if pid.nil?
     # Give it a second so they can start properly

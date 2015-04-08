@@ -2,45 +2,38 @@ require 'json'
 require 'sinatra'
 require 'nokogiri'
 
-# Configuration file and runlist (runlist as global)
-config_file = ARGV[0]
-$runlist_file = ARGV[1]
+require_relative '../../lib/config/runlist'
+require_relative '../../lib/config/config'
+require_relative '../../nutella_lib/framework_core'
 
-# Try to parse the both config file and runlist and terminate if we can't
-begin
-  config_h = JSON.parse(IO.read(config_file))
-  JSON.parse(IO.read($runlist_file))
-rescue
-  # something went wrong
-  abort 'Impossible to parse configuration and/or runlist files!'
-end
 
 # Set Sinatra to run in production mode
 set :environment, :production
 
 # Set Sinatra's port to nutella's main_interface_port
-set :port, config_h['main_interface_port']
+set :port, Nutella.config['main_interface_port']
 
 
+# Routes -------------------------------------------------------------------------
 
 
 # Display the form to input the app_id and run_id
 get '/' do
-  send_file 'public/index.html'
+  send_file File.join(File.dirname(__FILE__), 'public/index.html')
 end
+
 
 # Redirect if there is no slash after the run_id
 get '/:app_id/:run_id' do
   redirect "#{request.url}/"
 end
 
-
 # Renders the interfaces summary page for the run
 get '/:app_id/:run_id/' do
   # Parse the app_id and run_id from URL and extract the run path from runlist.json
   @app_id = params[:app_id]
   @run_id = params[:run_id]
-  @app_path = get_app_path @app_id
+  @app_path = Nutella.runlist.app_path @app_id
   # If there is no app with this name, render error page
   return erb( :not_found_404, :locals => {:not_found_type => 'run'} ) if @app_path.nil?
   # To generate the 'index.erb' we need to load a bunch of details
@@ -51,11 +44,11 @@ get '/:app_id/:run_id/' do
   erb :index
 end
 
+
 # Redirect if there is a slash after the interface
 get '/:app_id/:run_id/:interface/' do
   redirect "#{request.url[0..-2]}"
 end
-
 
 # Serves the index.html file for each individual interface augmented with nutella query string parameters
 get '/:app_id/:run_id/runs/:interface' do
@@ -63,13 +56,13 @@ get '/:app_id/:run_id/runs/:interface' do
   app_id = params[:app_id]
   run_id = params[:run_id]
   interface = params[:interface]
-  app_path = get_app_path app_id
+  app_path = Nutella.runlist.app_path app_id
   # Compose the path of interface index file passing the nutella parameters
   index_file_path = "#{app_path}/interfaces/#{interface}/index.html"
   # If the index file doesn't exist, render error page
   return erb( :not_found_404, :locals => {:not_found_type => 'idx'} ) unless File.exist? index_file_path
   # If the index file exists, compose query string and redirect
-  index_with_query_url = "#{request.path}/index.html?broker=#{config_h['broker']}&app_id=#{app_id}&run_id=#{run_id}"
+  index_with_query_url = "#{request.path}/index.html?broker=#{Nutella.config['broker']}&app_id=#{app_id}&run_id=#{run_id}"
   redirect index_with_query_url
 end
 
@@ -79,7 +72,7 @@ get '/:app_id/:run_id/runs/:interface/*' do
   app_id = params[:app_id]
   interface = params[:interface]
   relative_file_path = params[:splat][0]
-  app_path = get_app_path app_id
+  app_path = Nutella.runlist.app_path app_id
   # Compose the path of the file we are trying to serve
   file_path = "#{app_path}/interfaces/#{interface}/#{relative_file_path}"
   # If the file we are trying to serve doesn't exist, render error page
@@ -98,7 +91,7 @@ get '/:app_id/:run_id/framework/:interface' do
   # If the index file doesn't exist, render error page
   return erb( :not_found_404, :locals => {:not_found_type => 'idx'} ) unless File.exist? index_file_path
   # If the index file exists, compose query string and redirect
-  index_with_query_url = "#{request.path}/index.html?broker=#{config_h['broker']}&app_id=#{app_id}&run_id=#{run_id}"
+  index_with_query_url = "#{request.path}/index.html?broker=#{Nutella.config['broker']}&app_id=#{app_id}&run_id=#{run_id}"
   redirect index_with_query_url
 end
 
@@ -117,19 +110,8 @@ end
 
 # Utility functions -------------------------------------------------------------------------
 
-# Utility function:
-# Gets the path associated with a certain application
-def get_app_path( app_id )
-  begin
-    runs_h = JSON.parse(IO.read($runlist_file))
-    runs_h[app_id]['path']
-  rescue
-    nil
-  end
-end
 
-# Utility function:
-# Loads all the details for all interfaces and stores them into an array of hashes
+# Loads all the details for all run interfaces and stores them into an array of hashes
 def load_interfaces_details( app_path )
   interfaces = Array.new
   interfaces_path = "#{app_path}/interfaces/"
@@ -140,6 +122,7 @@ def load_interfaces_details( app_path )
 end
 
 
+# Loads all the details for all framework interfaces and stores them into an array of hashes
 def load_framework_interfaces
   interfaces = Array.new
   components_directory = "#{File.dirname(__FILE__)}/../"
@@ -150,7 +133,6 @@ def load_framework_interfaces
 end
 
 
-# Utility function:
 # Extracts name, description and folder for a single interface from it's index.html
 def extract_interface_info( interfaces_path, iface_dir )
   iface_properties = Hash.new

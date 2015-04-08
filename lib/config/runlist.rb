@@ -50,6 +50,16 @@ module Nutella
     end
 
 
+    # Returns the path for a certain application
+    #
+    # @param [String] app_id of the application we want to find the path of
+    # @return [String] the path of the app or nil if the app doesn't exist
+    def app_path( app_id )
+      return nil if @ph[app_id].nil?
+      @ph[app_id]['path']
+    end
+
+
     # Adds a run_id to the runlist
     #
     # @param [String] app_id the app_id the run_id belongs to
@@ -100,6 +110,19 @@ module Nutella
     end
 
 
+    # Checks if a certain run is contained in the list
+    #
+    # @param [String] app_id the app_id the run_id belongs to
+    # @param [String] run_id the run_if we are checking
+    # @return [Boolean] true if the run_id is in the list, false otherwise
+    def include? (app_id, run_id)
+      # If there is no app, then return false and do nothing
+      return false if @ph[app_id].nil?
+      # Otherwise check the runs array
+      @ph[app_id]['runs'].include? run_id
+    end
+
+
     # Returns true if the runs list is empty
     # @return [Boolean] true if the list is empty, false otherwise
     def empty?
@@ -137,8 +160,5 @@ module Nutella
     rl.clean_list
     rl
   end
-  
+
 end
-
-
-

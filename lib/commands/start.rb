@@ -27,11 +27,12 @@ module Nutella
         return
       end
 
-      return unless add_to_run_list( app_id, run_id, app_path )
+      return if run_exist?( app_id, run_id)
 
       return unless start_all_components(app_id, app_path, run_id, params)
 
-      # Output messages
+      return unless Nutella.runlist.add?(app_id, run_id, app_path)
+
       print_confirmation(run_id, params, app_id, app_path)
     end
 
@@ -75,18 +76,17 @@ module Nutella
     end
 
 
-    # Check that the run is unique and add it to the list of runs
-    # If it's not, return (without adding the run to the list of course)
-    def add_to_run_list( app_id, run_id, prj_dir )
-      unless Nutella.runlist.add?(app_id, run_id, prj_dir)
-        # If the run_id is already in the list, check that it's actually live
+    # Check that the run_id we are trying to start has not been started already
+    def run_exist?( app_id, run_id)
+      if Nutella.runlist.include?(app_id, run_id)
+        # If the run_id is already in the list, check that it is actually live
         if Tmux.session_exist? Tmux.session_name(app_id, run_id)
           console.error 'Impossible to start nutella app: an instance of this app with the same run_id is already running!'
           console.error "You might want to kill it with 'nutella stop #{run_id}'"
-          return false
+          return true
         end
       end
-      true
+      false
     end
 
 
@@ -106,7 +106,7 @@ module Nutella
 
     def print_confirmation( run_id, params, app_id, app_path )
       # If there are no run-level bots to start, do not create the run and error out
-      if run_level_bots_list(app_path, params).empty?
+      if ComponentsList.run_level_bots_list(app_path, params).empty?
         console.warn 'This run doesn\'t seem to have any components. No run was created.'
         return
       end
@@ -127,8 +127,7 @@ module Nutella
       console.success "Do `tmux attach-session -t #{Tmux.session_name(app_id,run_id)}` to monitor your bots."
       console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{app_id}/#{run_id} to access your interfaces"
     end
-    
-  end
-  
-end
 
+  end
+
+end
