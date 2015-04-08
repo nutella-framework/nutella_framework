@@ -1,4 +1,5 @@
 require 'commands/meta/command'
+require 'commands/util/components_list'
 require 'slop'
 
 module Nutella
@@ -50,40 +51,6 @@ module Nutella
     end
 
 
-    # Returns all the components in a certain directory
-    def components_in_dir( dir )
-      Dir.entries(dir).select {|entry| File.directory?(File.join(dir, entry)) && !(entry =='.' || entry == '..') }
-    end
-
-
-    # Executes a code block for each component in a certain directory
-    # @param [String] dir directory where we are iterating
-    # @yield [component] Passes the component name to the block
-    def for_each_component_in_dir( dir, &block )
-      components_in_dir(dir).each do |component|
-        block.call component
-      end
-    end
-
-    
-    # Runs a script for each bot in a certain directory.
-    # Message is displayed in case something goes wrong
-    def run_script_for_all_bots_in( dir, script, message )
-      for_each_component_in_dir dir do |bot|
-        # Skip bot if there is no script
-        next unless File.exist? "#{dir}/bots/#{bot}/#{script}"
-        # Output message
-        console.info "#{message} bot #{bot}."
-        # Execute 'script' script
-        cur_dir = Dir.pwd
-        Dir.chdir "#{dir}/bots/#{bot}"
-        system "./#{script}"
-        Dir.chdir cur_dir
-      end
-      true
-    end
-
-
     #  Prints a success message if the command completes correctly
     def print_success_message(app_id, run_id, action)
       if run_id == 'default'
@@ -100,14 +67,32 @@ module Nutella
         console.warn 'The current directory is not a nutella application'
         return
       end
-
       # Run script
       return unless run_script_for_all_bots_in( Dir.pwd, script, in_progress_message )
-
       # Output success message
       console.success "All #{complete_message} for #{Nutella.current_app.config['name']}"
     end
 
+
+    private
+
+
+    # Runs a script for each bot in a certain directory.
+    # Message is displayed in case something goes wrong
+    def run_script_for_all_bots_in( dir, script, message )
+      ComponentsList.for_each_component_in_dir dir do |bot|
+        # Skip bot if there is no script
+        next unless File.exist? "#{dir}/bots/#{bot}/#{script}"
+        # Output message
+        console.info "#{message} bot #{bot}."
+        # Execute 'script' script
+        cur_dir = Dir.pwd
+        Dir.chdir "#{dir}/bots/#{bot}"
+        system "./#{script}"
+        Dir.chdir cur_dir
+      end
+      true
+    end
 
   end
 
