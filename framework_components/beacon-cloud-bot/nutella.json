@@ -1,6 +1,0 @@
-{
-    "name": "beacon-cloud-bot",
-    "version": "0.0.1",
-    "type": "bot",
-    "description": "This is a RoomPlaces bot, it keep tracks of information about beacons in order to decouple low level technical details with the resource name needed by RoomPlaces"
-}

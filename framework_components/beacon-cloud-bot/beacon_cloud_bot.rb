@@ -5,10 +5,6 @@ require_relative '../../lib/config/runlist'
 require_relative '../../lib/config/config'
 require_relative '../../nutella_lib/framework_core'
 
-# Parse command line arguments
-broker, app_id, run_id = nutella.parse_args ARGV
-# Extract the component_id
-component_id = nutella.extract_component_id
 # Initialize nutella
 nutella.f.init(Nutella.config['broker'], 'beacon-cloud-bot')
 
