@@ -1,4 +1,4 @@
-source "http://rubygems.org"
+source 'http://rubygems.org'
 
 gem 'semantic', '~> 1.4'
 gem 'logging', '~> 1.8'
@@ -7,7 +7,7 @@ gem 'sinatra', '~>1.4'
 gem 'thin', '~>1.6'
 gem 'nokogiri', '~>1.6'
 gem 'slop', '~>4.0'
-gem 'nutella_lib','~>0.4.10'
+gem 'nutella_lib','~>0.4', '>=0.4.11'
 
 
 group :development do
