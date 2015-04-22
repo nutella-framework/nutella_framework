@@ -38,5 +38,6 @@ If you already have an application you want to tinker with (like [RoomQuake](htt
 If you want to create your own application, hold on tight, a tutorial is coming soon.
 
 
-# Contributing
-Check out our [contributing wiki page](https://github.com/nutella-framework/nutella_framework/wiki/Contributing)! Thanks!
+# Building (for contributors)
+Clone the repo, `bundle install` to take care of the dependencies and then `rake` to run all the tests. If you want to build and install the gem just `rake install`. If you want a list of available build tasks, simply type `rake -T`. 
+
