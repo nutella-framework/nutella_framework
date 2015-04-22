@@ -143,11 +143,17 @@ module Nutella
     def clean_list
       all_runs.each do |app, _|
         runs_for_app(app).each do |run|
-          unless Tmux.session_exist? Tmux.session_name(app, run)
+          unless Tmux.session_exist?(Tmux.session_name(app, run)) || app_has_no_bots(app)
             delete? app, run
           end
         end
       end
+    end
+
+
+    # Returns true if the app has no bots
+    def app_has_no_bots( app_id )
+      Dir.entries("#{app_path(app_id)}/bots").select{|entry| File.directory?(entry) && !(entry =='.' || entry == '..') }.empty?
     end
 
   end

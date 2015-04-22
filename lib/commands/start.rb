@@ -22,7 +22,7 @@ module Nutella
 
       app_id, app_path = fetch_app_details
 
-      if no_bot_to_start(app_id, app_path, params)
+      if no_app_bot_to_start app_id, app_path, params
         console.warn "Run #{run} not created: your application bots are already started and you specified no regular bots exclusively for this run"
         return
       end
@@ -65,7 +65,7 @@ module Nutella
 
     # Returns true if both the list of run level bots is empty and the app bots
     # have been started already
-    def no_bot_to_start(app_id, app_path, params)
+    def no_app_bot_to_start(app_id, app_path, params)
       ComponentsList.run_level_bots_list(app_path, params).empty? && app_bots_started?(app_id)
     end
 
@@ -106,7 +106,7 @@ module Nutella
 
     def print_confirmation( run_id, params, app_id, app_path )
       # If there are no run-level bots to start, do not create the run and error out
-      if ComponentsList.run_level_bots_list(app_path, params).empty?
+      if ComponentsList.run_level_bots_list(app_path, params).empty? && !Nutella.runlist.app_has_no_bots(app_id)
         console.warn 'This run doesn\'t seem to have any components. No run was created.'
         return
       end
@@ -123,10 +123,15 @@ module Nutella
       unless app_bots_list.nil? || app_bots_list.empty?
         console.success "Do `tmux attach-session -t #{Tmux.app_bot_session_name(app_id)}` to monitor your app bots."
       end
-      # Output rest of monitoring info
-      console.success "Do `tmux attach-session -t #{Tmux.session_name(app_id,run_id)}` to monitor your bots."
+      # Only print bots monitoring info if there bots in the run
+      unless Nutella.runlist.app_has_no_bots app_id
+        console.success "Do `tmux attach-session -t #{Tmux.session_name(app_id,run_id)}` to monitor your bots."
+      end
+      # Main interface is always available
       console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{app_id}/#{run_id} to access your interfaces"
     end
+
+
 
   end
 
