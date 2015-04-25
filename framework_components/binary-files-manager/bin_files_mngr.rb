@@ -61,7 +61,7 @@ get "/test/:filename" do |fn|
   if File.exist? "#{data_folder}/#{fn}"
     {url: url("/#{fn}")}.to_json
   else
-    [404, {error: 404}.to_json]
+    {error: 404}.to_json
   end
 end
 
