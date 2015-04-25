@@ -2,5 +2,6 @@
   "logging_bot",
   "runs_list_bot",
   "main_interface",
-  "beacon-cloud-bot"
+  "beacon-cloud-bot",
+  "binary-files-manager"
 ]
