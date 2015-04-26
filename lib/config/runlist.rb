@@ -153,7 +153,7 @@ module Nutella
 
     # Returns true if the app has no bots
     def app_has_no_bots( app_id )
-      Dir.entries("#{app_path(app_id)}/bots").select{|entry| File.directory?(entry) && !(entry =='.' || entry == '..') }.empty?
+      Dir.entries("#{app_path(app_id)}/bots").select{|entry| File.directory?(File.join("#{app_path(app_id)}/bots",entry)) && !(entry =='.' || entry == '..') }.empty?
     end
 
   end
