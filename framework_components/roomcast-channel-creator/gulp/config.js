@@ -10,15 +10,15 @@ module.exports = {
             baseDir: [dest, src]
         },
         files: [
-      dest + '/**'
-    ]
+            dest + '/**'
+        ]
     },
     less: {
         src: src + '/less/main.less',
         watch: [
-      src + '/less/**',
-      mui + '/less/**'
-    ],
+            src + '/less/**',
+            mui + '/less/**'
+        ],
         dest: dest
     },
     css: {
@@ -26,8 +26,8 @@ module.exports = {
         dest: dest + "/css"
     },
     fonts: {
-        src: mui + '/less/material-design-fonticons/fonts/**',
-        dest: dest + '/fonts/mdfonticon'
+        src: src + '/fonts/**',
+        dest: dest + '/fonts'
     },
     muiFonts: {
         src: mui + '/less/material-ui-icons/fonts/**',
@@ -46,6 +46,6 @@ module.exports = {
             entries: src + '/app/app.js',
             dest: dest,
             outputName: 'app.js'
-    }]
+        }]
     }
 };
