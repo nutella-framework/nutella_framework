@@ -8,7 +8,7 @@ gem 'sinatra-cross_origin', '~> 0.3.2'
 gem 'thin', '~>1.6'
 gem 'nokogiri', '~>1.6'
 gem 'slop', '~>4.0'
-gem 'nutella_lib','~>0.4', '>=0.4.11'
+gem 'nutella_lib','~>0.4', '>=0.4.12'
 
 
 group :development do

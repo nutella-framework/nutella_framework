@@ -8,9 +8,9 @@ nutella.f.init(Nutella.config['broker'], 'roomcast-bot')
 puts 'Initializing RoomCast...'
 
 # Open the database
-configs_db = nutella.persist.get_json_object_store('configs')
-channels_db = nutella.persist.get_json_object_store('channels')
-channelsData_db = nutella.persist.get_json_object_store('channels-data')
+#configs_db = nutella.persist.get_json_object_store('configs')
+#channels_db = nutella.persist.get_json_object_store('channels')
+#channelsData_db = nutella.persist.get_json_object_store('channels-data')
 
 nutella.f.net.subscribe_to_all_runs('configs/update', lambda do |message, app_id, run_id, from|
 
@@ -20,8 +20,7 @@ nutella.f.net.subscribe_to_all_runs('configs/update', lambda do |message, app_id
                                         puts new_configs
 
                                         # Update
-                                        configs_db = nutella.persist.get_json_object_store('configs')
-                                        nutella.f.persist.get_json_object_store
+                                        configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                         if new_configs != nil
                                           configs_db[:configs] = new_configs
                                         end
@@ -47,6 +46,7 @@ nutella.net.handle_requests('configs/retrieve', lambda do |request, from|
                                                 if request == {}
                                                   reply
                                                 elsif request == 'all'
+                                                  configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                   reply = configs_db['configs']
                                                   puts reply
                                                   reply
@@ -60,6 +60,7 @@ nutella.net.handle_requests('mapping/retrieve', lambda do |request, from|
                                                 if request == {}
                                                   reply
                                                 elsif request == 'all'
+                                                  configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                   configs = configs_db['configs']
                                                   id = '%d' % configs_db['currentConfig']
                                                   config = configs[id]
@@ -78,7 +79,8 @@ nutella.net.subscribe('currentConfig/update', lambda do |message, from|
 
                                               # Update
                                               if new_config != nil
-                                                configs_db[:currentConfig] = new_config
+                                                configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
+                                                configs_db['currentConfig'] = new_config
                                               end
 
                                               puts 'Updated DB'
@@ -92,6 +94,7 @@ nutella.net.subscribe('currentConfig/update', lambda do |message, from|
 nutella.net.subscribe('currentConfig/updated', lambda do |message, from|
 
                                                begin
+                                                 configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                  configs = configs_db['configs']
                                                  id = '%d' % configs_db['currentConfig']
                                                  config = configs[id]
@@ -107,6 +110,7 @@ nutella.net.subscribe('currentConfig/updated', lambda do |message, from|
 nutella.net.handle_requests('currentConfig/retrieve', lambda do |request, from|
                                                       puts 'request: ' + request
                                                       reply = {}
+                                                      configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                       reply = configs_db['currentConfig']
                                                       puts reply
                                                       reply
@@ -118,7 +122,8 @@ nutella.net.subscribe('channels/update', lambda do |message, from|
 
                                          # Update
                                          if new_channels != nil
-                                           channels_db[:channels] = new_channels
+                                           channels_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'channels')
+                                           channels_db['channels'] = new_channels
                                          end
 
                                          # Notify Update
@@ -131,52 +136,12 @@ nutella.net.handle_requests('channels/retrieve', lambda do |request, from|
                                                  if request == {}
                                                    reply
                                                  elsif request == 'all'
+                                                   channels_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'channels')
                                                    reply = channels_db['channels']
                                                    puts reply
                                                    reply
                                                  end
                                                end)
-
-nutella.net.subscribe('channel/storeImage', lambda do |message, from|
-
-                                            puts 'channel/storeImage:'
-                                            puts message
-                                            puts message['id']
-
-                                            begin
-
-                                              # Update
-                                              if message != nil
-                                                db = channelsData_db['images']
-                                                id = '%d' % message['id']
-                                                db[id] = []
-                                                db[id] = message['data']
-                                              end
-
-                                            rescue => exception
-
-                                              puts exception
-                                              puts exception.backtrace
-                                              raise exception
-                                            end
-
-                                            puts 'Stored image'
-
-                                            # Notify Update
-                                            # managed at the end by channels update
-
-                                          end)
-
-nutella.net.handle_requests('channels/retrieveImages', lambda do |request, from|
-                                                       reply = {}
-                                                       if request == {}
-                                                         reply
-                                                       elsif request == 'all'
-                                                         reply = channelsData_db['images']
-                                                         puts reply
-                                                         reply
-                                                       end
-                                                     end)
 
 def publish_configs_update(configs)
   nutella.net.publish('configs/updated', configs)
