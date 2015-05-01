@@ -1,0 +1,481 @@
+/* Eric Meyer's Reset CSS v2.0 - http://cssreset.com */
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:none}table{border-collapse:collapse;border-spacing:0}
+
+@import "node_modules/material-ui/src/less/scaffolding.less";
+//Define a custom less file to override any variables defined in scaffolding.less
+@import "my_overrides.less";
+@import "node_modules/material-ui/src/less/components.less";
+
+//////////// My custom app styles ////////////
+
+// VARIABLES
+@default-margin: 20px;
+
+@card-margin: 20px;
+@pad1: 2.60%; // 50px
+@pad2: @pad1/2;
+@margin-top: 36px + 10*2 + @card-margin;
+@card-border: 5px;
+
+@channel-icon-width: 60px;
+@color-mui-blue: #00bcd4;
+@color-mui-pink: #e91e63;
+@color-mui-deselected: #cdcdcd;
+@menu-item-hover-color: rgba(0, 0, 0, .035);
+
+// Channels panel sections
+@channels-title: 10%;
+@channels-grid: 90%;
+@channels-footer: 56px;
+
+// MIXINS
+.hidden {
+  color: transparent;
+}
+.hovered {
+  box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+  opacity: 1;
+}
+
+// CODE
+
+html, body {
+  height: 100%;
+  overflow-y: scroll;
+  background-color: #e9eaed;
+  -webkit-user-select: none;
+}
+.resources-panel {
+  width: 50%;
+  position: absolute;
+  display: block;
+}
+.resources-panel:first-child {
+  margin-top: @default-margin;
+}
+.resource-family-pool {
+  position: static;
+  width: auto;
+  margin-left: @default-margin;
+  margin-right: @default-margin;
+  margin-bottom: @default-margin;
+  table {
+    width: 100%;
+    //table-layout: fixed;
+    tbody {
+      width: 100%;
+    }
+  }
+}
+.configurations-panel-div {
+  position: static;
+  width: auto;
+  margin-left: @default-margin;
+  margin-right: @default-margin;
+  margin-bottom: @default-margin;
+  .config-title {
+    font-size: 1.3vw;
+    font-weight: 300;
+    -webkit-user-select: none;
+    cursor: default;
+    margin-left: 30px;
+    vertical-align: middle;
+    float: left;
+  }
+  >.mui-paper:first-child {
+    height: 60px;
+    line-height: 60px;
+  }
+}
+.pool-row {
+  width: 100%;
+  border-top: solid 1px rgb(224, 224, 224);
+  td {
+    height: 100px;
+    vertical-align: middle;
+    //padding-top: 16px;
+    //padding-bottom: 10px;
+  }
+  td:first-child {
+    width: 10px;
+    min-width: 10px;
+    .remove-row-div {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  td:nth-child(2) {
+    width: 20%;
+    text-align: center;
+  }
+  td:nth-child(3) {
+    width: 65%;
+  }
+  td:last-child {
+    //width: 10%;
+  }
+  &.pool-add-row {
+    text-align: center;
+    cursor: pointer;
+    -webkit-user-select: none;
+    td {
+      height: 0;
+    }
+    :hover {
+      color: #ffffff;
+      background-color: @color-mui-blue;
+    }
+  }
+}
+.pool-row:hover .remove-row-div {
+  background-color: @color-mui-pink;
+  cursor: pointer;
+}
+.pool-header{
+  height: 80px;
+  th {
+    vertical-align: middle;
+  }
+  th:first-child {
+    width: 10px;
+    min-width: 10px;
+  }
+  th:nth-child(2) {
+    width: 20%;
+    min-width: 20%;
+    text-align: center;
+    font-size: 2em;
+    font-weight: 300;
+    -webkit-user-select: none;
+    cursor: default;
+  }
+}
+
+/////////////////////////////////
+
+.div-button-container {
+  display: inline-block;
+  margin-right: 10px;
+  line-height: 20px;
+}
+
+///////// ChannelsPanel /////////
+.channels-panel {
+  width: 50%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: block;
+}
+.channels-panel-paper {
+  height: calc(~"100% - 2*@{default-margin}");
+  width: auto;
+  margin-top: @default-margin;
+  margin-right: @default-margin;
+  margin-bottom: @default-margin;
+}
+.channels-catalogue-title-div-outer {
+  height: @channels-title;
+  width: 100%;
+  display: table;
+  //display: block;
+  //text-align: center;
+  p {
+    font-size: 6vh;
+    font-weight: 100;
+    margin: 0;
+    padding: 0;
+    -webkit-user-select: none;
+    cursor: default;
+  }
+}
+.channels-catalogue-title-div-middle {
+  padding: 0;
+  display: table-cell;
+  vertical-align: middle;
+}
+.channels-catalogue-title-div-inner {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+.channels-panel-save-buttons-div-outer {
+  height: @channels-footer;
+  width: 100%;
+  margin: auto;
+  text-align: center;
+  position: absolute;
+  bottom: 0px + @default-margin;
+  background-color: white;
+}
+.channels-panel-save-buttons-div-inner {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+.div-button-container-final-button {
+  display: inline-block;
+  //margin-top: 5px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  //line-height: 10px;
+  .mui-raised-button {
+    //height: 50%;
+    .mui-raised-button-container {
+      //height: 50%;
+    }
+  }
+}
+
+///////// Channel items /////////
+
+.channel-item {
+  display: inline-block;
+  text-align: center;
+  //width: @channel-icon-width;
+  margin-right: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  cursor: pointer;
+  .channel-icon {
+    display: block;
+    margin: 0 auto;
+    border-radius: @card-border + 5;
+    width: @channel-icon-width;
+    height: @channel-icon-width;
+    background-color: white;
+    position: relative;
+    border: 1px solid transparent;
+    &:hover {
+      .hovered;
+    }
+  }
+  span {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+///////////  Cards grid   ////////////////
+
+.content-div {
+  width: 100%;
+  height: @channels-grid;
+  display: block;
+  position: relative;
+  overflow: scroll;
+  padding-left: @default-margin;
+  .grid {
+    width: 100%;
+    height: 100%;
+    padding: 0 0 0 0;
+    display: table;
+    //clear: both;
+    position: relative;
+    [class*='col-'] {
+      float: left;
+      position: relative;
+      padding-right: @pad1;
+      padding-bottom: @pad2;
+    }
+    [class*='col-']:last-of-type {
+      padding-right: @pad1;
+      padding-bottom: @channels-footer - 5;
+    }
+  }
+  .col-1-3 {
+    width: 33.33%;
+    position: relative;
+  }
+  .col-1-2 {
+    width: 50%;
+    position: relative;
+  }
+  .col-size {
+    .col-1-3;
+    @media (max-width: 1280px) {
+      .col-1-2;
+    }
+  }
+}
+
+///////////  Card preview  /////////////////
+
+.channel-card {
+  // aspect ratio: 10:7.23
+  width: 100%;
+  height: 0;
+  padding-bottom: 72.30%;
+  position: relative;
+  background: white;
+  margin-bottom: 20px;
+  cursor: pointer;
+  * {
+    cursor: pointer;
+  }
+  &:hover {
+    opacity: 1 !important;
+  }
+  .channel-div {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    &:hover {
+      .hovered;
+    }
+    .channel-caption {
+      width: 100%;
+      height: 27%;
+      position: absolute;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      .icon-name-wrapper {
+        width: 100%;
+        position: absolute;
+        bottom: 10%;
+        overflow: auto;
+        .channel-icon {
+          width: 15%;
+          height: 0;
+          padding-bottom: 15%;
+          margin-left: 2%;
+          background-color: white;
+          position: relative;
+          float: left;
+          vertical-align: bottom;
+          border:1px solid transparent;
+          border-radius: @card-border;
+        }
+        .name-wrapper {
+          width: 83%;
+          display: inline-block;
+          position: absolute;
+          float: right;
+          top: 50%;
+          transform: translateY(-50%);
+          .channel-name {
+            color: #ffffff;
+            font-size: 1.3vw;
+            margin: 0 0 0 3%;
+            padding: 0 0 0 0;
+            vertical-align: middle;
+            @media (min-width: 1025px) and (max-width: 1480px) {
+              margin: 0 0 3% 3%;
+            }
+            @media (max-width: 1024px) {
+              margin: 0 0 2% 3%;
+            }
+            @media (max-width: 900px) {
+              margin: 0 0 1% 3%;
+            }
+          }
+          .channel-description {
+            color: #ffffff;
+            font-size: 0.8vw;
+            margin: 0 0 0 3%;
+            padding: 0 0 0 0;
+            line-height: 0;
+          }
+        }
+      }
+
+    }
+  }
+}
+
+.unfocused {
+  opacity: 0.5;
+}
+
+///////// Channels List /////////
+
+/*.channels-list-div {
+  height: 35%;
+  width: 100%;
+  padding: 20px;
+  overflow: scroll;
+}*/
+
+/////////// Mui ///////////
+.mui-paper {
+  background-color: #fff;
+}
+.mui-floating-action-button-container {
+  z-index: 0;
+}
+.text-field-div {
+  width: 100%;
+}
+.mui-text-field {
+  width: 100%;
+  padding-left: 20px;
+  padding-right: 20px;
+  .mui-text-field-underline {
+    position: relative;
+  }
+  .mui-text-field-focus-underline {
+    position: relative;
+  }
+}
+.mui-menu .mui-menu-item {
+  cursor: default;
+}
+.mui-menu .mui-menu-item:hover .check-config-icon i {
+  color: @color-mui-blue;
+}
+.mui-menu .mui-menu-item:hover .delete-config-icon i {
+  color: @color-mui-pink;
+}
+.mui-drop-down-menu {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.mui-drop-down-menu .mui-menu .mui-menu-item {
+  padding-right: 0;
+}
+///////// Config Dropdown ///////////////////
+
+.check-config-icon {
+  float: right;
+  cursor: pointer;
+  margin-left: 20px;
+  i {
+    color: @color-mui-deselected;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+}
+.delete-config-icon {
+  float: right;
+  cursor: pointer;
+  margin-left: 20px;
+  margin-right: 20px;
+  i {
+    color: @color-mui-deselected;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+}
+.config-text-field-div {
+  position: relative;
+  input {
+    width: 50%;
+    float: left;
+    line-height: inherit;
+    border: none;
+    outline:0 !important;
+    -webkit-appearance: none;
+    background: transparent;
+    &:focus {
+    }
+  }
+}
+
+////////////////////////////
+
+
+
+
