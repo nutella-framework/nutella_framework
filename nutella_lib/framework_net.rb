@@ -265,7 +265,6 @@ module Nutella
           end
         end
         # Subscribe to the channel
-        puts padded_channel
         Nutella.mqtt.subscribe( padded_channel, mqtt_cb )
         # Notify subscription
         Nutella::Net.publish_to('subscriptions', {'type' => 'handle_requests', 'channel' => padded_channel}, nil, nil)

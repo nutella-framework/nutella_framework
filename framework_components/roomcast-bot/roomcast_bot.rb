@@ -40,7 +40,7 @@ nutella.f.net.subscribe_to_all_runs('configs/update', lambda do |message, app_id
 
                                       end)
 
-nutella.net.handle_requests('configs/retrieve', lambda do |request, from|
+nutella.f.net.handle_requests_on_all_runs('configs/retrieve', lambda do |request, app_id, run_id, from|
                                                 puts 'request: ' + request
                                                 reply = {}
                                                 if request == {}
@@ -54,7 +54,7 @@ nutella.net.handle_requests('configs/retrieve', lambda do |request, from|
                                               end)
 
 # 'mapping' is the current running configuration
-nutella.net.handle_requests('mapping/retrieve', lambda do |request, from|
+nutella.f.net.handle_requests_on_all_runs('mapping/retrieve', lambda do |request, app_id, run_id, from|
                                                 puts 'request: ' + request
                                                 reply = {}
                                                 if request == {}
@@ -70,7 +70,7 @@ nutella.net.handle_requests('mapping/retrieve', lambda do |request, from|
                                                 end
                                               end)
 
-nutella.net.subscribe('currentConfig/update', lambda do |message, from|
+nutella.f.net.subscribe_to_all_runs('currentConfig/update', lambda do |message, app_id, run_id, from|
 
                                               new_config = message
 
@@ -91,7 +91,7 @@ nutella.net.subscribe('currentConfig/update', lambda do |message, from|
                                             end)
 
 # Reacts to updates to config id by publishing the updated mapping
-nutella.net.subscribe('currentConfig/updated', lambda do |message, from|
+nutella.f.net.subscribe_to_all_runs('currentConfig/updated', lambda do |message, app_id, run_id, from|
 
                                                begin
                                                  configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
@@ -107,7 +107,7 @@ nutella.net.subscribe('currentConfig/updated', lambda do |message, from|
 
                                              end)
 
-nutella.net.handle_requests('currentConfig/retrieve', lambda do |request, from|
+nutella.f.net.handle_requests_on_all_runs('currentConfig/retrieve', lambda do |request, app_id, run_id, from|
                                                       puts 'request: ' + request
                                                       reply = {}
                                                       configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
@@ -116,7 +116,7 @@ nutella.net.handle_requests('currentConfig/retrieve', lambda do |request, from|
                                                       reply
                                                     end)
 
-nutella.net.subscribe('channels/update', lambda do |message, from|
+nutella.f.net.subscribe_to_all_runs('channels/update', lambda do |message, app_id, run_id, from|
 
                                          new_channels = message
 
@@ -131,11 +131,12 @@ nutella.net.subscribe('channels/update', lambda do |message, from|
 
                                        end)
 
-nutella.net.handle_requests('channels/retrieve', lambda do |request, from|
+nutella.f.net.handle_requests_on_all_runs('channels/retrieve', lambda do |request, app_id, run_id, from|
                                                  reply = {}
                                                  if request == {}
                                                    reply
                                                  elsif request == 'all'
+                                                   puts 'requesting channels'
                                                    channels_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'channels')
                                                    reply = channels_db['channels']
                                                    puts reply
