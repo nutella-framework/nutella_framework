@@ -3,8 +3,8 @@ var Mui = require('material-ui');
 var Paper = Mui.Paper;
 var ChannelInfo = require('./ChannelCard');
 var ChannelsCatalogue = require('./ChannelsCatalogue');
-var RaisedButton = Mui.RaisedButton_;
-var Dialog = Mui.Dialog_;
+var RaisedButton = require('./material-ui/raised-button_.jsx');
+var Dialog = require('./material-ui/dialog_.jsx');
 var FlatButton = Mui.FlatButton;
 
 var ChannelsPanel = React.createClass({

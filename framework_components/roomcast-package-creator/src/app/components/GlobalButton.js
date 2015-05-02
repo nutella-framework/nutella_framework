@@ -1,6 +1,6 @@
 var React = require('react');
 var Mui = require('material-ui');
-var RaisedButton = Mui.RaisedButton_;
+var RaisedButton = require('./material-ui/raised-button_.jsx');
 
 /**
  * @prop type

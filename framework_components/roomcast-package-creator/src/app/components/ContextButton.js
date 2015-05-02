@@ -1,6 +1,6 @@
 var React = require('react');
 var Mui = require('material-ui');
-var FloatingActionButton_ = Mui.FloatingActionButton_;
+var FloatingActionButton_ = require('./material-ui/floating-action-button_.jsx');
 
 /**
  * @prop type
