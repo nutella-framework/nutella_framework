@@ -1,6 +1,6 @@
 var React = require('react');
 var Mui = require('material-ui');
-var RaisedButton_ = Mui.RaisedButton_;
+var RaisedButton_ = require('./material-ui/raised-button_.jsx');
 var ContextButton = require('./ContextButton');
 var GlobalButton = require('./GlobalButton');
 
