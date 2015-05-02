@@ -29,7 +29,6 @@
     "watchify": "^2.2.1"
   },
   "dependencies": {
-    "d3": "^3.5.5",
     "material-ui": "^0.4.1",
     "nutella_lib": "^0.5.1",
     "react": "^0.12.2",
