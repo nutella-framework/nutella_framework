@@ -108,13 +108,14 @@ var ResourceFamilyPool = React.createClass({
         this.handleUpdatedFamily(familyItems);
     },
 
-    render: function(){
+    render: function() {
 
         var self=this;
         var rows=[];
         var i = 0;
-        this.props.resourcesWithChannels.forEach(function(resource) {
+        this.props.resourcesWithChannels.forEach(function(resource, k) {
             rows.push(<PoolRow
+                    key={k}
                     mapping={self.props.mapping}
                     resourceWithChannels={resource}
                     channels={self.props.channels}
@@ -137,18 +138,18 @@ var ResourceFamilyPool = React.createClass({
 
                         <thead>
 
-                            <PoolHeader familyName={this.props.familyName}
-                                selectedChannel={self.props.selectedChannel}
-                                onRemovedAllChannels={this.handleRemovedAllChannels}
-                                onAddedChannelToPool={this.handleAddedChannelToPool}
-                                onRemovedChannelFromPool={this.handleRemovedChannelFromPool} />
+                        <PoolHeader familyName={this.props.familyName}
+                                    selectedChannel={self.props.selectedChannel}
+                                    onRemovedAllChannels={this.handleRemovedAllChannels}
+                                    onAddedChannelToPool={this.handleAddedChannelToPool}
+                                    onRemovedChannelFromPool={this.handleRemovedChannelFromPool} />
 
                         </thead>
 
                         <tbody>
 
-                            {rows}
-                            <tr className='pool-row pool-add-row' ref={this.props.familyName + 'pool'} onTouchTap={this.handleAddRow}> <td colSpan='4'> Add Row </td> </tr>
+                        {rows}
+                        <tr className='pool-row pool-add-row' ref={this.props.familyName + 'pool'} onTouchTap={this.handleAddRow}> <td colSpan='4'> Add Row </td> </tr>
 
                         </tbody>
 

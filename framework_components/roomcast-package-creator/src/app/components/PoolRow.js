@@ -4,7 +4,7 @@ var ChannelItem = require('./ChannelItem');
 var ContextButton = require('./ContextButton');
 var GlobalButton = require('./GlobalButton');
 var ButtonInteractionsMixin = require('./ButtonInteractionsMixin');
-var TextField = Mui.TextField;
+var TextField = require('./material-ui/text-field.jsx');
 var FloatingActionButton = Mui.FloatingActionButton;
 
 var PoolRow = React.createClass({

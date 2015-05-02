@@ -102,11 +102,11 @@ var ChannelsPanel = React.createClass({
                         <div className='channels-panel-save-buttons-div-inner' >
 
                             <div className='div-button-container-final-button'>
-                                <RaisedButton className='save-button' label='Save changes' saveButton={true} onTouchTap={this.enableSaveDialog} />
+                                <RaisedButton className='save-button' label='Save changes' secondary={true} saveButton={true} onTouchTap={this.enableSaveDialog} />
                             </div>
 
                             <div className='div-button-container-final-button'>
-                                <RaisedButton className='undo-button' label='Undo changes' undoButton={true} onTouchTap={this.enableUndoDialog} />
+                                <RaisedButton className='undo-button' label='Undo changes' primary={true} undoButton={true} onTouchTap={this.enableUndoDialog} />
                             </div>
 
                         </div>

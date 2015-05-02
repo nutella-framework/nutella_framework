@@ -5,6 +5,13 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 //Define a custom less file to override any variables defined in scaffolding.less
 @import "my_overrides.less";
 @import "node_modules/material-ui/src/less/components.less";
+@import "enhanced-textarea.less";
+@import "text-field.less";
+@import "svg-icon.less";
+//@import "menu-item.less";
+@import "drop-down-menu.less";
+@import "drop-down-icon.less";
+@import "menu.less";
 
 //////////// My custom app styles ////////////
 
@@ -421,6 +428,9 @@ html, body {
 }
 .mui-menu .mui-menu-item {
   cursor: default;
+  &.mui-is-selected {
+    color: @color-mui-blue;
+  }
 }
 .mui-menu .mui-menu-item:hover .check-config-icon i {
   color: @color-mui-blue;
@@ -430,6 +440,7 @@ html, body {
 }
 .mui-drop-down-menu {
   display: block;
+  height: 50px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -475,7 +486,6 @@ html, body {
 }
 
 ////////////////////////////
-
 
 
 

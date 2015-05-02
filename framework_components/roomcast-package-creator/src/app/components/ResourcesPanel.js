@@ -31,7 +31,7 @@ var ResourcesPanel = React.createClass({
     },
 
     handleUpdateConfigName: function(id, value) {
-      this.props.onUpdateConfigName(id, value);
+        this.props.onUpdateConfigName(id, value);
     },
 
     render: function(){
@@ -40,18 +40,18 @@ var ResourcesPanel = React.createClass({
 
         var self=this;
         var pools = [];
-        // TODO add keys to array
         var channels = this.props.channels;
-        this.props.mapping.forEach(function(family) {
+        this.props.mapping.forEach(function(family, i) {
             pools.push(<ResourceFamilyPool
-                mapping={self.props.mapping}
-                familyName={family.family}
-                resourcesWithChannels={family.items}
-                channels={channels}
-                selectedChannel={self.props.selectedChannel}
-                onSelectedChannel={self.handleSelectedChannel}
-                onUpdatedMapping={self.handleUpdatedMapping}
-                onAddRow={self.handleAddRow} />
+                    key={i}
+                    mapping={self.props.mapping}
+                    familyName={family.family}
+                    resourcesWithChannels={family.items}
+                    channels={channels}
+                    selectedChannel={self.props.selectedChannel}
+                    onSelectedChannel={self.handleSelectedChannel}
+                    onUpdatedMapping={self.handleUpdatedMapping}
+                    onAddRow={self.handleAddRow} />
             );
         });
 
