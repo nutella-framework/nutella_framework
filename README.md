@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/nutella-framework/nutella_framework.svg?branch=master)](https://travis-ci.org/nutella-framework/nutella_framework)
 [![Code Climate](https://codeclimate.com/github/nutella-framework/nutella_framework/badges/gpa.svg)](https://codeclimate.com/github/nutella-framework/nutella_framework)
 
-nutella is a framework to build and run RoomApps. It's still _very_ under development so any help [finding and fixing bugs](https://github.com/nutella-framework/nutella_framework/issues) will be greatly appreciated!
+nutella is a framework to build and run Macroworlds. It's still _very_ under development so any help [finding and fixing bugs](https://github.com/nutella-framework/nutella_framework/issues) will be greatly appreciated!
 
 # Installing
 Nutella is written in ruby but it leverages a bunch of other technologies that need to be installed. You will need:
