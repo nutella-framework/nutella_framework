@@ -9,7 +9,7 @@ gem 'thin', '~>1.6'
 gem 'nokogiri', '~>1.6'
 gem 'slop', '~>4.0'
 gem 'nutella_lib','~>0.4', '>=0.4.12'
-
+gem 'activesupport', '~>4.2'
 
 group :development do
   gem 'shoulda', '~> 3.0'
