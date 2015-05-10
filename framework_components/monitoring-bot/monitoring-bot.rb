@@ -29,7 +29,6 @@ puts 'Monitoring bot initialization'
 
 # Add an alert on a specific application/instance/component
 nutella.f.net.subscribe_to_all_runs('monitoring/alert/add', lambda do |message, appId, runId, from|
-  puts message
   application = message['application']
   instance = message['instance']
   component = message['component']
@@ -256,38 +255,68 @@ end)
 # Catch subscribe / handle_request messages
 nutella.f.net.subscribe_to_all_runs("subscriptions", lambda do |payload, app_id, run_id, from|
 
+  component_id = from['component_id']
+  type = payload['type']
+  channel = nutella.net.un_pad_channel(payload['channel'], app_id, run_id)
+
+  if type == 'subscribe'
+    create_if_not_present(app_id, run_id, component_id)
+
+    subscribe = $applications[app_id]['instances'][run_id]['components'][component_id]['subscribe']
+
+    if not subscribe.include? ({'channel' => channel})
+      subscribe.push({'channel' => channel})
+    end
+
+    $applications[app_id]['instances'][run_id]['components'][component_id]['subscribe'] = subscribe
+
+  end
+
+  if type == 'handle_requests'
+    create_if_not_present(app_id, run_id, component_id)
+
+    handle_request = $applications[app_id]['instances'][run_id]['components'][component_id]['handle_request']
+
+    if not handle_request.include? ({'channel' => channel})
+      handle_request.push({'channel' => channel})
+    end
+
+    $applications[app_id]['instances'][run_id]['components'][component_id]['handle_request'] = handle_request
+
+  end
+
+end)
+
+# Catch subscribe / handle_request messages
+nutella.f.net.catch_requests_on_all_runs_wildcard(lambda do |channel, payload, app_id, run_id, from|
+
  component_id = from['component_id']
- type = payload['type']
- channel = nutella.net.un_pad_channel(payload['channel'], app_id, run_id)
 
- puts "#{channel} #{app_id} #{run_id}"
+ create_if_not_present(app_id, run_id, component_id)
 
- if type == 'subscribe'
-   create_if_not_present(app_id, run_id, component_id)
+ request = $applications[app_id]['instances'][run_id]['components'][component_id]['request']
 
-   subscribe = $applications[app_id]['instances'][run_id]['components'][component_id]['subscribe']
-
-   if not subscribe.include? ({'channel' => channel})
-     subscribe.push({'channel' => channel})
-   end
-
-   $applications[app_id]['instances'][run_id]['components'][component_id]['subscribe'] = subscribe
-
+ unless request.include? ({'channel' => channel})
+   request.push({'channel' => channel})
  end
+
+ $applications[app_id]['instances'][run_id]['components'][component_id]['request'] = request
+
 
 end)
 
 
-=begin
 nutella.f.net.subscribe_to_all_runs("pings", lambda do |payload, app_id, run_id, from|
+
+ component_id = from['component_id']
 
  puts " #{payload}, #{app_id}, #{run_id}, #{from}"
 
- component_id = from['component_id']
+ create_if_not_present(app_id, run_id, component_id)
+
+ $applications[app_id]['instances'][run_id]['components'][component_id]['timestamp'] = Time.now.to_f
 
 end)
-
-=end
 
 puts 'Initialization completed'
 
@@ -308,5 +337,23 @@ while sleep 0.25
         create_if_not_present(app_id, run_id, comp_name)
       end
     end
+  end
+
+  $applications.each do |_, application|
+    appProblems = 0
+    application['instances'].each do |_, instance|
+      instanceProblems = 0
+      instance['components'].each do |_, component|
+        if component['timestamp'] == nil || Time.now.to_f - component['timestamp'] > 16.0
+          appProblems += 1
+          instanceProblems += 1
+          component['problem'] = true
+        else
+          component['problem'] = false
+        end
+      end
+      instance['problems'] = instanceProblems
+    end
+    application['problems'] = appProblems
   end
 end

@@ -280,6 +280,32 @@ module Nutella
         Nutella::Net.publish_to('subscriptions', {'type' => 'handle_requests', 'channel' => padded_channel}, nil, nil)
       end
 
+      def self.catch_requests_on_all_runs_wildcard(callback)
+        # Pad channel
+        padded_channel = Nutella::Net.pad_channel("#", '+', '+')
+        mqtt_cb = lambda do |request, mqtt_channel|
+          begin
+            # Extract nutella fields
+            type, from, payload, id = Nutella::Net.extract_fields_from_message request
+            app_id, run_id = self.extract_run_id_and_app_id mqtt_channel
+            # Only handle requests that have proper id set
+            return if type!='request' || id.nil?
+            # Execute callback and send response
+            regex = Regexp.new '/nutella/apps/[^"\/"]+/runs/[^"\/"]+/'
+            unpadded_channel = mqtt_channel.gsub(regex, '')
+            callback.call( unpadded_channel, payload, app_id, run_id, from)
+          rescue JSON::ParserError
+            # Make sure that request contains JSON, if not drop the message
+            return
+          rescue ArgumentError
+            # Check the passed callback has the right number of arguments
+            STDERR.puts "The callback you passed to subscribe has the #{$!}: it needs 'request', 'app_id', 'run_id' and 'from'"
+          end
+        end
+        # Subscribe to the channel
+        Nutella.mqtt.subscribe( padded_channel, mqtt_cb )
+      end
+
       # @!endgroup
 
       # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
