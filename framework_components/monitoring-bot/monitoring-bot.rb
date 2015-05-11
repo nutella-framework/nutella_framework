@@ -4,6 +4,7 @@ require_relative '../../nutella_lib/framework_core'
 require_relative '../../lib/commands/util/components_list'
 require 'active_support/core_ext/object/deep_dup'
 require 'mandrill'
+require 'mongo'
 
 # Framework bots can access all the parameters they need directly
 # from the configuration file and the runlist,
@@ -27,6 +28,10 @@ $messages = nutella.f.persist.get_json_object_store('messages')
 
 # Application structure
 $applications = {}
+
+# MongoDB client
+Mongo::Logger.logger.level = ::Logger::INFO
+client = Mongo::Client.new([Nutella.config['broker']], :database => 'nutella')
 
 puts 'Monitoring bot initialization'
 
@@ -307,9 +312,20 @@ nutella.f.net.handle_requests_on_all_runs('monitoring/application', lambda do |r
 end)
 
 nutella.f.net.handle_requests_on_all_runs('monitoring/message', lambda do |request, appId, runId, from|
-  reply = $messages['messages']
-  {:messages => reply}
-                                                              end)
+  application = request['application']
+  instance = request['instance']
+  channel = request['channel']
+
+  collection = client['dump']
+
+  messages = []
+
+  collection.find({'channel' => '/nutella/apps/crepe/runs/default/location/resources'}).sort({:_id => -1}).limit(5).each do |message|
+    messages.push(message)
+  end
+
+  {:messages => messages}
+end)
 
 # Catch publish messages
 nutella.f.net.subscribe_to_all_runs("#", lambda do |channel, payload, app_id, run_id, from|
@@ -371,15 +387,19 @@ nutella.f.net.catch_requests_on_all_runs_wildcard(lambda do |channel, payload, a
 
  component_id = from['component_id']
 
- create_if_not_present(app_id, run_id, component_id)
+ if component_id != nil
 
- request = $applications[app_id]['instances'][run_id]['components'][component_id]['request']
+   create_if_not_present(app_id, run_id, component_id)
 
- unless request.include? ({'channel' => channel})
-   request.push({'channel' => channel})
+   request = $applications[app_id]['instances'][run_id]['components'][component_id]['request']
+
+   unless request.include? ({'channel' => channel})
+     request.push({'channel' => channel})
+   end
+
+   $applications[app_id]['instances'][run_id]['components'][component_id]['request'] = request
+
  end
-
- $applications[app_id]['instances'][run_id]['components'][component_id]['request'] = request
 
 
 end)
@@ -389,13 +409,13 @@ nutella.f.net.subscribe_to_all_runs("pings", lambda do |payload, app_id, run_id,
 
  component_id = from['component_id']
 
- puts " #{payload}, #{app_id}, #{run_id}, #{from}"
-
  create_if_not_present(app_id, run_id, component_id)
 
  $applications[app_id]['instances'][run_id]['components'][component_id]['timestamp'] = Time.now.to_f
 
 end)
+
+# TODO implement framework pings
 
 puts 'Initialization completed'
 
@@ -428,7 +448,7 @@ while sleep 0.25
           instanceProblems += 1
           if component['problem'] != true
             component['problem'] = true
-            puts "Set problem on #{application['name']} > #{instance['name']} > #{component['name']}}"
+            #puts "Set problem on #{application['name']} > #{instance['name']} > #{component['name']}}"
             if component['alert'] != nil
               component['alert'].each do |mail|
                 send_notification_mail(mail, application['name'], instance['name'], component['name'])
