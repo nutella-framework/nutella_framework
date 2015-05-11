@@ -3,7 +3,7 @@ require_relative '../../lib/config/config'
 require_relative '../../nutella_lib/framework_core'
 require_relative '../../lib/commands/util/components_list'
 require 'active_support/core_ext/object/deep_dup'
-
+require 'mandrill'
 
 # Framework bots can access all the parameters they need directly
 # from the configuration file and the runlist,
@@ -19,6 +19,9 @@ require 'active_support/core_ext/object/deep_dup'
 # Initialize this bot as framework component
 nutella.f.init(Nutella.config['broker'], 'monitoring_bot')
 
+# Mandrill access key
+$m = Mandrill::API.new 'i4frQYcTBMyZ6bYyLkEVOQ'
+
 # Open the resources database
 $messages = nutella.f.persist.get_json_object_store('messages')
 
@@ -26,6 +29,81 @@ $messages = nutella.f.persist.get_json_object_store('messages')
 $applications = {}
 
 puts 'Monitoring bot initialization'
+
+def send_subscription_mail(mail, application, instance = nil, component = nil)
+  object = application
+
+  if instance != nil
+    object = object + ' > ' + instance
+    if rcomponent != nil
+      object = object + ' > ' + component
+    end
+  end
+
+  puts "Send mail to " + mail + "message: " + object
+
+
+  template_name = 'Nutella subscription'
+  template_content = [
+      {
+          :name=> 'main',
+          :content=> "Congratulation: subscription to component
+  <b>#{object}</b>
+  has been succeded."
+      }
+  ]
+  message = {
+      :subject=> "Subscription to #{object}",
+      :from_name=> 'Nutella Monitoring Interface',
+      :to=>[
+          {
+              :email=> mail,
+              # :name=> ""
+          }
+      ],
+      :from_email=>'nutellamonitoring@gmail.com'
+  }
+
+  sending = $m.messages.send_template template_name, template_content, message
+end
+
+def send_notification_mail(mail, application, instance = nil, component = nil)
+  object = application
+
+  if instance != nil
+    object = object + ' > ' + instance
+    if component != nil
+      object = object + ' > ' + component
+    end
+  end
+
+  puts "Send mail to " + mail + "message: " + object
+
+  template_name = 'Nutella alert'
+  template_content = [
+      {
+          :name=> 'main',
+          :content=> "Attention: component
+  <b>#{object}</b>
+  had a problem and went down."
+      }
+  ]
+  message = {
+      :subject=> "Alert: #{object} went down",
+      :from_name=> 'Nutella Monitoring Interface',
+      :to=>[
+          {
+              :email=> mail,
+              # :name=> ""
+          }
+      ],
+      :from_email=>'nutellamonitoring@gmail.com'
+  }
+
+  sending = $m.messages.send_template template_name, template_content, message
+  puts sending
+
+end
 
 # Add an alert on a specific application/instance/component
 nutella.f.net.subscribe_to_all_runs('monitoring/alert/add', lambda do |message, appId, runId, from|
@@ -66,6 +144,7 @@ nutella.f.net.subscribe_to_all_runs('monitoring/alert/add', lambda do |message, 
     emails = a['alert']
     if !emails.include? mail
       emails.push(mail)
+      send_subscription_mail(mail, application)
     end
     $applications[application] = a
   end
@@ -287,7 +366,7 @@ nutella.f.net.subscribe_to_all_runs("subscriptions", lambda do |payload, app_id,
 
 end)
 
-# Catch subscribe / handle_request messages
+# Catch requests
 nutella.f.net.catch_requests_on_all_runs_wildcard(lambda do |channel, payload, app_id, run_id, from|
 
  component_id = from['component_id']
@@ -347,13 +426,31 @@ while sleep 0.25
         if component['timestamp'] == nil || Time.now.to_f - component['timestamp'] > 16.0
           appProblems += 1
           instanceProblems += 1
-          component['problem'] = true
+          if component['problem'] != true
+            component['problem'] = true
+            puts "Set problem on #{application['name']} > #{instance['name']} > #{component['name']}}"
+            if component['alert'] != nil
+              component['alert'].each do |mail|
+                send_notification_mail(mail, application['name'], instance['name'], component['name'])
+              end
+            end
+            if instance['alert'] != nil
+              instance['alert'].each do |mail|
+                send_notification_mail(mail, application['name'], instance['name'], component['name'])
+              end
+            end
+            if application['alert'] != nil
+              application['alert'].each do |mail|
+                send_notification_mail(mail, application['name'], instance['name'], component['name'])
+              end
+            end
+          end
         else
           component['problem'] = false
         end
+        instance['problems'] = instanceProblems
       end
-      instance['problems'] = instanceProblems
+      application['problems'] = appProblems
     end
-    application['problems'] = appProblems
   end
 end
