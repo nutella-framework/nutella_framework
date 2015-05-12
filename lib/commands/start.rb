@@ -94,6 +94,8 @@ module Nutella
     def start_all_components( app_id, app_path, run_id, params )
       # Start the internal broker
       return false unless ComponentsStarter.start_internal_broker
+      # Start mongo db
+      return false unless ComponentsStarter.start_mongo_db
       # Start all framework-level components (if needed)
       return false unless ComponentsStarter.start_framework_components
       # Start all app-level bots (if any, if needed)

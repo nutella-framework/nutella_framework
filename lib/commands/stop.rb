@@ -34,6 +34,7 @@ module Nutella
       # If running on the internal broker, stop it if needed
       if Nutella.runlist.empty?
         stop_internal_broker
+        stop_mongo
       end
 
       # Output success message
@@ -76,6 +77,12 @@ module Nutella
 
     def stop_internal_broker
       pid_file_path = "#{Nutella.config['broker_dir']}/bin/.pid"
+      kill_process_with_pid pid_file_path
+    end
+
+
+    def stop_mongo
+      pid_file_path = "#{Nutella.config['config_dir']}.mongo_pid"
       kill_process_with_pid pid_file_path
     end
 

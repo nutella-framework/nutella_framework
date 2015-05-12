@@ -45,7 +45,7 @@ module Nutella
       File.chmod( 0755, 'startup' )
     
       # Write configuration into config.json
-      Nutella.config['broker'] = 'localhost'
+      Nutella.config['broker'] = '127.0.0.1'
       out1 && out2
     end
     
@@ -69,8 +69,14 @@ module Nutella
         out.slice!(0,5)
         Semantic::Version.new "#{out[0..2]}.0"
       end
+      # Mongo version lambda
+      mongo_semver = lambda do
+        out = `mongod --version`
+        out.slice!(0,12)
+        Semantic::Version.new out[0..4]
+      end
       # Check versions
-      return true if check_version?('node', '0.10.0', node_semver) && check_version?('git', '1.8.0', git_semver) && check_version?('tmux', '1.8.0', tmux_semver)
+      return true if check_version?('node', '0.10.0', node_semver) && check_version?('git', '1.8.0', git_semver) && check_version?('tmux', '1.8.0', tmux_semver) && check_version?('mongodb', '2.6.9', mongo_semver)
       # If even one of the checks fails, return false
       false
     end
