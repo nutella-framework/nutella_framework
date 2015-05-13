@@ -8,7 +8,7 @@ var UploadingScreen = React.createClass({
 
     componentDidMount: function() {
 
-        d3.xml("./Logo_grid.svg", "image/svg+xml", function (logo) {
+        d3.xml("./upload.svg", "image/svg+xml", function (logo) {
 
             d3.select('.uploading-container')[0][0].appendChild(logo.documentElement);
 
@@ -67,7 +67,7 @@ var UploadingScreen = React.createClass({
 
     render: function() {
 
-        return <div className='uploading-container' ></div>;
+        return (<div className='uploading-container' > </div>);
 
     }
 
