@@ -4,6 +4,7 @@ var Mui = require('material-ui');
 var TopBar = require('./TopBar');
 var Dialog = Mui.Dialog;
 var FlatButton = Mui.FlatButton;
+var UploadingScreen = require('./UploadingScreen');
 
 var CataloguePage = React.createClass({
 
@@ -14,6 +15,16 @@ var CataloguePage = React.createClass({
 
     componentWillUnmount: function() {
         window.removeEventListener("resize", this.updateDimensions);
+    },
+
+    componentWillReceiveProps: function(newProps) {
+        var self = this;
+        if(!newProps.isUploading) {
+            if (self.refs.uploadingScreen) {
+                console.log(self.refs.uploadingScreen.getDOMNode());
+                React.unmountComponentAtNode(self.refs.uploadingScreen.getDOMNode());
+            }
+        }
     },
 
     getInitialState: function () {
@@ -95,9 +106,16 @@ var CataloguePage = React.createClass({
             overlay = <div className="grid-overlay is-shown"  onTouchTap={this.props.onExitSelection} ></div>;
         }
 
+        var uploadingScreen = null;
+        if(this.props.isUploading) {
+            uploadingScreen = <UploadingScreen ref='uploadingScreen' />;
+        }
+
         return (
 
             <div>
+
+                {uploadingScreen}
 
                 <TopBar
                     onSave={this.enableSaveDialog}
