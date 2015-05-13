@@ -1,0 +1,6 @@
+#!/bin/sh
+
+BASEDIR=$(dirname $0)
+
+ruby $BASEDIR/monitoring-bot.rb # > /dev/null 2>&1 &
+echo $! > $BASEDIR/.pid

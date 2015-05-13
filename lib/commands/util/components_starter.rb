@@ -24,6 +24,27 @@ class ComponentsStarter
   end
 
 
+  # Starts mongodb if it's not started already.
+  # This operation is only necessary on mac because Ubuntu automatically
+  # installs mongo as a service and runs it.
+  # @return [boolean] true if mongo has been correctly started, false otherwise
+  def self.start_mongo_db
+    pid_file_path = "#{Nutella.config['config_dir']}.mongo_pid"
+    # Check if the process with pid indicated in the pidfile is alive
+    return true if sanitize_pid_file pid_file_path
+    # Check that mongo is not running 'unsupervised' (i.e. check port 27017), if it is, return
+    return true unless mongo_port_free?
+    # Mongo is not running and there is no pid file so we try to start it and create a new pid file.
+    # Note that the pid file is created by the `startup` script, not here.
+    pid = fork
+    exec("mongod --config /usr/local/etc/mongod.conf > /dev/null 2>&1 & \necho $! > #{pid_file_path}") if pid.nil?
+    # Wait a bit to give the chance to mongo to actually start up
+    sleep 1
+    # All went well so we return true
+    true
+  end
+
+
   # Starts all framework components. If order.json is present, components are started
   # in that order.
   # @return [boolean] true if all components are started correctly, false otherwise
@@ -126,6 +147,21 @@ class ComponentsStarter
     true
   end
   private_class_method :broker_port_free?
+
+
+  # Checks if port 27017 (MongoDB standard port) is free
+  # or some other service is already listening on it
+  # @return [boolean] true if there is no mongo listening on port 27017, false otherwise
+  def self.mongo_port_free?
+    begin
+      s = TCPServer.new('0.0.0.0', 27017)
+      s.close
+    rescue
+      return false
+    end
+    true
+  end
+  private_class_method :mongo_port_free?
 
 
   # Starts a single framework component

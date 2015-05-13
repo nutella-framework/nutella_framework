@@ -29,17 +29,17 @@ module Nutella
 
     # Removes a run-level session associated to a particular run
     def self.kill_run_session( app_id, run_id )
-      `tmux kill-session -t #{session_name(app_id, run_id)} &> /dev/null`
+      `tmux kill-session -t #{session_name(app_id, run_id)} > /dev/null 2>&1`
     end
 
     # Removes the app-level session associated to a particular application
     def self.kill_app_session( app_id )
-      `tmux kill-session -t #{app_bot_session_name( app_id )} &> /dev/null`
+      `tmux kill-session -t #{app_bot_session_name( app_id )} > /dev/null 2>&1`
     end
 
     #  Returns true if a tmux session with a certain id exists
     def self.session_exist?( session_id )
-      system( "tmux has-session -t #{session_id} &> /dev/null" )
+      system( "tmux has-session -t #{session_id} > /dev/null 2>&1" )
     end
 
     # Builds a session name for run-level session
