@@ -59,15 +59,13 @@ var UploadingScreen = React.createClass({
 
             setInterval(action, 200);
 
-            console.log('loading screen');
-
         });
 
     },
 
     render: function() {
 
-        return (<div className='uploading-container' > </div>);
+        return <div className='uploading-container' ></div>;
 
     }
 

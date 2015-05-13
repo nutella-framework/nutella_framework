@@ -174,7 +174,6 @@ var Channel = React.createClass({
         if(this.imageFile_) {
             ReactMain.imagesQueue++;
             nutella.net.bin.uploadFile(this.imageFile_, function(url) {
-                console.log('got url', url);
                 self.props.onSetScreenshot(self.props.channelId, url);
                 ReactMain.imagesQueue--;
                 if(ReactMain.imagesQueue === 0) {

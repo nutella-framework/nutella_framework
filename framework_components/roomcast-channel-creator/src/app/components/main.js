@@ -41,7 +41,6 @@ var Main = React.createClass({
         var callback = function() {
             if(publish) {
                 nutella.net.publish('channels/update', self.state.channels);
-                console.log('publishing', channels);
             }
         };
         this.setState({
@@ -93,7 +92,6 @@ var Main = React.createClass({
      * Called when last saving on server has finished.
      */
     handleSaveCallback: function() {
-        console.log("All done!");
         this.saveLocalCatalogue(true);
         this.setState({
             isUploading: false
@@ -194,10 +192,7 @@ var Main = React.createClass({
         var channel = channels[channelId];
         channel.screenshot = value;
         channels[channelId] = channel;
-        console.log(channel, channels);
         this.setChannels(channels);
-        console.warn('saved', value, channelId);
-
     },
 
     handleSetDescription: function(value) {
