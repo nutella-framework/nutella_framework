@@ -22,7 +22,7 @@ nutella.f.net.subscribe_to_all_runs('configs/update', lambda do |message, app_id
                                         # Update
                                         configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                         if new_configs != nil
-                                          configs_db[:configs] = new_configs
+                                          configs_db['configs'] = new_configs
                                         end
 
                                         puts 'Updated DB'
