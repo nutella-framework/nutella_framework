@@ -30,13 +30,13 @@ nutella.f.net.subscribe_to_all_runs('configs/update', lambda do |message, app_id
                                         # Notify Update
 
                                         # Notify change of all configs
-                                        publish_configs_update(new_configs)
+                                        publish_configs_update(app_id, run_id, new_configs)
 
                                         # Notify possible change of current config
                                         configs = configs_db['configs']
                                         id = '%d' % configs_db['currentConfig']
                                         config = configs[id]
-                                        publish_mapping_update(config['mapping'])
+                                        publish_mapping_update(app_id, run_id, config['mapping'])
 
                                       end)
 
@@ -86,7 +86,7 @@ nutella.f.net.subscribe_to_all_runs('currentConfig/update', lambda do |message, 
                                               puts 'Updated DB'
 
                                               # Notify Update
-                                              publish_current_config_update(new_config)
+                                              publish_current_config_update(app_id, run_id, new_config)
 
                                             end)
 
@@ -98,7 +98,7 @@ nutella.f.net.subscribe_to_all_runs('currentConfig/updated', lambda do |message,
                                                  configs = configs_db['configs']
                                                  id = '%d' % configs_db['currentConfig']
                                                  config = configs[id]
-                                                 publish_switch_config(config['mapping'])
+                                                 publish_switch_config(app_id, run_id, config['mapping'])
                                                rescue => exception
                                                  puts exception
                                                  puts exception.backtrace
@@ -127,7 +127,7 @@ nutella.f.net.subscribe_to_all_runs('channels/update', lambda do |message, app_i
                                          end
 
                                          # Notify Update
-                                         publish_channels_update(new_channels)
+                                         publish_channels_update(app_id, run_id, new_channels)
 
                                        end)
 
@@ -144,31 +144,31 @@ nutella.f.net.handle_requests_on_all_runs('channels/retrieve', lambda do |reques
                                                  end
                                                end)
 
-def publish_configs_update(configs)
-  nutella.f.net.publish_to_all_runs('configs/updated', configs)
+def publish_configs_update(app_id, run_id, configs)
+  nutella.f.net.publish_to_run(app_id, run_id, 'configs/updated', configs)
   puts 'Sent configs/updated'
 end
 
 # Sends the update config id
-def publish_current_config_update(config_id)
-  nutella.f.net.publish_to_all_runs('currentConfig/updated', config_id)
+def publish_current_config_update(app_id, run_id, config_id)
+  nutella.f.net.publish_to_run(app_id, run_id, 'currentConfig/updated', config_id)
   puts 'Sent currentConfig/updated'
 end
 
 # Sends the whole new current configuration
-def publish_switch_config(mapping)
-  nutella.f.net.publish_to_all_runs('currentConfig/switched', mapping)
+def publish_switch_config(app_id, run_id, mapping)
+  nutella.f.net.publish_to_run(app_id, run_id, 'currentConfig/switched', mapping)
   puts 'Sent currentConfig/switched'
 end
 
 # Sends the current config (mapping), which might have been updated
-def publish_mapping_update(mapping)
-  nutella.f.net.publish_to_all_runs('mapping/updated', mapping)
+def publish_mapping_update(app_id, run_id, mapping)
+  nutella.f.net.publish_to_run(app_id, run_id, 'mapping/updated', mapping)
   puts 'Sent mapping/updated'
 end
 
-def publish_channels_update(channels)
-  nutella.f.net.publish_to_all_runs('channels/updated', channels)
+def publish_channels_update(app_id, run_id, channels)
+  nutella.f.net.publish_to_run(app_id, run_id, 'channels/updated', channels)
   puts 'Sent channels/updated'
 end
 
