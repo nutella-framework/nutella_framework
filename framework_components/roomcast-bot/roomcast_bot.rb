@@ -151,24 +151,24 @@ end
 
 # Sends the update config id
 def publish_current_config_update(config_id)
-  nutella.net.publish_to_all_runs('currentConfig/updated', config_id)
+  nutella.f.net.publish_to_all_runs('currentConfig/updated', config_id)
   puts 'Sent currentConfig/updated'
 end
 
 # Sends the whole new current configuration
 def publish_switch_config(mapping)
-  nutella.net.publish_to_all_runs('currentConfig/switched', mapping)
+  nutella.f.net.publish_to_all_runs('currentConfig/switched', mapping)
   puts 'Sent currentConfig/switched'
 end
 
 # Sends the current config (mapping), which might have been updated
 def publish_mapping_update(mapping)
-  nutella.net.publish_to_all_runs('mapping/updated', mapping)
+  nutella.f.net.publish_to_all_runs('mapping/updated', mapping)
   puts 'Sent mapping/updated'
 end
 
 def publish_channels_update(channels)
-  nutella.net.publish_to_all_runs('channels/updated', channels)
+  nutella.f.net.publish_to_all_runs('channels/updated', channels)
   puts 'Sent channels/updated'
 end
 
