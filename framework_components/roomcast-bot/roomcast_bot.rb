@@ -76,6 +76,7 @@ nutella.f.net.subscribe_to_all_runs('currentConfig/update', lambda do |message, 
 
                                               puts 'currentConfig/update:'
                                               puts new_config
+                                              p from
 
                                               # Update
                                               if new_config != nil
@@ -91,14 +92,14 @@ nutella.f.net.subscribe_to_all_runs('currentConfig/update', lambda do |message, 
                                             end)
 
 # Reacts to updates to config id by publishing the updated mapping
-nutella.f.net.subscribe_to_all_runs('currentConfig/updated', lambda do |message, app_id, run_id, from|
+nutella.f.net.subscribe_to_all_runs('currentConfig/ack_updated', lambda do |message, app_id, run_id, from|
 
                                                begin
                                                  configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                  configs = configs_db['configs']
                                                  id = '%d' % configs_db['currentConfig']
                                                  config = configs[id]
-                                                 publish_switch_config(app_id, run_id, config['mapping'])
+                                                 publish_switch_config(app_id, run_id, config['mapping']) # TODO
                                                rescue => exception
                                                  puts exception
                                                  puts exception.backtrace
@@ -133,12 +134,18 @@ nutella.f.net.subscribe_to_all_runs('channels/update', lambda do |message, app_i
 
 nutella.f.net.handle_requests_on_all_runs('channels/retrieve', lambda do |request, app_id, run_id, from|
                                                  reply = {}
+
                                                  if request == {}
                                                    reply
                                                  elsif request == 'all'
-                                                   puts 'requesting channels'
+                                                   puts 'Requesting channels'
                                                    channels_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'channels')
                                                    reply = channels_db['channels']
+
+                                                   if reply == nil
+                                                     reply = {}
+                                                   end
+
                                                    puts reply
                                                    reply
                                                  end
@@ -149,9 +156,9 @@ def publish_configs_update(app_id, run_id, configs)
   puts 'Sent configs/updated'
 end
 
-# Sends the update config id
+# Sends the updated config id
 def publish_current_config_update(app_id, run_id, config_id)
-  nutella.f.net.publish_to_run(app_id, run_id, 'currentConfig/updated', config_id)
+  nutella.f.net.publish_to_run(app_id, run_id, 'currentConfig/ack_updated', config_id)
   puts 'Sent currentConfig/updated'
 end
 
