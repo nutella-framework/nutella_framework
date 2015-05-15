@@ -4,12 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>RoomCast - Package Creator</title>
-    <meta name="description" content="The interface to create activities as mappings of channels over packages.">
+    <title>RoomCast - Teacher controls</title>
+    <meta name="description" content="The interface to control the class activities in real-time.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="dist/main.css">
-    <link rel="stylesheet" type="text/css" href="dist/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="dist/css/ionicons.min.css">
 </head>
 
 <body>
@@ -22,7 +20,7 @@
     var query_parameters = NUTELLA.parseURLParameters();
 
     // Get an instance of nutella.
-    var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'configuration-interface');
+    var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'broadcasting-interface');
 
 </script>
 
@@ -45,6 +43,8 @@
 </script>
 
 <script src="dist/app.js"></script>
+
+
 
 </body>
 

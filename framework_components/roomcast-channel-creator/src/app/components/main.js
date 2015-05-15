@@ -142,10 +142,12 @@ var Main = React.createClass({
     getIds: function() {
         var channels = this.state.channels;
         var ids = [];
-        if(Object.keys(channels).length !== 0) {
-            for (var c in channels) {
-                if (channels.hasOwnProperty(c)) {
-                    ids.push(+c);
+        if(channels) {
+            if (Object.keys(channels).length !== 0) {
+                for (var c in channels) {
+                    if (channels.hasOwnProperty(c)) {
+                        ids.push(+c);
+                    }
                 }
             }
         }
@@ -168,8 +170,8 @@ var Main = React.createClass({
         this.saveLocalCatalogue();
 
         channels[newChannelId] = {
-            "name": " ",
-            "icon": "",
+            "name": "",
+            "icon": "#00bcd4",
             "screenshot": "http://localhost:57882/2413e677923c146b5ebbe4500b5580c9.png",
             "description": "",
             "url": "",

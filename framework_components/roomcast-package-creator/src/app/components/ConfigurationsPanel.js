@@ -81,7 +81,7 @@ var ConfigurationsPanel = React.createClass({
             });
 
             // Add last item: new configuration
-            menuItems.push({configId: 0, text: '', lastSavedName: 'Add configuration'});
+            menuItems.push({configId: 0, text: '', lastSavedName: 'Add activity'});
 
             dropdown = (<DropDownMenu
                 menuItems={menuItems}
@@ -98,7 +98,7 @@ var ConfigurationsPanel = React.createClass({
 
                 <Paper>
 
-                    <span className='config-title'> Configuration: </span>
+                    <span className='config-title'> Activity: </span>
 
                 {dropdown}
 

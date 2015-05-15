@@ -1,0 +1,6 @@
+{
+  "name": "roomcast-teacher-interface",
+  "version": "0.1.0",
+  "type": "interface",
+  "description": "The web interface of RoomCast teacher controls"
+}
