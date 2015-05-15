@@ -314,7 +314,6 @@ end)
 
 nutella.f.net.handle_requests_on_all_runs('monitoring/message', lambda do |request, appId, runId, from|
 
-  puts "Extract messages"
   application = request['application']
   instance = request['instance']
   channel = request['channel']
@@ -341,7 +340,6 @@ nutella.f.net.handle_requests_on_all_runs('monitoring/message', lambda do |reque
     messages.push(m)
   end
 
-  puts "Send messages"
   {:messages => messages}
 end)
 
