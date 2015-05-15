@@ -13,11 +13,7 @@ puts 'Initializing RoomCast...'
 #channelsData_db = nutella.persist.get_json_object_store('channels-data')
 
 nutella.f.net.subscribe_to_all_runs('configs/update', lambda do |message, app_id, run_id, from|
-
                                                       new_configs = message
-
-                                                      puts 'configs/update:'
-                                                      puts new_configs
 
                                                       # Update
                                                       configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
@@ -25,19 +21,17 @@ nutella.f.net.subscribe_to_all_runs('configs/update', lambda do |message, app_id
                                                         configs_db['configs'] = new_configs
                                                       end
 
-                                                      puts 'Updated DB'
-
-                                                      # Notify Update
-
                                                       # Notify change of all configs
                                                       publish_configs_update(app_id, run_id, new_configs)
 
                                                       # Notify possible change of current config
                                                       configs = configs_db['configs']
                                                       id = '%d' % configs_db['currentConfig']
+                                                      if id == nil
+                                                        id = 1
+                                                      end
                                                       config = configs[id]
                                                       publish_mapping_update(app_id, run_id, config['mapping'])
-
                                                     end)
 
 nutella.f.net.handle_requests_on_all_runs('configs/retrieve', lambda do |request, app_id, run_id, from|
@@ -47,7 +41,6 @@ nutella.f.net.handle_requests_on_all_runs('configs/retrieve', lambda do |request
                                                               elsif request == 'all'
                                                                 configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                                 reply = configs_db['configs']
-
                                                                 if reply == nil
                                                                   reply = {
                                                                       "1"=> {
@@ -67,37 +60,33 @@ nutella.f.net.handle_requests_on_all_runs('configs/retrieve', lambda do |request
                                                                                        }]
                                                                       }
                                                                   }
+                                                                  configs_db['currentConfig'] = 1
                                                                 end
-
-                                                                puts reply
                                                                 reply
                                                               end
                                                             end)
 
 # 'mapping' is the current running configuration
 nutella.f.net.handle_requests_on_all_runs('mapping/retrieve', lambda do |request, app_id, run_id, from|
-                                                              puts 'request: ' + request
                                                               reply = {}
                                                               if request == {}
                                                                 reply
                                                               elsif request == 'all'
                                                                 configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
-                                                                configs = configs_db['configs']
-                                                                id = '%d' % configs_db['currentConfig']
-                                                                config = configs[id]
-                                                                reply = config['mapping']
-                                                                puts reply
+                                                                if configs_db == nil
+                                                                  reply = []
+                                                                else
+                                                                  configs = configs_db['configs']
+                                                                  id = '%d' % configs_db['currentConfig']
+                                                                  config = configs[id]
+                                                                  reply = config['mapping']
+                                                                end
                                                                 reply
                                                               end
                                                             end)
 
 nutella.f.net.subscribe_to_all_runs('currentConfig/update', lambda do |message, app_id, run_id, from|
-
                                                             new_config = message
-
-                                                            puts 'currentConfig/update:'
-                                                            puts new_config
-                                                            p from
 
                                                             # Update
                                                             if new_config != nil
@@ -105,41 +94,31 @@ nutella.f.net.subscribe_to_all_runs('currentConfig/update', lambda do |message, 
                                                               configs_db['currentConfig'] = new_config
                                                             end
 
-                                                            puts 'Updated DB'
-
                                                             # Notify Update
                                                             publish_current_config_update(app_id, run_id, new_config)
-
                                                           end)
 
 # Reacts to updates to config id by publishing the updated mapping
 nutella.f.net.subscribe_to_all_runs('currentConfig/ack_updated', lambda do |message, app_id, run_id, from|
-
                                                                  begin
                                                                    configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                                    configs = configs_db['configs']
                                                                    id = '%d' % configs_db['currentConfig']
                                                                    config = configs[id]
-                                                                   publish_switch_config(app_id, run_id, config['mapping']) # TODO
-                                                                 rescue => exception
-                                                                   puts exception
-                                                                   puts exception.backtrace
-                                                                   raise exception
+                                                                   publish_switch_config(app_id, run_id, config['mapping'])
                                                                  end
-
                                                                end)
 
 nutella.f.net.handle_requests_on_all_runs('currentConfig/retrieve', lambda do |request, app_id, run_id, from|
-                                                                    puts 'request: ' + request
-                                                                    reply = {}
                                                                     configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                                     reply = configs_db['currentConfig']
-                                                                    puts reply
+                                                                    if reply == nil
+                                                                      reply = 1
+                                                                    end
                                                                     reply
                                                                   end)
 
 nutella.f.net.subscribe_to_all_runs('channels/update', lambda do |message, app_id, run_id, from|
-
                                                        new_channels = message
 
                                                        # Update
@@ -150,22 +129,18 @@ nutella.f.net.subscribe_to_all_runs('channels/update', lambda do |message, app_i
 
                                                        # Notify Update
                                                        publish_channels_update(app_id, run_id, new_channels)
-
                                                      end)
 
 nutella.f.net.handle_requests_on_all_runs('channels/retrieve', lambda do |request, app_id, run_id, from|
                                                                reply = {}
-
                                                                if request == {}
                                                                  reply
                                                                elsif request == 'all'
                                                                  channels_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'channels')
                                                                  reply = channels_db['channels']
-
                                                                  if reply == nil
                                                                    reply = {}
                                                                  end
-
                                                                  reply
                                                                end
                                                              end)
