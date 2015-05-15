@@ -142,7 +142,7 @@ var Main = React.createClass({
     getIds: function() {
         var channels = this.state.channels;
         var ids = [];
-        console.log('channels');
+        console.log('channels:', channels);
         if(channels) {
             if (Object.keys(channels).length !== 0) {
                 for (var c in channels) {
