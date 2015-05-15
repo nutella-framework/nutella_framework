@@ -38,9 +38,6 @@ var Channel = React.createClass({
             backgroundSize: '100% 100%'
         };
 
-        //<img className='channel-screenshot' src={this.props.channel.screenshot}> </img>
-        //onTouchStart={this.handleClick} >
-
         return (
             <Paper className='channel' style={style} ref='channelRef' onTouchTap={this.handleClick} >
 

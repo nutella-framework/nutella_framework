@@ -37,7 +37,6 @@ var ActivityCard = React.createClass({
         var publishAfterTransition = function() {
             var action = function() {
                 nutella.net.publish('currentConfig/update', +self.props.configId);
-                console.log('published currentConfig/update', +self.props.configId);
             };
             self._timeoutId = setTimeout(action, self._timerDuration);
         };
