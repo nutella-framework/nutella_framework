@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+
+    <meta name="description" content="">
+
+    <title>Monitoring Interface</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link href="css/page.css" rel="stylesheet" type="text/css">
+    <link href="css/cursor.css" rel="stylesheet" type="text/css">
+    <link href="css/ui-connection-view.css" rel="stylesheet" type="text/css">
+    <link href="css/ui-application.css" rel="stylesheet" type="text/css">
+    <link href="css/ui-legend-view.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/highlight.default.min.css">
+
+    <script type="application/javascript" src="js/lib/d3.v3.min.js" charset="utf-8"></script>
+    <script type="application/javascript" src="js/lib/underscore-min.js" charset="utf-8"></script>
+    <script type="application/javascript" src="js/lib/jquery-1.10.0.min.js" charset="utf-8"></script>
+    <script type="application/javascript" src="js/lib/bootstrap.min.js" charset="utf-8"></script>
+    <script type="application/javascript" src="js/lib/highlight.min.js"></script>
+
+    <script type="application/javascript" src="js/lib/react-with-addons-0.12.2.js"></script>
+    <script type="application/javascript" src="js/lib/JSXTransformer-0.12.2.js"></script>
+
+    <script type="application/javascript" src="js/d3/layout/radial-layout.js"></script>
+    <script type="application/javascript" src="js/d3/layout/grid-layout.js"></script>
+
+    <script type="application/javascript" src="js/notification/notifications.js"></script>
+    <script type="application/javascript" src="js/notification/notification-center.js"></script>
+
+    <script type="application/javascript" src="js/model/applications-model.js"></script>
+    <script type="application/javascript" src="js/model/messages-model.js"></script>
+    <script type="application/javascript" src="js/model/alerts-model.js"></script>
+
+    <script type="application/javascript" src="js/view-controller/view-controller.js"></script>
+    <script type="application/javascript" src="js/view-controller/window-view-controller.js"></script>
+    <script type="application/javascript" src="js/view-controller/application-view-controller.js"></script>
+    <script type="application/javascript" src="js/view-controller/instance-view-controller.js"></script>
+
+    <script type="application/javascript" src="js/d3/plugin/graphics.js"></script>
+    <script type="application/javascript" src="js/d3/plugin/tab-table.js"></script>
+
+    <script type="application/javascript" src="js/d3/ui/animations.js"></script>
+    <script type="application/javascript" src="js/d3/ui/ui-element.js"></script>
+    <script type="application/javascript" src="js/d3/ui/ui-legend.js"></script>
+    <script type="application/javascript" src="js/d3/ui/ui-notification.js"></script>
+    <script type="application/javascript" src="js/d3/ui/ui-application.js"></script>
+    <script type="application/javascript" src="js/d3/ui/ui-connection-view.js"></script>
+    <script type="application/javascript" src="js/d3/ui/ui-tab.js"></script>
+
+    <script type="application/javascript" src="js/react/dist/ui-messages.js"></script>
+    <script type="application/javascript" src="js/react/dist/ui-alerts.js"></script>
+    <script type="application/javascript" src="js/react/dist/ui-message-send.js"></script>
+
+    <!-- Scripts -->
+    <script src="js/lib/nutella_lib.js"></script>
+
+</head>
+<body style="margin: 0">
+
+<svg id="container"></svg>
+
+<!-- Message display -->
+<div class="modal fade" id="messageDisplay" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<!-- Message send -->
+<div class="modal fade" id="messageSend" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+<!-- Mail -->
+<div class="modal fade" id="mailDisplay" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
+
+</body>
+
+<script  type="text/jsx">
+    // Initialize react components here
+
+    React.render(
+            <UIMessages/>,
+            document.getElementById('messageDisplay')
+    );
+
+    React.render(
+            <UIAlerts/>,
+            document.getElementById('mailDisplay')
+    );
+
+    React.render(
+            <UIMessageSend/>,
+            document.getElementById('messageSend')
+    );
+</script>
+
+<script>
+    $("#subscribeButton").on("click", function() {
+        var email = $("#subscribeEmail").val();
+        alert("ciao " + email);
+    });
+</script>
+
+<script>
+
+    // Parse the query parameters
+    var query_parameters = NUTELLA.parseURLParameters();
+
+    var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'monitoring-interface');
+
+    var nutellaFramework = NUTELLA.initFramework(query_parameters.broker, 'monitoring-interface');
+
+    // Nutella request
+//    var email = "gianluca.91@gmail.com";
+//
+//    nutella.net.request("mail/send_subscription", {to: email, application: "palloSinistro", instance:"palloDestro", component:"e la minchia"});
+//    nutella.net.request("mail/send_notification", {to: email, application: "palloSinistro", instance:"palloDestro"});
+
+    var svg = d3.select("#container");
+
+    // Set background color
+    svg.style("background", defaultPalette.background.normal);
+
+    windowViewController.view = svg;
+    windowViewController.updateViewBox();
+
+    applicationModel.fetchData("data/data.json");
+
+    /*
+    var c = 0;
+    window.setInterval(function(){
+        console.log("change");
+        if(c%4 == 0)
+            applicationModel.fetchData("data/data2.json");
+        else if(c%4 == 1)
+            applicationModel.fetchData("data/data3.json");
+        else if(c%4 == 2)
+            applicationModel.fetchData("data/data4.json");
+        else
+            applicationModel.fetchData("data/data.json");
+        c++;
+    }, 5000);
+    */
+</script>
+
+</html>
