@@ -1,4 +1,5 @@
 [
+  "monitoring-bot",
   "logging_bot",
   "runs_list_bot",
   "main_interface",

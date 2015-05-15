@@ -1,0 +1,6 @@
+{
+	"name": "monitoring-interface",
+	"version": "0.0.1",
+	"type": "interface",
+	"description": "The web interface of Monitoring"
+}

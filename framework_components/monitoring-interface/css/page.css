@@ -1,0 +1,41 @@
+body {
+    font-family: sans-serif;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.modal-content {
+    border-radius: 0!important;
+}
+
+.btn {
+    border-radius: 0!important;
+}
+
+.modal-messages {
+    width: 80%; /* desired relative width */
+    /* place center */
+    margin-left:auto;
+    margin-right:auto;
+}
+
+code {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+.modal-backdrop {
+    position: fixed;
+}
+
+#modalLabel {
+    text-align: center;
+}

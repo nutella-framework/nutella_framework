@@ -320,8 +320,17 @@ nutella.f.net.handle_requests_on_all_runs('monitoring/message', lambda do |reque
 
   messages = []
 
-  collection.find({'channel' => '/nutella/apps/crepe/runs/default/location/resources'}).sort({:_id => -1}).limit(5).each do |message|
-    messages.push(message)
+  collection.find({'channel' => "/nutella/apps/#{application}/runs/#{instance}/#{channel}"}).sort({:_id => -1}).limit(5).each do |message|
+    m = {
+        'from' => '',
+        'to' => '',
+        'from' => '',
+        'date' => message['_id'],
+        'type' => message['message']['type'],
+        'payload' => message['message']['payload']
+    }
+    puts m['date']
+    messages.push(m)
   end
 
   {:messages => messages}
