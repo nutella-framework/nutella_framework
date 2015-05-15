@@ -67,8 +67,10 @@ module Nutella
         console.warn 'The current directory is not a nutella application'
         return
       end
-      # Run script
-      return unless run_script_for_all_bots_in( Dir.pwd, script, in_progress_message )
+      # Run script for all bots
+      return unless run_script_for_components_in( "#{Dir.pwd}/bots", script, in_progress_message )
+      # Run script for all interfaces
+      return unless run_script_for_components_in( "#{Dir.pwd}/interfaces", script, in_progress_message )
       # Output success message
       console.success "All #{complete_message} for #{Nutella.current_app.config['name']}"
     end
@@ -77,17 +79,17 @@ module Nutella
     private
 
 
-    # Runs a script for each bot in a certain directory.
+    # Runs a script for each component in a certain directory.
     # Message is displayed in case something goes wrong
-    def run_script_for_all_bots_in( dir, script, message )
-      ComponentsList.for_each_component_in_dir dir do |bot|
-        # Skip bot if there is no script
-        next unless File.exist? "#{dir}/bots/#{bot}/#{script}"
+    def run_script_for_components_in( dir, script, message )
+      ComponentsList.for_each_component_in_dir dir do |component|
+        # Skip component if there is no script
+        next unless File.exist? "#{dir}/#{component}/#{script}"
         # Output message
-        console.info "#{message} bot #{bot}."
+        console.info "#{message} #{component}."
         # Execute 'script' script
         cur_dir = Dir.pwd
-        Dir.chdir "#{dir}/bots/#{bot}"
+        Dir.chdir "#{dir}/#{component}"
         system "./#{script}"
         Dir.chdir cur_dir
       end
