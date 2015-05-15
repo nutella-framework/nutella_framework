@@ -5,6 +5,7 @@ require_relative '../../lib/commands/util/components_list'
 require 'active_support/core_ext/object/deep_dup'
 require 'mandrill'
 require 'mongo'
+require 'bson'
 
 # Framework bots can access all the parameters they need directly
 # from the configuration file and the runlist,
@@ -312,6 +313,8 @@ nutella.f.net.handle_requests_on_all_runs('monitoring/application', lambda do |r
 end)
 
 nutella.f.net.handle_requests_on_all_runs('monitoring/message', lambda do |request, appId, runId, from|
+
+  puts "Extract messages"
   application = request['application']
   instance = request['instance']
   channel = request['channel']
@@ -320,19 +323,25 @@ nutella.f.net.handle_requests_on_all_runs('monitoring/message', lambda do |reque
 
   messages = []
 
-  collection.find({'channel' => "/nutella/apps/#{application}/runs/#{instance}/#{channel}"}).sort({:_id => -1}).limit(5).each do |message|
+  timestamp_low = (Time.now-3600).to_f # Last hour
+  timestamp_high = Time.now.to_f
+  object_id_low = BSON::ObjectId.from_string((timestamp_low).floor.to_s(16) + "0000000000000000")
+  object_id_high = BSON::ObjectId.from_string((timestamp_high).floor.to_s(16) + "0000000000000000")
+
+
+  collection .find({ '_id' => { '$gt' => object_id_low, '$lt' => object_id_high }, 'channel' => "/nutella/apps/#{application}/runs/#{instance}/#{channel}"}).sort({'_id' => -1}).limit(50).each do |message|
     m = {
         'from' => '',
         'to' => '',
         'from' => '',
-        'date' => message['_id'],
+        'date' => message['_id'].generation_time.getlocal.to_s,
         'type' => message['message']['type'],
         'payload' => message['message']['payload']
     }
-    puts m['date']
     messages.push(m)
   end
 
+  puts "Send messages"
   {:messages => messages}
 end)
 
