@@ -142,7 +142,7 @@ var PoolRow = React.createClass({
                     <div className='text-field-div'>
                         <TextField
                             ref={'textField' + this.props.rowIndex}
-                            hintText={'Group name'}
+                            hintText={'Package name'}
                             value={this.props.resourceWithChannels.name}
                             multiLine={true}
                             onChange={this.handleTextFieldChange}/>
