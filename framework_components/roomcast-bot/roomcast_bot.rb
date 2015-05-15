@@ -100,13 +100,15 @@ nutella.f.net.subscribe_to_all_runs('currentConfig/update', lambda do |message, 
 
 # Reacts to updates to config id by publishing the updated mapping
 nutella.f.net.subscribe_to_all_runs('currentConfig/ack_updated', lambda do |message, app_id, run_id, from|
-                                                                 begin
-                                                                   configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
-                                                                   configs = configs_db['configs']
-                                                                   id = '%d' % configs_db['currentConfig']
-                                                                   config = configs[id]
-                                                                   publish_switch_config(app_id, run_id, config['mapping'])
-                                                                 end
+                                                                 configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
+                                                                 configs = configs_db['configs']
+                                                                 id = '%d' % configs_db['currentConfig']
+                                                                 config = configs[id]
+                                                                 publish_switch_config(app_id, run_id, config['mapping'])
+
+                                                                 # Publish activity name on RoomCast API
+                                                                 activity_name = config['name']
+                                                                 publish_activity_update(app_id, run_id, activity_name)
                                                                end)
 
 nutella.f.net.handle_requests_on_all_runs('currentConfig/retrieve', lambda do |request, app_id, run_id, from|
@@ -147,31 +149,50 @@ nutella.f.net.handle_requests_on_all_runs('channels/retrieve', lambda do |reques
 
 def publish_configs_update(app_id, run_id, configs)
   nutella.f.net.publish_to_run(app_id, run_id, 'configs/updated', configs)
-  puts 'Sent configs/updated'
 end
 
 # Sends the updated config id
 def publish_current_config_update(app_id, run_id, config_id)
   nutella.f.net.publish_to_run(app_id, run_id, 'currentConfig/ack_updated', config_id)
-  puts 'Sent currentConfig/updated'
 end
 
 # Sends the whole new current configuration
 def publish_switch_config(app_id, run_id, mapping)
   nutella.f.net.publish_to_run(app_id, run_id, 'currentConfig/switched', mapping)
-  puts 'Sent currentConfig/switched'
 end
 
 # Sends the current config (mapping), which might have been updated
 def publish_mapping_update(app_id, run_id, mapping)
   nutella.f.net.publish_to_run(app_id, run_id, 'mapping/updated', mapping)
-  puts 'Sent mapping/updated'
 end
 
 def publish_channels_update(app_id, run_id, channels)
   nutella.f.net.publish_to_run(app_id, run_id, 'channels/updated', channels)
-  puts 'Sent channels/updated'
 end
+
+################ RoomCast API ################
+
+# Returns the name of the current running activity
+nutella.f.net.handle_requests_on_all_runs('roomcast/activity', lambda do |request, app_id, run_id, from|
+                                                               reply = {}
+                                                               configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
+                                                               id = '%d' % configs_db['currentConfig']
+                                                               if id != nil
+                                                                 configs = configs_db['configs']
+                                                                 if configs != nil
+                                                                   config = configs[id]
+                                                                   reply = config['name']
+                                                                 end
+                                                               end
+                                                               reply
+                                                             end)
+
+# Notifies a change of current running activity
+def publish_activity_update(app_id, run_id, activity_name)
+  nutella.f.net.publish_to_run(app_id, run_id, 'roomcast/new_activity', activity_name)
+end
+
+##############################################
 
 puts 'Initialization complete.'
 
