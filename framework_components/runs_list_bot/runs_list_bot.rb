@@ -27,6 +27,10 @@ nutella.f.net.handle_requests('runs_list', lambda do |req, from|
   Nutella.runlist.all_runs
 end)
 
+# Listen for runs_list requests at run level (done by Roomcast iPad interface)
+nutella.f.net.handle_requests_on_all_runs('runs_list', lambda do |req, app_id, run_id, from|
+  Nutella.runlist.all_runs
+end)
 
 # Whenever the runs list is updated, fire an updated runlist to all the apps and all framework components
 p = Nutella.runlist.all_runs
