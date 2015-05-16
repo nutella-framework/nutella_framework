@@ -11,6 +11,7 @@ gem 'slop', '~>4.0'
 gem 'nutella_lib','~>0.4', '>=0.4.12'
 gem 'activesupport', '~>4.2'
 gem 'mandrill-api', '~>1.0', '>=1.0.53'
+gem 'bson', '~> 3.0'
 
 group :development do
   gem 'shoulda', '~> 3.0'

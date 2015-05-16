@@ -46,7 +46,7 @@ var UIMessages = React.createClass({
                         <a data-toggle="collapse" data-parent="#accordion" href={"#collapse"+index} aria-expanded="true" aria-controls={"collapse"+index}>
                             <div className="panel-heading" role="tab" id="headingOne">
                                 <h4 className="panel-title">
-                                {date.getUTCDate()+"/"+(date.getUTCMonth()+1)+"/"+date.getUTCFullYear()+" "+date.getUTCHours()+":"+date.getUTCMinutes()+":"+date.getUTCSeconds()+"."+date.getUTCMilliseconds()+
+                                {date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds()+"."+date.getMilliseconds()+
                                 " - "+message.type}
                                 </h4>
                             </div>
@@ -72,7 +72,7 @@ var UIMessages = React.createClass({
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h4 className="modal-title" id="modalLabel">Message display</h4>
+                        <h4 className="modal-title" id="modalLabel">Message display for channel <span className="label label-default">{messageModel.channel}</span></h4>
                         <svg style={{height: "40px", width: "100%"}} viewBox="0 0 1000 40">
                             <text x="50" y="20" textAnchor="middle" fill="black">{this.state.to}</text>
                             <text x="950" y="20" textAnchor="middle" fill="black">{this.state.from}</text>

@@ -46,7 +46,7 @@ var UIMessages = React.createClass({displayName: "UIMessages",
                         React.createElement("a", {"data-toggle": "collapse", "data-parent": "#accordion", href: "#collapse"+index, "aria-expanded": "true", "aria-controls": "collapse"+index}, 
                             React.createElement("div", {className: "panel-heading", role: "tab", id: "headingOne"}, 
                                 React.createElement("h4", {className: "panel-title"}, 
-                                date.getUTCDate()+"/"+(date.getUTCMonth()+1)+"/"+date.getUTCFullYear()+" "+date.getUTCHours()+":"+date.getUTCMinutes()+":"+date.getUTCSeconds()+"."+date.getUTCMilliseconds()+
+                                date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds()+"."+date.getMilliseconds()+
                                 " - "+message.type
                                 )
                             )
@@ -72,7 +72,7 @@ var UIMessages = React.createClass({displayName: "UIMessages",
                         React.createElement("button", {type: "button", className: "close", "data-dismiss": "modal", "aria-label": "Close"}, 
                             React.createElement("span", {"aria-hidden": "true"}, "×")
                         ), 
-                        React.createElement("h4", {className: "modal-title", id: "modalLabel"}, "Message display"), 
+                        React.createElement("h4", {className: "modal-title", id: "modalLabel"}, "Message display for channel ", React.createElement("span", {className: "label label-default"}, messageModel.channel)), 
                         React.createElement("svg", {style: {height: "40px", width: "100%"}, viewBox: "0 0 1000 40"}, 
                             React.createElement("text", {x: "50", y: "20", textAnchor: "middle", fill: "black"}, this.state.to), 
                             React.createElement("text", {x: "950", y: "20", textAnchor: "middle", fill: "black"}, this.state.from), 
