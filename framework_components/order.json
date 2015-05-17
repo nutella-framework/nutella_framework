@@ -5,5 +5,6 @@
   "main_interface",
   "beacon-cloud-bot",
   "binary-files-manager",
-  "roomcast-bot"
+  "roomcast-bot",
+  "room-places-bot"
 ]
