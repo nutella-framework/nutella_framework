@@ -1,22 +1,15 @@
+require_relative '../../lib/config/runlist'
+require_relative '../../lib/config/config'
+require_relative '../../nutella_lib/framework_core'
+require_relative '../../lib/commands/util/components_list'
 require 'nutella_lib'
 require 'net/http'
 require 'net/https'
 require 'uri'
 require 'json'
 
-# Configuration part
-# ----- Estimote ------
-
-$estimote_url = 'https://cloud.estimote.com/v1/beacons'
-$estimote_user = 'app_20ubacrvcr'
-$estimote_pass = 'aaa1c1e666642c3643ee74dda4145093'
-
-# Parse command line arguments
-broker, app_id, run_id = nutella.parse_args ARGV
-# Extract the component_id
-component_id = nutella.extract_component_id
-# Initialize nutella
-nutella.init(broker, app_id, run_id, component_id)
+# Initialize this bot as framework component
+nutella.f.init(Nutella.config['broker'], 'room_places_bot')
 
 # Buffer object that caches all the updates
 class RoomPlacesCachePublish
@@ -79,46 +72,46 @@ class RoomPlacesCachePublish
     }
   end
 
-  def publish_update
+  def publish_update(app_id, run_id)
     @s6.synchronize {
       if @resource_updated.length > 0
-        nutella.net.publish('location/resources/updated', {:resources => @resource_updated.values})
+        nutella.f.net.publish_to_run(app_id, run_id, 'location/resources/updated', {:resources => @resource_updated.values})
         @resource_updated = {}
       end
     }
   end
 
-  def publish_add
+  def publish_add(app_id, run_id)
     @s7.synchronize {
       if @resource_added.length > 0
-        nutella.net.publish('location/resources/added', {:resources => @resource_added})
+        nutella.f.net.publish_to_run(app_id, run_id, 'location/resources/added', {:resources => @resource_added})
         @resource_added = []
       end
     }
   end
 
-  def publish_remove
+  def publish_remove(app_id, run_id)
     @s8.synchronize {
       if @resource_removed.length > 0
-        nutella.net.publish('location/resources/removed', {:resources => @resource_removed})
+        nutella.f.net.publish_to_run(app_id, run_id, 'location/resources/removed', {:resources => @resource_removed})
         @resource_removed = []
       end
     }
   end
 
-  def publish_enter
+  def publish_enter(app_id, run_id)
     @s9.synchronize {
       @resource_entered.each do |baseStationRid, resources|
-        nutella.net.publish("location/resource/static/#{baseStationRid}/enter", {'resources' => resources})
+        nutella.f.net.publish_to_run(app_id, run_id, "location/resource/static/#{baseStationRid}/enter", {'resources' => resources})
       end
       @resource_entered = {}
     }
   end
 
-  def publish_exit
+  def publish_exit(app_id, run_id)
     @s10.synchronize {
       @resource_exited.each do |baseStationRid, resources|
-        nutella.net.publish("location/resource/static/#{baseStationRid}/exit", {'resources' => resources})
+        nutella.f.net.publish_to_run(app_id, run_id, "location/resource/static/#{baseStationRid}/exit", {'resources' => resources})
       end
       @resource_exited = {}
     }
@@ -131,136 +124,95 @@ $cache = RoomPlacesCachePublish.new
 puts 'Room places initialization'
 
 # Open the resources database
-$resources = nutella.persist.get_json_object_store('resources')
-#$resources = nutella.persist.get_mongo_object_store('resources')
-$groups = nutella.persist.get_json_object_store('groups')
-$room = nutella.persist.get_json_object_store('room')
-$discrete_tracking = nutella.persist.get_json_object_store('discrete_tracking')
+#$resources = nutella.f.persist.get_mongo_object_store('resources')
+#$groups = nutella.f.persist.get_mongo_object_store('groups')
+#$room = nutella.f.persist.get_mongo_object_store('room')
+#$discrete_tracking = nutella.f.persist.get_mongo_object_store('discrete_tracking')
 
 # Create new resource
-nutella.net.subscribe('location/resource/add', lambda do |message, from|
-										rid = message['rid']
-										type = message['type']
-										model = message['model']
-										proximity_range = message['proximity_range']
+nutella.f.net.subscribe_to_all_runs('location/resource/add', lambda do |message, app_id, run_id, from|
+  # Persistent data
+  resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
 
-										if proximity_range == nil
-											proximity_range = 0
-										end
+  rid = message['rid']
+  type = message['type']
+  model = message['model']
+  proximity_range = message['proximity_range']
 
-										if rid != nil && type != nil && model != nil
-                      if $resources[rid] == nil
-                        if type == 'STATIC'
-                          $resources[rid]={:rid => rid,
-                              :type => type,
-                              :model => model,
-                              :proximity_range => proximity_range,
-                              :parameters => {}
-                            };
-                        elsif type == 'DYNAMIC'
-                          $resources[rid]={:rid => rid,
-                              :type => type,
-                              :model => model,
-                              :parameters => {}
-                            }
-                        end
-                        publishResourceAdd($resources[rid])
-                        $cache.publish_add
-                        puts('Added resource')
-                      end
+  if proximity_range == nil
+    proximity_range = 0
+  end
 
-										end
-									end)
+  if rid != nil && type != nil && model != nil
+    if resources[rid] == nil
+      if type == 'STATIC'
+        resources[rid]={:rid => rid,
+            :type => type,
+            :model => model,
+            :proximity_range => proximity_range,
+            :parameters => {}
+          };
+      elsif type == 'DYNAMIC'
+        resources[rid]={:rid => rid,
+            :type => type,
+            :model => model,
+            :parameters => {}
+          }
+      end
+      publishResourceAdd(resources[rid])
+      $cache.publish_add(app_id, run_id)
+      puts('Added resource')
+    end
+
+  end
+end)
 
 # Remove resource
-nutella.net.subscribe('location/resource/remove', lambda do |message, from|
-										rid = message['rid']
-										if rid != nil
+nutella.f.net.subscribe_to_all_runs('location/resource/remove', lambda do |message, app_id, run_id, from|
+  resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
 
-                      resourceCopy = $resources[rid]
-                      $resources.delete(rid)
-                      publishResourceRemove(resourceCopy)
-                      $cache.publish_remove
-                      puts('Removed resource')
+  rid = message['rid']
+  if rid != nil
 
-										end
-									end)
+    resourceCopy = resources[rid]
+    resources.delete(rid)
+    publishResourceRemove(resourceCopy)
+    $cache.publish_remove(app_id, run_id)
+    puts('Removed resource')
 
-# Create new group
-nutella.net.subscribe('location/group/add', lambda do |message, from|
-										group = message['group']
-										if group != nil
+  end
+end)
 
-                      g=$groups[group]
-                      if g == nil
-                        $groups[group] = {:resources => []}
-                      end
-                      puts('Added group')
-
-										end
-									end)
-
-# Remove group
-nutella.net.subscribe('location/group/remove', lambda do |message, from|
-										group = message['group']
-										if rid != nil
-                      g=$groups[group]
-                      if g != nil
-                        $groups.delete(group);
-                      end
-                      puts('Removed group')
-
-										end
-									end)
-
-# Add resource to group
-nutella.net.subscribe('location/group/resource/add', lambda do |message, from|
-										rid = message['rid']
-										group = message['group']
-										if rid != nil && group != nil
-											resource = nil
-											resource = $resources[rid]
-
-											if resource != nil
-												puts 'The resource exixts'
-                        # The group exists and the resource is not yet present
-                        if $groups[group] != nil && !default['resources'].include?(rid)
-                          $groups[group]['resources'].push(rid)
-                          puts 'Added resources to group'
-                        else
-                          puts 'The group doesn\'t exist or the resource is already in it'
-                        end
-
-											else
-												puts 'The resource doesn\'t exist'
-											end
-										end
-									end)
 
 # Update the location of the resources
-nutella.net.subscribe('location/resource/update', lambda do |message, from|
-    updateResource(message)
+nutella.f.net.subscribe_to_all_runs('location/resource/update', lambda do |message, app_id, run_id, from|
+  updateResource(app_id, run_id, message)
 
-    $cache.publish_update
-    $cache.publish_exit
-    $cache.publish_enter
-  end)
+  $cache.publish_update(app_id, run_id)
+  $cache.publish_exit(app_id, run_id)
+  $cache.publish_enter(app_id, run_id)
+end)
 
 # Update the location of the resources
-nutella.net.subscribe('location/resources/update', lambda do |message, from|
+nutella.f.net.subscribe_to_all_runs('location/resources/update', lambda do |message, app_id, run_id, from|
     resources = message['resources']
     if resources != nil
       resources.each do |resource|
-        updateResource(resource)
+        updateResource(app_id, run_id, resource)
       end
     end
 
-    $cache.publish_update
-    $cache.publish_exit
-    $cache.publish_enter
+    $cache.publish_update(app_id, run_id)
+    $cache.publish_exit(app_id, run_id)
+    $cache.publish_enter(app_id, run_id)
   end)
 
-def updateResource(updatedResource)
+def updateResource(app_id, run_id, updatedResource)
+  puts updatedResource
+  resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
+  room = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'room')
+  discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
+
   rid = updatedResource['rid']
   type = updatedResource['type']
   proximity = updatedResource['proximity']
@@ -273,27 +225,27 @@ def updateResource(updatedResource)
   # Retrieve $room data
   r = {}
 
-  if $room['x'] == nil || $room['y'] == nil
+  if room['x'] == nil || room['y'] == nil
     r['x'] = 10
     r['y'] = 7
   else
-    r['x'] = $room['x']
-    r['y'] = $room['y']
+    r['x'] = room['x']
+    r['y'] = room['y']
   end
 
-  if $room['z'] != nil
-    r['z'] = $room['z']
+  if room['z'] != nil
+    r['z'] = room['z']
   end
 
 
-  resource = $resources[rid]
+  resource = resources[rid]
 
   if resource == nil
     return
   end
 
   if proximity != nil && proximity['rid'] != nil && proximity['distance'] != nil
-    baseStation = $resources[proximity['rid']]
+    baseStation = resources[proximity['rid']]
 
     if baseStation != nil
 
@@ -309,7 +261,7 @@ def updateResource(updatedResource)
             resource['proximity'] = proximity
             resource['proximity']['timestamp'] = Time.now.to_f
           end
-          computeResourceUpdate(oldBaseStationRid)
+          computeResourceUpdate(app_id, run_id, oldBaseStationRid)
         else
           resource['proximity'] = proximity
           resource['proximity']['timestamp'] = Time.now.to_f
@@ -344,7 +296,7 @@ def updateResource(updatedResource)
     end
   end
 
-  if $discrete_tracking['x'] != nil
+  if discrete_tracking['x'] != nil
     if discrete != nil
 
       # Translate all coordinates in numbers
@@ -356,14 +308,14 @@ def updateResource(updatedResource)
       end
 
 
-      if discrete['x'] > $discrete_tracking['n_x'] - 1
-        discrete['x'] = $discrete_tracking['n_x'] - 1
+      if discrete['x'] > discrete_tracking['n_x'] - 1
+        discrete['x'] = discrete_tracking['n_x'] - 1
       end
       if discrete['x'] < 0
         discrete['x'] = 0
       end
-      if discrete['y'] > $discrete_tracking['n_y'] - 1
-        discrete['y'] = $discrete_tracking['n_y'] - 1
+      if discrete['y'] > discrete_tracking['n_y'] - 1
+        discrete['y'] = discrete_tracking['n_y'] - 1
       end
       if discrete['y'] < 0
         discrete['y'] = 0
@@ -432,31 +384,34 @@ def updateResource(updatedResource)
 
   end
 
-  $resources[rid]=resource
-  computeResourceUpdate(rid)
+  resources[rid]=resource
+  computeResourceUpdate(app_id, run_id, rid)
 
 end
 
 # Request the position of a single resource
-nutella.net.handle_requests('location/resources', lambda do |request, from|
+nutella.f.net.handle_requests_on_all_runs('location/resources', lambda do |request, app_id, run_id, from|
+  resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
+  groups = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'groups')
+
   puts 'Send list of resources'
 
 	rid = request['rid']
 	group = request['group']
 	reply = nil
 	if rid != nil
-    reply = $resources[rid]
+    reply = resources[rid]
 
 		reply
 	elsif group != nil
 		rs = []
 		reply = []
-    for resource in $groups[group]['resources']
+    for resource in groups[group]['resources']
       rs.push(resource)
     end
 
 		for r in rs
-      resource = $resources[resource]
+      resource = resources[resource]
       # Translate discrete coordinate
       if resource['discrete'] != nil
         resource['discrete'] = translateDiscreteCoordinates(resource['discrete'])
@@ -468,8 +423,7 @@ nutella.net.handle_requests('location/resources', lambda do |request, from|
 	else
 		resourceList = []
 
-    for resource in $resources.keys()
-      resource = $resources[resource]
+    resources.to_h.each do |_, resource|
       # Translate discrete coordinate
       if resource['discrete'] != nil
         resource['discrete'] = translateDiscreteCoordinates(resource['discrete'])
@@ -482,35 +436,38 @@ nutella.net.handle_requests('location/resources', lambda do |request, from|
 end)
 
 # Update the room size
-nutella.net.subscribe('location/room/update', lambda do |message, from|
-												x = message['x']
-												y = message['y']
-												z = message['z']
+nutella.f.net.subscribe_to_all_runs('location/room/update', lambda do |message, app_id, run_id, from|
+  room = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'room')
 
-												if x != nil && y != nil
-													r = {}
-                          $room['x'] = x
-                          r['x'] = x
+  x = message['x']
+  y = message['y']
+  z = message['z']
 
-                          $room['y'] = y
-                          r['y'] = y
+  if x != nil && y != nil
+    r = {}
+    room['x'] = x
+    r['x'] = x
 
-                          if z != nil
-                            $room['z'] = z
-                            r['z'] = z
-                          end
+    room['y'] = y
+    r['y'] = y
 
-													publishRoomUpdate(r)
-													puts 'Room updated'
-												end
-											end)
+    if z != nil
+      room['z'] = z
+      r['z'] = z
+    end
+
+    publishRoomUpdate(app_id, run_id, r)
+    puts 'Room updated'
+  end
+end)
 
 # Compute and publish resource
-def computeResourceUpdate(rid)
+def computeResourceUpdate(app_id, run_id, rid)
+  resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
 
   resource = nil
 
-  resource = $resources[rid]
+  resource = resources[rid]
 
   if resource != nil
     if resource['proximity'] != nil
@@ -519,14 +476,14 @@ def computeResourceUpdate(rid)
       if resource['proximity']['rid'] != nil
         puts 'Search for base station ' + resource['proximity']['rid']
         baseStation = nil
-        baseStation = $resources[resource['proximity']['rid']]
+        baseStation = resources[resource['proximity']['rid']]
 
         if baseStation != nil && baseStation['continuous'] != nil
           puts 'Copy continuous position base station'
           resource['proximity']['continuous'] = baseStation['continuous']
 
           # Update basic station
-          computeResourceUpdate(resource['proximity']['rid'])
+          computeResourceUpdate(app_id, run_id, resource['proximity']['rid'])
         else
           puts 'Continuous position not present'
         end
@@ -540,7 +497,7 @@ def computeResourceUpdate(rid)
       end
     end
 
-    $resources[rid] = resource
+    resources[rid] = resource
 
 =begin
     if resource['continuous'] != nil
@@ -572,11 +529,13 @@ def computeResourceUpdate(rid)
 end
 
 def translateDiscreteCoordinates(discrete)
-  if discrete != nil && $discrete_tracking['t_x'] != nil && $discrete_tracking['t_y'] != nil
-    if $discrete_tracking['t_x'] == 'LETTER'
+  discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
+
+  if discrete != nil && discrete_tracking['t_x'] != nil && discrete_tracking['t_y'] != nil
+    if discrete_tracking['t_x'] == 'LETTER'
       discrete['x'] = (discrete['x'] + 'a'.ord).chr
     end
-    if $discrete_tracking['t_y'] == 'LETTER'
+    if discrete_tracking['t_y'] == 'LETTER'
       discrete['y'] = (discrete['y'] + 'a'.ord).chr
     end
   end
@@ -584,7 +543,9 @@ def translateDiscreteCoordinates(discrete)
 end
 
 # Update the room size
-nutella.net.subscribe('location/tracking/discrete/update', lambda do |message, from|
+nutella.f.net.subscribe_to_all_runs('location/tracking/discrete/update', lambda do |message, app_id, run_id, from|
+
+ discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
  tracking = message['tracking']
 
  if tracking != nil
@@ -598,26 +559,26 @@ nutella.net.subscribe('location/tracking/discrete/update', lambda do |message, f
    t_y = tracking['t_y']
 
    if x != nil && y != nil && width != nil && height != nil && n_x != nil && n_y != nil && t_x != nil && t_y != nil
-     $discrete_tracking['x'] = x
-     $discrete_tracking['y'] = y
-     $discrete_tracking['width'] = width
-     $discrete_tracking['height'] = height
-     $discrete_tracking['n_x'] = n_x
-     $discrete_tracking['n_y'] = n_y
-     $discrete_tracking['t_x'] = t_x
-     $discrete_tracking['t_y'] = t_y
+     discrete_tracking['x'] = x
+     discrete_tracking['y'] = y
+     discrete_tracking['width'] = width
+     discrete_tracking['height'] = height
+     discrete_tracking['n_x'] = n_x
+     discrete_tracking['n_y'] = n_y
+     discrete_tracking['t_x'] = t_x
+     discrete_tracking['t_y'] = t_y
    else
-     $discrete_tracking['x'] = nil
-     $discrete_tracking['y'] = nil
-     $discrete_tracking['width'] = nil
-     $discrete_tracking['height'] = nil
-     $discrete_tracking['n_x'] = nil
-     $discrete_tracking['n_y'] = nil
-     $discrete_tracking['t_x'] = nil
-     $discrete_tracking['t_y'] = nil
+     discrete_tracking['x'] = nil
+     discrete_tracking['y'] = nil
+     discrete_tracking['width'] = nil
+     discrete_tracking['height'] = nil
+     discrete_tracking['n_x'] = nil
+     discrete_tracking['n_y'] = nil
+     discrete_tracking['t_x'] = nil
+     discrete_tracking['t_y'] = nil
    end
 
-   publishDiscreteUpdate()
+   publishDiscreteUpdate(app_id, run_id)
  end
 
 end)
@@ -642,8 +603,8 @@ def publishResourceUpdate(resource)
 end
 
 # Publish an updated room
-def publishRoomUpdate(room)
-	nutella.net.publish('location/room/updated', room)
+def publishRoomUpdate(app_id, run_id, room)
+	nutella.f.net.publish_to_run(app_id, run_id, 'location/room/updated', room)
 end
 
 # Publish resources enter base station proximity area
@@ -671,16 +632,19 @@ def publishResourceExit(resource, baseStationRid)
 end
 
 # Publish tracking system update
-def publishDiscreteUpdate()
+def publishDiscreteUpdate(app_id, run_id)
 
-  x = $discrete_tracking['x']
-  y = $discrete_tracking['y']
-  width = $discrete_tracking['width']
-  height = $discrete_tracking['height']
-  n_x = $discrete_tracking['n_x']
-  n_y = $discrete_tracking['n_y']
-  t_x = $discrete_tracking['t_x']
-  t_y = $discrete_tracking['t_y']
+  resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
+  discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
+
+  x = discrete_tracking['x']
+  y = discrete_tracking['y']
+  width = discrete_tracking['width']
+  height = discrete_tracking['height']
+  n_x = discrete_tracking['n_x']
+  n_y = discrete_tracking['n_y']
+  t_x = discrete_tracking['t_x']
+  t_y = discrete_tracking['t_y']
 
   if x != nil && y != nil && width != nil && height != nil && n_x != nil && n_y != nil && t_x != nil && t_y != nil
     message = {
@@ -693,79 +657,59 @@ def publishDiscreteUpdate()
         :t_x => t_x,
         :t_y => t_y
     }
-    nutella.net.publish('location/tracking/discrete/updated', {:tracking => message})
+    nutella.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => message})
 
     # Update all the discrete resources
-    for r in $resources.keys()
-      resource = $resources[r]
+    resources.to_h.each do |_, resource|
+      resource = resources[resource]
       if resource['discrete'] != nil
-        computeResourceUpdate(r)
+        computeResourceUpdate(app_id, run_id, resource)
       end
     end
 
   else
-    nutella.net.publish('location/tracking/discrete/updated', {:tracking => {}})
+    nutella.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => {}})
   end
 
 end
 
-# Request the estimote iBeacons data
-nutella.net.handle_requests('location/estimote', lambda do |request, from|
-	puts 'Download estimote iBeacon list'
-
-	uri = URI.parse($estimote_url)
-
-	https= Net::HTTP.new(uri.host, uri.port)
-	https.use_ssl = true
-	#https.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-	headers = {
-		:Accept => 'application/json'
-	}
-
-	request = Net::HTTP::Get.new(uri.path, headers)
-	request.basic_auth $estimote_user, $estimote_pass
-
-
-	#response = https.request(request)
-	response = https.start {|http| http.request(request) }
-	beacons = JSON.parse(response.body)
-	{:resources => beacons}
-end)
-
 # Request the size of the room
-nutella.net.handle_requests('location/room', lambda do |request, from|
+nutella.f.net.handle_requests_on_all_runs('location/room', lambda do |request, app_id, run_id, from|
+  room = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'room')
 	puts 'Send the room dimension'
 
 	r = {}
 
-  if $room['x'] == nil || $room['y'] == nil
+  if room['x'] == nil || room['y'] == nil
     r['x'] = 10
     r['y'] = 7
   else
-    r['x'] = $room['x']
-    r['y'] = $room['y']
+    r['x'] = room['x']
+    r['y'] = room['y']
   end
 
-  if $room['z'] != nil
-    r['z'] = $room['z']
+  if room['z'] != nil
+    r['z'] = room['z']
   end
 
 	r
 end)
 
 # Request discrete tracking system
-nutella.net.handle_requests('location/tracking/discrete', lambda do |request, from|
+nutella.f.net.handle_requests_on_all_runs('location/tracking/discrete', lambda do |request, app_id, run_id, from|
+
+  discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
+
   puts 'Send the discrete tracking system'
 
-  x = $discrete_tracking['x']
-  y = $discrete_tracking['y']
-  width = $discrete_tracking['width']
-  height = $discrete_tracking['height']
-  n_x = $discrete_tracking['n_x']
-  n_y = $discrete_tracking['n_y']
-  t_x = $discrete_tracking['t_x']
-  t_y = $discrete_tracking['t_y']
+  x = discrete_tracking['x']
+  y = discrete_tracking['y']
+  width = discrete_tracking['width']
+  height = discrete_tracking['height']
+  n_x = discrete_tracking['n_x']
+  n_y = discrete_tracking['n_y']
+  t_x = discrete_tracking['t_x']
+  t_y = discrete_tracking['t_y']
 
   if x != nil && y != nil && width != nil && height != nil && n_x != nil && n_y != nil && t_x != nil && t_y != nil
     tracking = {
@@ -785,6 +729,8 @@ nutella.net.handle_requests('location/tracking/discrete', lambda do |request, fr
 end)
 
 # Routine that delete old proximity beacons
+
+=begin
 
 Thread.new do
   while true do
@@ -808,16 +754,18 @@ Thread.new do
 
     # Update the counters of the base stations
     for baseStation in baseStations
-      computeResourceUpdate(baseStation)
+      computeResourceUpdate(app_id, run_id, baseStation)
     end
 
-    $cache.publish_update
-    $cache.publish_exit
-    $cache.publish_enter
+    $cache.publish_update(app_id, run_id)
+    $cache.publish_exit(app_id, run_id)
+    $cache.publish_enter(app_id, run_id)
 
     sleep 2
   end
 end
+
+=end
 
 puts 'Initialization completed'
 
