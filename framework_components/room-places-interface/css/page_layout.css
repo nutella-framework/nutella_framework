@@ -1,0 +1,82 @@
+.text-center {
+    text-align: center;
+}
+
+table {
+    width: 100%;
+}
+
+thead, tbody, tr, td, th { display: block; }
+
+tr:after {
+    content: ' ';
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
+
+tbody {
+    /*max-height: 400px;*/
+    /*overflow-y: auto;*/
+}
+
+thead {
+}
+
+
+tbody td, thead th {
+    float: left !important;
+}
+
+
+.right {
+    float: right;
+}
+
+.vertical-center span {
+    height: 34px;
+}
+
+.vertical-center span {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.table_container {
+    margin-top: 10px;
+}
+
+td.input-fill input {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    line-height: 1 !important;
+}
+
+td.input-fill {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+span[contenteditable=true] {
+    cursor: pointer;
+}
+
+td.key-values {
+    height: 40px;
+}
+
+form input {
+    width: 100px;
+    height: 20px;
+    border: none;
+    background: none;
+}
+
+form, form input, button {
+    display: inline;
+}

@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+				<!-- Your interface name here-->
+        <title>Room Places</title>
+				<!-- The description of this interfaces here -->
+        <meta name="description" content="">
+				<!-- Your CSS here -->
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/animation.css">
+		<link rel="stylesheet" href="css/cursor.css">
+		<link rel="stylesheet" href="css/page_layout.css">
+		<link rel="stylesheet" href="css/font-awesome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="css/icomoon.css">
+
+		<script src="js/lib/react-with-addons-0.12.2.js"></script>
+    	<script src="js/lib/JSXTransformer-0.12.2.js"></script>
+    	<script src="js/lib/jquery-1.10.0.min.js"></script>
+    	<script src="js/lib/bootstrap.min.js"></script>
+		<script src="js/lib/d3.v3.min.js" charset="utf-8"></script>
+		<script src="js/lib/underscore.js" charset="utf-8"></script>
+
+		<script src="js/position.js" charset="utf-8"></script>
+		<script src="js/map.js" charset="utf-8"></script>
+		<script src="js/room.js" charset="utf-8"></script>
+
+		<script src="js/lib/nutella_lib.js" charset="utf-8"></script>
+    </head>
+    <body>
+
+		<div class="col-lg-8 col-md-7 col-sm-12 col-xs-12">
+			<svg id="map" style="max-height: 1000px"></svg>
+		</div>
+
+		<div class="col-lg-4 col-md-5 col-sm-12 col-xs-12 table-responsive" style="overflow-x: visible;" id="resource">
+
+		</div>
+
+				
+		<!-- Scripts -->
+		<script src="js/react/dist/resource.js"></script>
+		<script src="js/react/dist/resource-table.js"></script>
+		<script src="js/react/dist/resource-add.js"></script>
+		<script src="js/react/dist/beacon.js"></script>
+		<script src="js/react/dist/discrete.js"></script>
+		<script src="js/react/dist/interactive-label.js"></script>
+		<!-- <script src="build/component.js"></script> -->
+
+		<!-- Your scripts here -->
+
+		<script type="text/jsx">
+
+			var query_parameters = NUTELLA.parseURLParameters();
+
+            nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'room-places-interface');
+
+            var room = Room();
+
+            var map = Map("#map", room);
+
+			var nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'room-places-interface');
+
+            React.render(
+				<ResourceTable room={room}/>,
+				document.getElementById('resource')
+			);
+
+
+		</script>
+				
+    </body>
+</html>
