@@ -97,15 +97,20 @@ d4 = ["vb31",
 
 # Routine that delete old proximity beacons
 Thread.new do
+  i = 0
   while true do
     #publishResourceUpdate("Table1", "beacon1", 1.0);
-    if rand(0...100) < 50
+    puts ">"
+    if i % 2 == 0
       puts "Table1"
       publishResourcesUpdate(["Table1"]*10, d1, 0.5)
     else
       puts "Table2"
       publishResourcesUpdate(["Table2"]*10, d1, 0.5)
     end
+
+    i += 1
+
     #publishResourcesUpdate(["Table2"]*10, d2, rand(10...100)/60);
     #publishResourcesUpdate(["Table3"]*10, d3, rand(10...100)/60);
     #publishResourcesUpdate(["Table4"]*10, d4, rand(10...100)/60);

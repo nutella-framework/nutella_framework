@@ -208,7 +208,6 @@ nutella.f.net.subscribe_to_all_runs('location/resources/update', lambda do |mess
   end)
 
 def updateResource(app_id, run_id, updatedResource)
-  puts updatedResource
   resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
   room = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'room')
   discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
@@ -728,46 +727,44 @@ nutella.f.net.handle_requests_on_all_runs('location/tracking/discrete', lambda d
   end
 end)
 
+puts 'Initialization completed'
+
 # Routine that delete old proximity beacons
 
-=begin
+while sleep 0.5
 
-Thread.new do
-  while true do
-    baseStations = []
+  Nutella.runlist.all_apps.each do |app_id|
+    Nutella.runlist.runs_for_app(app_id).each do |run_id|
+      baseStations = []
+      resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
 
-    for r in $resources.keys()
-      resource = $resources[r]
-      if resource['proximity'] != nil && resource['proximity']['timestamp'] != nil
-        if Time.now.to_f - resource['proximity']['timestamp'] > 3.0
-          if resource['proximity']['rid'] != nil
-            baseStations.push(resource['proximity']['rid'])
-            publishResourceExit(resource, resource['proximity']['rid'])
+      resources.to_h.each do |_, resource|
+        if resource['proximity'] != nil && resource['proximity']['timestamp'] != nil
+          if Time.now.to_f - resource['proximity']['timestamp'] > 3.0
+            if resource['proximity']['rid'] != nil
+              baseStations.push(resource['proximity']['rid'])
+              publishResourceExit(resource, resource['proximity']['rid'])
+            end
+            resource['proximity'] = {}
+            resources[resource['rid']] = resource
+            puts 'Delete proximity resource'
+            publishResourceUpdate(resource)
           end
-          resource['proximity'] = {}
-          $resources[r] = resource
-          puts 'Delete proximity resource'
-          publishResourceUpdate(resource)
         end
       end
+
+      # Update the counters of the base stations
+      for baseStation in baseStations
+        computeResourceUpdate(app_id, run_id, baseStation)
+      end
+
+      $cache.publish_update(app_id, run_id)
+      $cache.publish_exit(app_id, run_id)
+      $cache.publish_enter(app_id, run_id)
     end
-
-    # Update the counters of the base stations
-    for baseStation in baseStations
-      computeResourceUpdate(app_id, run_id, baseStation)
-    end
-
-    $cache.publish_update(app_id, run_id)
-    $cache.publish_exit(app_id, run_id)
-    $cache.publish_enter(app_id, run_id)
-
-    sleep 2
   end
+
 end
-
-=end
-
-puts 'Initialization completed'
 
 # Just sit there waiting for messages to come
 nutella.net.listen
