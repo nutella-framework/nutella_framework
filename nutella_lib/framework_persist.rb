@@ -65,7 +65,13 @@ module Nutella
       # @param [String] name the name of the store
       # @return [MongoPersistedCollection] a MongoDB-backed collection store
       def self.get_run_mongo_collection_store( app_id, run_id, name )
-        MongoPersistedCollection.new Nutella.mongo_host, app_id, "#{run_id}/#{name}"
+        if @run_stores.nil?
+          @run_stores = {}
+        end
+        unless @run_stores.include? [app_id, run_id, name]
+          @run_stores[[app_id, run_id, name]] = MongoPersistedCollection.new Nutella.mongo_host, app_id, "#{run_id}/#{name}"
+        end
+        @run_stores[[app_id, run_id, name]]
       end
 
       # This method returns a MongoDB-backed store
@@ -75,7 +81,13 @@ module Nutella
       # @param [String] name the name of the store
       # @return [MongoPersistedHash] a MongoDB-backed Hash store
       def self.get_run_mongo_object_store( app_id, run_id, name )
-        MongoPersistedHash.new Nutella.mongo_host, app_id, 'run_persisted_hashes', "#{run_id}/#{name}"
+        if @run_stores.nil?
+          @run_stores = {}
+        end
+        unless @run_stores.include? [app_id, run_id, name]
+          @run_stores[[app_id, run_id, name]] = MongoPersistedHash.new Nutella.mongo_host, app_id, 'run_persisted_hashes', "#{run_id}/#{name}"
+        end
+        @run_stores[[app_id, run_id, name]]
       end
 
       # This method returns a JSON-file-backed store
