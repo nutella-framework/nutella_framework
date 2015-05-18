@@ -64,7 +64,10 @@ $("#request_frm").submit(function(e) {
     e.preventDefault();
     var inputs = $('#request_frm :input');
     nutella.net.request(inputs[0].value, inputs[1].value, function(res){
-        $("#response").text(res);
+        if (typeof res === 'object')
+            $("#response").text(JSON.stringify(res));
+        else
+            $("#response").text(res);
     });
 });
 
