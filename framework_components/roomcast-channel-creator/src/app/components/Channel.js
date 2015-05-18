@@ -130,8 +130,8 @@ var Channel = React.createClass({
                     // do nothing
                 } else {
                     if(prefix2 === 'https://') {
-                        value = value.slice(8, value.length);
-                        value = 'http://' + value;
+                        var value_ = value.slice(8, value.length);
+                        value = 'http://' + value_;
                     } else {
                         value = 'http://' + value;
                     }
