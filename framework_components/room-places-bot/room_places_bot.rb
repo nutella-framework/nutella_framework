@@ -14,7 +14,12 @@ nutella.f.init(Nutella.config['broker'], 'room_places_bot')
 # Buffer object that caches all the updates
 class RoomPlacesCachePublish
 
-  def initialize
+  @@cache_list = {}
+
+  def initialize(app_id, run_id)
+    @app_id = app_id
+    @run_id = run_id
+
     @resource_updated = {}
     @resource_added = []
     @resource_removed = []
@@ -72,54 +77,59 @@ class RoomPlacesCachePublish
     }
   end
 
-  def publish_update(app_id, run_id)
+  def publish_update()
     @s6.synchronize {
       if @resource_updated.length > 0
-        nutella.f.net.publish_to_run(app_id, run_id, 'location/resources/updated', {:resources => @resource_updated.values})
+        nutella.f.net.publish_to_run(@app_id, @run_id, 'location/resources/updated', {:resources => @resource_updated.values})
         @resource_updated = {}
       end
     }
   end
 
-  def publish_add(app_id, run_id)
+  def publish_add()
     @s7.synchronize {
       if @resource_added.length > 0
-        nutella.f.net.publish_to_run(app_id, run_id, 'location/resources/added', {:resources => @resource_added})
+        nutella.f.net.publish_to_run(@app_id, @run_id, 'location/resources/added', {:resources => @resource_added})
         @resource_added = []
       end
     }
   end
 
-  def publish_remove(app_id, run_id)
+  def publish_remove()
     @s8.synchronize {
       if @resource_removed.length > 0
-        nutella.f.net.publish_to_run(app_id, run_id, 'location/resources/removed', {:resources => @resource_removed})
+        nutella.f.net.publish_to_run(@app_id, @run_id, 'location/resources/removed', {:resources => @resource_removed})
         @resource_removed = []
       end
     }
   end
 
-  def publish_enter(app_id, run_id)
+  def publish_enter()
     @s9.synchronize {
       @resource_entered.each do |baseStationRid, resources|
-        nutella.f.net.publish_to_run(app_id, run_id, "location/resource/static/#{baseStationRid}/enter", {'resources' => resources})
+        nutella.f.net.publish_to_run(@app_id, @run_id, "location/resource/static/#{baseStationRid}/enter", {'resources' => resources})
       end
       @resource_entered = {}
     }
   end
 
-  def publish_exit(app_id, run_id)
+  def publish_exit()
     @s10.synchronize {
       @resource_exited.each do |baseStationRid, resources|
-        nutella.f.net.publish_to_run(app_id, run_id, "location/resource/static/#{baseStationRid}/exit", {'resources' => resources})
+        nutella.f.net.publish_to_run(@app_id, @run_id, "location/resource/static/#{baseStationRid}/exit", {'resources' => resources})
       end
       @resource_exited = {}
     }
   end
 
-end
+  def self.get_cache(app_id, run_id)
+    unless @@cache_list.has_key? [app_id, run_id]
+      @@cache_list[[app_id, run_id]] = RoomPlacesCachePublish.new(app_id, run_id)
+    end
+    @@cache_list[[app_id, run_id]]
+  end
 
-$cache = RoomPlacesCachePublish.new
+end
 
 puts 'Room places initialization'
 
@@ -133,6 +143,9 @@ puts 'Room places initialization'
 nutella.f.net.subscribe_to_all_runs('location/resource/add', lambda do |message, app_id, run_id, from|
   # Persistent data
   resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
+
+  # Cache
+  cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
 
   rid = message['rid']
   type = message['type']
@@ -159,8 +172,8 @@ nutella.f.net.subscribe_to_all_runs('location/resource/add', lambda do |message,
             :parameters => {}
           }
       end
-      publishResourceAdd(resources[rid])
-      $cache.publish_add(app_id, run_id)
+      publishResourceAdd(app_id, run_id, resources[rid])
+      cache.publish_add
       puts('Added resource')
     end
 
@@ -169,15 +182,19 @@ end)
 
 # Remove resource
 nutella.f.net.subscribe_to_all_runs('location/resource/remove', lambda do |message, app_id, run_id, from|
+  # Persistent data
   resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
+
+  # Cache
+  cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
 
   rid = message['rid']
   if rid != nil
 
     resourceCopy = resources[rid]
     resources.delete(rid)
-    publishResourceRemove(resourceCopy)
-    $cache.publish_remove(app_id, run_id)
+    publishResourceRemove(app_id, run_id, resourceCopy)
+    cache.publish_remove
     puts('Removed resource')
 
   end
@@ -186,28 +203,35 @@ end)
 
 # Update the location of the resources
 nutella.f.net.subscribe_to_all_runs('location/resource/update', lambda do |message, app_id, run_id, from|
+  # Cache
+  cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
+
   updateResource(app_id, run_id, message)
 
-  $cache.publish_update(app_id, run_id)
-  $cache.publish_exit(app_id, run_id)
-  $cache.publish_enter(app_id, run_id)
+  cache.publish_update(app_id, run_id)
+  cache.publish_exit(app_id, run_id)
+  cache.publish_enter(app_id, run_id)
 end)
 
 # Update the location of the resources
 nutella.f.net.subscribe_to_all_runs('location/resources/update', lambda do |message, app_id, run_id, from|
-    resources = message['resources']
-    if resources != nil
-      resources.each do |resource|
-        updateResource(app_id, run_id, resource)
-      end
-    end
+  # Cache
+  cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
 
-    $cache.publish_update(app_id, run_id)
-    $cache.publish_exit(app_id, run_id)
-    $cache.publish_enter(app_id, run_id)
-  end)
+  resources = message['resources']
+  if resources != nil
+    resources.each do |resource|
+      updateResource(app_id, run_id, resource)
+    end
+  end
+
+  cache.publish_update
+  cache.publish_exit
+  cache.publish_enter
+end)
 
 def updateResource(app_id, run_id, updatedResource)
+  # Persistent data
   resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
   room = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'room')
   discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
@@ -254,8 +278,8 @@ def updateResource(app_id, run_id, updatedResource)
           if resource['proximity']['rid'] != proximity['rid']
             resource['proximity'] = proximity
             resource['proximity']['timestamp'] = Time.now.to_f
-            publishResourceExit(resource, oldBaseStationRid)
-            publishResourceEnter(resource, resource['proximity']['rid'])
+            publishResourceExit(app_id, run_id, resource, oldBaseStationRid)
+            publishResourceEnter(app_id, run_id, resource, resource['proximity']['rid'])
           else
             resource['proximity'] = proximity
             resource['proximity']['timestamp'] = Time.now.to_f
@@ -264,7 +288,7 @@ def updateResource(app_id, run_id, updatedResource)
         else
           resource['proximity'] = proximity
           resource['proximity']['timestamp'] = Time.now.to_f
-          publishResourceEnter(resource, resource['proximity']['rid'])
+          publishResourceEnter(app_id, run_id, resource, resource['proximity']['rid'])
         end
       end
     end
@@ -390,6 +414,7 @@ end
 
 # Request the position of a single resource
 nutella.f.net.handle_requests_on_all_runs('location/resources', lambda do |request, app_id, run_id, from|
+  # Persistent data
   resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
   groups = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'groups')
 
@@ -436,11 +461,11 @@ end)
 
 # Update the room size
 nutella.f.net.subscribe_to_all_runs('location/room/update', lambda do |message, app_id, run_id, from|
+  # Persistent data
   room = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'room')
 
   x = message['x']
   y = message['y']
-  z = message['z']
 
   if x != nil && y != nil
     r = {}
@@ -449,11 +474,6 @@ nutella.f.net.subscribe_to_all_runs('location/room/update', lambda do |message, 
 
     room['y'] = y
     r['y'] = y
-
-    if z != nil
-      room['z'] = z
-      r['z'] = z
-    end
 
     publishRoomUpdate(app_id, run_id, r)
     puts 'Room updated'
@@ -464,8 +484,6 @@ end)
 def computeResourceUpdate(app_id, run_id, rid)
   resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
 
-  resource = nil
-
   resource = resources[rid]
 
   if resource != nil
@@ -474,7 +492,6 @@ def computeResourceUpdate(app_id, run_id, rid)
 
       if resource['proximity']['rid'] != nil
         puts 'Search for base station ' + resource['proximity']['rid']
-        baseStation = nil
         baseStation = resources[resource['proximity']['rid']]
 
         if baseStation != nil && baseStation['continuous'] != nil
@@ -521,7 +538,7 @@ def computeResourceUpdate(app_id, run_id, rid)
     end
 
     # Send update
-    publishResourceUpdate(resource)
+    publishResourceUpdate(app_id, run_id, resource)
     puts 'Sent update'
 
   end
@@ -584,20 +601,29 @@ end)
 
 
 # Publish an added resource
-def publishResourceAdd(resource)
-  $cache.resources_add([resource])
+def publishResourceAdd(app_id, run_id, resource)
+  # Cache
+  cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
+
+  cache.resources_add([resource])
 	#nutella.net.publish('location/resources/added', {:resources => [resource]})
 end
 
 # Publish a removed resource
-def publishResourceRemove(resource)
-  $cache.resources_remove([resource])
+def publishResourceRemove(app_id, run_id, resource)
+  # Cache
+  cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
+
+  cache.resources_remove([resource])
 	#nutella.net.publish('location/resources/removed', {:resources => [resource]})
 end
 
 # Publish an updated resource
-def publishResourceUpdate(resource)
-  $cache.resources_update([resource])
+def publishResourceUpdate(app_id, run_id, resource)
+  # Cache
+  cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
+
+  cache.resources_update([resource])
 	#nutella.net.publish('location/resources/updated', {:resources => [resource]})
 end
 
@@ -607,27 +633,29 @@ def publishRoomUpdate(app_id, run_id, room)
 end
 
 # Publish resources enter base station proximity area
-def publishResourcesEnter(resources, baseStationRid)
-  #message = {:resources => resources}
-  #nutella.net.publish("location/resource/static/#{baseStationRid}/enter", message)
-  $cache.resources_enter(resources, baseStationRid)
+def publishResourcesEnter(app_id, run_id, resources, baseStationRid)
+  # Cache
+  cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
+
+  cache.resources_enter(resources, baseStationRid)
 end
 
 # Publish resources exit base station proximity area
-def publishResourcesExit(resources, baseStationRid)
-  #message = {:resources => resources}
-  #nutella.net.publish("location/resource/static/#{baseStationRid}/exit", message)
-  $cache.resources_exit(resources, baseStationRid)
+def publishResourcesExit(app_id, run_id, resources, baseStationRid)
+  # Cache
+  cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
+
+  cache.resources_exit(resources, baseStationRid)
 end
 
 # Publish resource enter base station proximity area
-def publishResourceEnter(resource, baseStationRid)
-  publishResourcesEnter([resource], baseStationRid)
+def publishResourceEnter(app_id, run_id, resource, baseStationRid)
+  publishResourcesEnter(app_id, run_id, [resource], baseStationRid)
 end
 
 # Publish resource enter base station proximity area
-def publishResourceExit(resource, baseStationRid)
-  publishResourcesExit([resource], baseStationRid)
+def publishResourceExit(app_id, run_id, resource, baseStationRid)
+  publishResourcesExit(app_id, run_id, [resource], baseStationRid)
 end
 
 # Publish tracking system update
@@ -743,12 +771,12 @@ while sleep 0.5
           if Time.now.to_f - resource['proximity']['timestamp'] > 3.0
             if resource['proximity']['rid'] != nil
               baseStations.push(resource['proximity']['rid'])
-              publishResourceExit(resource, resource['proximity']['rid'])
+              publishResourceExit(app_id, run_id, resource, resource['proximity']['rid'])
             end
             resource['proximity'] = {}
             resources[resource['rid']] = resource
             puts 'Delete proximity resource'
-            publishResourceUpdate(resource)
+            publishResourceUpdate(app_id, run_id, resource)
           end
         end
       end
@@ -758,9 +786,12 @@ while sleep 0.5
         computeResourceUpdate(app_id, run_id, baseStation)
       end
 
-      $cache.publish_update(app_id, run_id)
-      $cache.publish_exit(app_id, run_id)
-      $cache.publish_enter(app_id, run_id)
+      # Cache
+      cache = RoomPlacesCachePublish.get_cache(app_id, run_id)
+
+      cache.publish_update
+      cache.publish_exit
+      cache.publish_enter
     end
   end
 
