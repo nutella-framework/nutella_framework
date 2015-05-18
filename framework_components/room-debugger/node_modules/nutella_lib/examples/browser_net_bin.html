@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Nutella hello world</title>
+</head>
+<body>
+
+<p>nutella.net.bin test interface</p>
+
+<form enctype="multipart/form-data" method="post" name="fileinfo">
+    <label>File to upload:</label>
+    <input type="file" name="file" id="input" required>
+    <input id="upload" type="submit" value="Upload file" />
+    <input id="publish" type="submit" value="Publish file" />
+</form>
+<p>Preview</p>
+<div id="preview"></div>
+<br>
+<hr>
+<p>Received files (from subscribe)</p>
+<div id="output"></div>
+
+
+<script src="../dist/nutella_lib.js"></script>
+<script>
+    // Initialize nutella
+    var nutella = NUTELLA.init('127.0.0.1', 'crepe', 'default', 'browser_net_bin_test');
+
+    // Upload file
+    var uploadBtn = document.getElementById('upload');
+    uploadBtn.addEventListener('click', function(e) {
+        var file = document.getElementById("input").files[0];
+        nutella.net.bin.uploadFile(file, function(url) {
+            console.log("Uploaded " + file.name + ". URL: " + url);
+        });
+        e.preventDefault();
+    });
+
+    // Publish file
+    var publishBtn = document.getElementById('publish');
+    publishBtn.addEventListener('click', function(e) {
+        var file = document.getElementById("input").files[0];
+        nutella.net.bin.publish('test_channel', file, {some:'metadata'}, function() {
+            console.log('This callback is fired whenever the image actually gets published')
+        });
+        e.preventDefault();
+    });
+
+    // Subscribe to messages updates
+    nutella.net.bin.subscribe('test_channel', function(file_url, metadata) {
+        // Update output
+        var img = document.createElement("img");
+        img.src = file_url;
+        img.width = 300;
+        var el = document.getElementById("output");
+        el.innerHTML="";
+        el.appendChild(img);
+    });
+
+
+    // THIS IS JUST FOR PRETTINESS
+    // Update preview
+    var e = document.getElementById("input");
+    e.addEventListener('change', function(ev){
+        // preview image
+        var img = document.createElement("img");
+        var file = e.files[0];
+        img.src = window.URL.createObjectURL(file);
+        img.width = 100;
+        var o = document.getElementById("preview");
+        o.innerHTML="";
+        o.appendChild(img);
+    });
+
+</script>
+</body>
+</html>
