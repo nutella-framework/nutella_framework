@@ -1,0 +1,6 @@
+{
+  "name": "room-debugger",
+  "version": "1.0.0",
+  "type": "interface",
+  "description": "A debugger to help you build your nutella applications"
+}

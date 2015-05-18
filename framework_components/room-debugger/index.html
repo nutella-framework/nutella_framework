@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RoomDebugger</title>
+    <meta name="description" content="A debugger to help you build your nutella applications">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Room Debugger</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#pubsub">Pub/Sub</a></li>
+                <li><a href="#reqres">Request/Response</a></li>
+                <li><a href="#roomplaces">RoomPlaces</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+
+
+<div class="container">
+
+    <section id="pubsub">
+        <h1>Publish/Subscribe debugger</h1>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Publish</h3>
+            </div>
+            <div class="panel-body">
+                <form id="publish_frm" class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Channel">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Message">
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Subscribe</h3>
+            </div>
+            <div class="panel-body">
+                <form id="sub_frm" class="navbar-form navbar-left">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Channel">
+                    </div>
+                    <button type="submit" class="btn btn-default">Subscribe</button>
+                    <div id="sub_list" class="form-group"> </div>
+                </form>
+            </div>
+        </div>
+
+
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <h3 class="panel-title pull-left" style="padding-top: 7px;">Incoming messages</h3>
+                <div class="btn-group pull-right">
+                    <a id="remove_messages" class="btn btn-default btn-sm">Clear all</a>
+                </div>
+            </div>
+            <table id="messages" class="table">
+                <thead>
+                <tr>
+                    <th>Channel</th>
+                    <th>From</th>
+                    <th>Message</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <!-- ----------------------------------------------- -->
+
+    <section id="reqres">
+        <h1>Request/Response debugger</h1>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Request</h3>
+            </div>
+            <div class="panel-body">
+                <form id="request_frm" class="form-inline">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Channel">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Message">
+                    </div>
+                    <button type="submit" class="btn btn-default">Send</button>
+                </form>
+                <h5>Response</h5>
+                <pre id="response">
+
+                </pre>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Handle requests</h3>
+            </div>
+            <div class="panel-body">
+                <form id="handle_frm">
+                    <div class="form-group">
+                        <label for="handle_req_ch">Channel</label>
+                        <input type="text" class="form-control" id="handle_req_ch" placeholder="Enter channel">
+                    </div>
+                    <div class="form-group">
+                        <label for="handle_req_cb">Response</label>
+                        <textarea id="handle_req_cb" class="form-control" placeholder="Enter the response" rows="3"></textarea>
+                    </div>
+                    <button id="handle_btn" type="submit" class="btn btn-default">Handle request</button>
+                </form>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ----------------------------------------------- -->
+
+    <section id="roomplaces">
+        <h1>RoomPlaces simulator</h1>
+        <!-- Interface for rp sim goes here -->
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Simulator parameters</h3>
+            </div>
+            <div class="panel-body">
+                <form id="sim_frm">
+                    <div class="form-group">
+                        <label for="hotsp_ls">Hotspots (static resources)</label>
+                        <input type="text" class="form-control" id="hotsp_ls" >
+                    </div>
+                    <div class="form-group">
+                        <label for="beacon_ls">Beacons (dynamic resources)</label>
+                        <input type="text" class="form-control" id="beacon_ls" >
+                    </div>
+                    <div class="form-group">
+                        <label for="distance_fr">Distance (in meters ± .1)</label>
+                        <input type="text" class="form-control" id="distance_fr" >
+                    </div>
+                    <button id="start_sim_btn" type="submit" class="btn btn-success">Start simulator</button>
+                </form>
+            </div>
+        </div>
+
+    </section>
+
+
+
+
+</div>
+
+
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="node_modules/nutella_lib/dist/nutella_lib.js"></script>
+<script src="room_places_simulator.js"></script>
+<script src="main.js"></script>
+<script>
+    // Utility function to handle vertical scrolling
+    function scrollNav() {
+        $('.nav a').click(function(){
+            //Toggle Class
+            $(".active").removeClass("active");
+            $(this).closest('li').addClass("active");
+            var theClass = $(this).attr("class");
+            $('.'+theClass).parent('li').addClass('active');
+            //Animate
+            $('html, body').stop().animate({
+                scrollTop: $( $(this).attr('href') ).offset().top - 160
+            }, 400);
+            return false;
+        });
+        $('.scrollTop a').scrollTop();
+    }
+    scrollNav();
+</script>
+</body>
+</html>

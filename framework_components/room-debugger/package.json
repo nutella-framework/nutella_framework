@@ -1,0 +1,14 @@
+{
+  "name": "room-debugger",
+  "version": "1.0.0",
+  "description": "A debugger to help you build your nutella applications",
+  "main": "app/js/index.js",
+  "repository": "no-repo",
+  "author": "Alessandro Gnoli",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^3.3.4",
+    "jquery": "^2.1.4",
+    "nutella_lib": "^0.5.10"
+  }
+}
