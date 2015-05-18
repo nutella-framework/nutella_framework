@@ -181,6 +181,9 @@ html, body {
   margin-top: @default-margin;
   margin-right: @default-margin;
   margin-bottom: @default-margin;
+  .mui-paper-container {
+    position: relative;
+  }
 }
 .channels-catalogue-title-div-outer {
   height: @channels-title;
@@ -214,7 +217,7 @@ html, body {
   margin: auto;
   text-align: center;
   position: absolute;
-  bottom: 0px + @default-margin;
+  bottom: 0;
   background-color: white;
 }
 .channels-panel-save-buttons-div-inner {
@@ -424,6 +427,12 @@ html, body {
   }
   .mui-text-field-focus-underline {
     position: relative;
+  }
+  .mui-text-field-textarea {
+
+  }
+  .mui-text-field-hint {
+    font-size: 0.8vw;
   }
 }
 .mui-menu .mui-menu-item {
