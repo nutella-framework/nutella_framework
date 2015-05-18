@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Alessandro Gnoli"]
-  s.date = "2015-05-17"
+  s.date = "2015-05-18"
   s.description = "utella is a framework to create and run RoomApps"
   s.email = "tebemis@gmail.com"
   s.executables = ["nutella"]
@@ -212,6 +212,29 @@ Gem::Specification.new do |s|
     "framework_components/monitoring-interface/js/view-controller/window-view-controller.js",
     "framework_components/monitoring-interface/nutella.json",
     "framework_components/order.json",
+    "framework_components/room-debugger/README.md",
+    "framework_components/room-debugger/css/bootstrap-theme.css",
+    "framework_components/room-debugger/css/bootstrap-theme.css.map",
+    "framework_components/room-debugger/css/bootstrap-theme.min.css",
+    "framework_components/room-debugger/css/bootstrap.css",
+    "framework_components/room-debugger/css/bootstrap.css.map",
+    "framework_components/room-debugger/css/bootstrap.min.css",
+    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.eot",
+    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.svg",
+    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.ttf",
+    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.woff",
+    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.woff2",
+    "framework_components/room-debugger/index.html",
+    "framework_components/room-debugger/js/bootstrap.js",
+    "framework_components/room-debugger/js/bootstrap.min.js",
+    "framework_components/room-debugger/js/jquery.min.js",
+    "framework_components/room-debugger/js/npm.js",
+    "framework_components/room-debugger/js/nutella_lib.js",
+    "framework_components/room-debugger/main.css",
+    "framework_components/room-debugger/main.js",
+    "framework_components/room-debugger/nutella.json",
+    "framework_components/room-debugger/package.json",
+    "framework_components/room-debugger/room_places_simulator.js",
     "framework_components/room-places-bot/.gitignore",
     "framework_components/room-places-bot/Gemfile",
     "framework_components/room-places-bot/README.md",
