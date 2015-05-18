@@ -124,11 +124,17 @@ var Channel = React.createClass({
         var value = this.refs['textFieldUrl' + this.props.channelId].getValue();
         switch(this.props.channel.type) {
             case 'web':
-                var prefix = value.slice(0, 7);
-                if(prefix === 'http://') {
+                var prefix1 = value.slice(0, 7);
+                var prefix2 = value.slice(0, 8);
+                if(prefix1 === 'http://') {
                     // do nothing
                 } else {
-                    value = 'http://' + value;
+                    if(prefix2 === 'https://') {
+                        value = value.slice(8, value.length);
+                        value = 'http://' + value;
+                    } else {
+                        value = 'http://' + value;
+                    }
                 }
                 break;
             case 'iOS':
