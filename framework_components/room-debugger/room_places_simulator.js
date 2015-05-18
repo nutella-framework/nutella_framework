@@ -46,6 +46,7 @@ RoomPlacesSimulator.prototype.setHotspots = function(hotspots) {
 };
 
 RoomPlacesSimulator.prototype.setBeacons = function(beacons) {
+    this.beacons = [];
     beacons.forEach((function(e){
         this.beacons.push({b: e, l: 'none'});
     }).bind(this));
