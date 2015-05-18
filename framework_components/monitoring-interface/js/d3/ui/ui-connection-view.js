@@ -62,6 +62,14 @@ var UIConnectionView = function(delegate) {
                     (component.request != undefined && component.request.length > 0)) {
                     noChannels = false;
                 }
+
+                component.publish.forEach(function(publish) {
+                    if(publish.channel == "pings") {
+                        publish.channel = "";
+                    }
+                });
+
+                component.publish.sort();
             });
         }
         else {

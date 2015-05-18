@@ -92,7 +92,7 @@ var InstanceViewController = function(parentApplicationViewController, name, ind
         self.applicationName = self.parentApplicationViewController.name;
         //self.selected = false;
 
-        self.tab = self.addUITab(self.name);
+        self.tab = self.addUITab(self.name)
 
         // Calculate the position of the notification and add it
         self._notification = self.addUINotification();

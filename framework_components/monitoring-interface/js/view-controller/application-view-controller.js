@@ -108,10 +108,13 @@ var ApplicationViewController = function(name, view) {
 
     // Data relative to the current selected instance
     self.__defineGetter__("instanceComponentData", function() {
-        if(applicationModel.viewControllerInstanceSelected == undefined)
+        if(applicationModel.viewControllerInstanceSelected == undefined ||
+            applicationModel.viewControllerApplicationSelected == undefined)
             return undefined;
 
-        var instanceData = applicationModel.getInstanceData(self.name, applicationModel.viewControllerInstanceSelected.name);
+        var instanceData = applicationModel.getInstanceData(
+            applicationModel.viewControllerApplicationSelected.name,
+            applicationModel.viewControllerInstanceSelected.name);
 
         return instanceData.components;
         // TODO: fix here
