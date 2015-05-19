@@ -25,7 +25,7 @@ RoomPlacesSimulator.prototype.start = function() {
             if(Math.random()>0.93) {
                 e.l = hotspots[Math.floor(Math.random()*hotspots.length)];
                 e.d = this.distance -0.1 + Math.random()*0.2;
-                console.log(e.b + " moved to " + e.l);
+                //console.log(e.b + " moved to " + e.l);
             }
             if (e.l != 'none')
                 this.publishLocation(e);
