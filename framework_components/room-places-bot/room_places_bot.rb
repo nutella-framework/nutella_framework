@@ -534,7 +534,7 @@ def computeResourceUpdate(app_id, run_id, rid)
 
     # Translate discrete coordinate
     if resource['discrete'] != nil
-      resource['discrete'] = translateDiscreteCoordinates(resource['discrete'])
+      resource['discrete'] = translateDiscreteCoordinates(app_id, run_id, resource['discrete'])
     end
 
     # Send update
@@ -544,7 +544,7 @@ def computeResourceUpdate(app_id, run_id, rid)
   end
 end
 
-def translateDiscreteCoordinates(discrete)
+def translateDiscreteCoordinates(app_id, run_id, discrete)
   discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
 
   if discrete != nil && discrete_tracking['t_x'] != nil && discrete_tracking['t_y'] != nil
