@@ -208,9 +208,9 @@ nutella.f.net.subscribe_to_all_runs('location/resource/update', lambda do |messa
 
   updateResource(app_id, run_id, message)
 
-  cache.publish_update(app_id, run_id)
-  cache.publish_exit(app_id, run_id)
-  cache.publish_enter(app_id, run_id)
+  cache.publish_update
+  cache.publish_exit
+  cache.publish_enter
 end)
 
 # Update the location of the resources
@@ -684,18 +684,17 @@ def publishDiscreteUpdate(app_id, run_id)
         :t_x => t_x,
         :t_y => t_y
     }
-    nutella.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => message})
+    nutella.f.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => message})
 
     # Update all the discrete resources
     resources.to_h.each do |_, resource|
-      resource = resources[resource]
       if resource['discrete'] != nil
         computeResourceUpdate(app_id, run_id, resource)
       end
     end
 
   else
-    nutella.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => {}})
+    nutella.f.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => {}})
   end
 
 end
