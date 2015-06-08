@@ -45,7 +45,7 @@ $("#sub_frm").on('click', ".label-default", function(e){
 
 // Append messages to table
 function appendMessage(channel, message, from) {
-    $("#messages").prepend('<tr><td>' + channel + '</td><td>' + message+ '</td><td>' + JSON.stringify(from) + '</td></tr>');
+    $("#messages").prepend('<tr><td>' + channel + '</td><td>' + JSON.stringify(message)+ '</td><td>' + JSON.stringify(from) + '</td></tr>');
 }
 
 
