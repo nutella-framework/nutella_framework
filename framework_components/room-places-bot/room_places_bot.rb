@@ -438,7 +438,7 @@ nutella.f.net.handle_requests_on_all_runs('location/resources', lambda do |reque
       resource = resources[resource]
       # Translate discrete coordinate
       if resource['discrete'] != nil
-        resource['discrete'] = translateDiscreteCoordinates(resource['discrete'])
+        resource['discrete'] = translateDiscreteCoordinates(app_id, run_id, resource['discrete'])
       end
       reply.push(resource)
 
@@ -450,7 +450,7 @@ nutella.f.net.handle_requests_on_all_runs('location/resources', lambda do |reque
     resources.to_h.each do |_, resource|
       # Translate discrete coordinate
       if resource['discrete'] != nil
-        resource['discrete'] = translateDiscreteCoordinates(resource['discrete'])
+        resource['discrete'] = translateDiscreteCoordinates(app_id, run_id, resource['discrete'])
       end
       resourceList.push(resource)
     end
