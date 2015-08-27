@@ -208,9 +208,9 @@ nutella.f.net.subscribe_to_all_runs('location/resource/update', lambda do |messa
 
   updateResource(app_id, run_id, message)
 
-  cache.publish_update(app_id, run_id)
-  cache.publish_exit(app_id, run_id)
-  cache.publish_enter(app_id, run_id)
+  cache.publish_update
+  cache.publish_exit
+  cache.publish_enter
 end)
 
 # Update the location of the resources
@@ -438,7 +438,7 @@ nutella.f.net.handle_requests_on_all_runs('location/resources', lambda do |reque
       resource = resources[resource]
       # Translate discrete coordinate
       if resource['discrete'] != nil
-        resource['discrete'] = translateDiscreteCoordinates(resource['discrete'])
+        resource['discrete'] = translateDiscreteCoordinates(app_id, run_id, resource['discrete'])
       end
       reply.push(resource)
 
@@ -450,7 +450,7 @@ nutella.f.net.handle_requests_on_all_runs('location/resources', lambda do |reque
     resources.to_h.each do |_, resource|
       # Translate discrete coordinate
       if resource['discrete'] != nil
-        resource['discrete'] = translateDiscreteCoordinates(resource['discrete'])
+        resource['discrete'] = translateDiscreteCoordinates(app_id, run_id, resource['discrete'])
       end
       resourceList.push(resource)
     end
@@ -534,7 +534,7 @@ def computeResourceUpdate(app_id, run_id, rid)
 
     # Translate discrete coordinate
     if resource['discrete'] != nil
-      resource['discrete'] = translateDiscreteCoordinates(resource['discrete'])
+      resource['discrete'] = translateDiscreteCoordinates(app_id, run_id, resource['discrete'])
     end
 
     # Send update
@@ -544,7 +544,7 @@ def computeResourceUpdate(app_id, run_id, rid)
   end
 end
 
-def translateDiscreteCoordinates(discrete)
+def translateDiscreteCoordinates(app_id, run_id, discrete)
   discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
 
   if discrete != nil && discrete_tracking['t_x'] != nil && discrete_tracking['t_y'] != nil
@@ -684,18 +684,17 @@ def publishDiscreteUpdate(app_id, run_id)
         :t_x => t_x,
         :t_y => t_y
     }
-    nutella.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => message})
+    nutella.f.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => message})
 
     # Update all the discrete resources
     resources.to_h.each do |_, resource|
-      resource = resources[resource]
       if resource['discrete'] != nil
         computeResourceUpdate(app_id, run_id, resource)
       end
     end
 
   else
-    nutella.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => {}})
+    nutella.f.net.publish_to_run(app_id, run_id, 'location/tracking/discrete/updated', {:tracking => {}})
   end
 
 end
