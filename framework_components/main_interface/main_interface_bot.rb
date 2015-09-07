@@ -12,7 +12,8 @@ set :environment, :production
 
 # Set Sinatra's port to nutella's main_interface_port
 set :port, Nutella.config['main_interface_port']
-
+# Disable X-Frame-Options header to allow iframes
+set :protection, :except => :frame_options
 
 # Routes -------------------------------------------------------------------------
 
