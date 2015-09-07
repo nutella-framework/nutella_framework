@@ -176,9 +176,13 @@ end
 # Removes deleted channels ids from configs and notifies
 def clean_configs(app_id, run_id)
   configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
+  channels_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'channels')
+  if configs_db['configs'] == nil || channels_db['channels'] == nil
+    return
+  end
+
   new_configs = configs_db.dup
 
-  channels_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'channels')
   ids = []
   channels_db['channels'].each do |k, channel|
     ids << k
