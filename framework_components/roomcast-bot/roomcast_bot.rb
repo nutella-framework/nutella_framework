@@ -129,7 +129,10 @@ nutella.f.net.subscribe_to_all_runs('channels/update', lambda do |message, app_i
                                                          channels_db['channels'] = new_channels
                                                        end
 
-                                                       # Notify Update
+                                                       # Clean configs to remove deleted channels + Notify configs update
+                                                       clean_configs(app_id, run_id)
+
+                                                       # Notify channels Update
                                                        publish_channels_update(app_id, run_id, new_channels)
                                                      end)
 
@@ -168,6 +171,34 @@ end
 
 def publish_channels_update(app_id, run_id, channels)
   nutella.f.net.publish_to_run(app_id, run_id, 'channels/updated', channels)
+end
+
+# Removes deleted channels ids from configs and notifies
+def clean_configs(app_id, run_id)
+  configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
+  new_configs = configs_db.dup
+
+  channels_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'channels')
+  ids = []
+  channels_db['channels'].each do |k, channel|
+    ids << k
+  end
+
+  o = {}
+  new_configs['configs'].each do |key, config|
+    config = new_configs['configs'][key]
+    config['mapping'].each do |mapping|
+      mapping['items'].each do |item|
+        item['channels'] = item['channels'] & ids   # intersection of channels
+        #p item['channels']
+      end
+    end
+    o[key] = config
+  end
+  #new_configs['configs'] = c
+  configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
+  configs_db['configs'] = o.dup
+  publish_configs_update(app_id, run_id, o.dup)
 end
 
 ################ RoomCast API ################

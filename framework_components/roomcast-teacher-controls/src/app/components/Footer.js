@@ -7,14 +7,13 @@ var RaisedButton = Mui.RaisedButton;
 var Footer = React.createClass({
 
     handleLogoutAll: function() {
-        console.log('logout all');
+        nutella.net.publish('logout/all', '');
     },
 
     render: function () {
 
         var footerStyle = {
             height: (window.innerHeight * 0.1)
-            //backgroundColor: 'grey'
         };
 
         return (
