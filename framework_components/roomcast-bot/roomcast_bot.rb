@@ -60,9 +60,16 @@ nutella.f.net.handle_requests_on_all_runs('configs/retrieve', lambda do |request
                                                                                        }]
                                                                       }
                                                                   }
-                                                                  configs_db['currentConfig'] = 1
-                                                                  configs_db['launchTime'] = Time.now.to_f
                                                                 end
+
+                                                                if configs_db['currentConfig'] == nil
+                                                                  configs_db['currentConfig'] = 1
+                                                                end
+
+                                                                if configs_db['launchTime'] == nil
+                                                                  configs_db['launchTime'] = Time.now.to_f * 1000
+                                                                end
+
                                                                 reply
                                                               end
                                                             end)
@@ -95,7 +102,7 @@ nutella.f.net.subscribe_to_all_runs('currentConfig/update', lambda do |message, 
                                                               configs_db['currentConfig'] = new_config
 
                                                               # Reset timer (enforces coupling new activity - new timer)
-                                                              new_time = Time.now.to_f
+                                                              new_time = Time.now.to_f * 1000
                                                               configs_db['launchTime'] = new_time
 
                                                               # Notify Update
@@ -144,7 +151,7 @@ nutella.f.net.handle_requests_on_all_runs('launchTime/retrieve', lambda do |requ
                                                                     configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                                     reply = configs_db['launchTime']
                                                                     if reply == nil
-                                                                      reply = Time.now.to_f
+                                                                      reply = Time.now.to_f * 1000
                                                                     end
                                                                     reply
                                                                   end)

@@ -3,6 +3,7 @@ var React = require('react');
 var Mui = require('material-ui');
 var Paper = Mui.Paper;
 var d3 = require('d3');
+var moment = require('moment');
 
 var ActivityCard = React.createClass({
 
@@ -95,6 +96,24 @@ var ActivityCard = React.createClass({
         }
     },
 
+    formatTimer: function(ms) {
+        var x = ms / 1000;
+        var seconds = Math.floor(x % 60);
+        x /= 60;
+        var minutes = Math.floor(x % 60);
+        x /= 60;
+        var hours = Math.floor(x % 24);
+        x /= 24;
+        var days = Math.floor(x);
+
+        var timer;
+        timer = seconds + ' sec';
+        timer = minutes != 0 ? minutes + " min " + timer : timer;
+        timer = hours != 0 ? hours + " hrs " + timer : timer;
+        timer = days != 0 ? days + " days " + timer : timer;
+        return timer;
+    },
+
     render: function () {
 
         var selectedCardStyle = {
@@ -105,18 +124,30 @@ var ActivityCard = React.createClass({
         // Copy
         var cardStyle = {};
         for(var p_ in this.props.cardStyle) {
-            cardStyle[p_] = this.props.cardStyle[p_];
+            if(this.props.cardStyle.hasOwnProperty(p_)) {
+                cardStyle[p_] = this.props.cardStyle[p_];
+            }
         }
+        var spanStyle = {};
 
         var className='activity-card';
+        var timer = null;
 
         // Add properties if selected
         if(this.state.isSelected) {
             className += ' activity-card-selected';
             for(var p in selectedCardStyle) {
-                cardStyle[p] = selectedCardStyle[p];
+                if(selectedCardStyle.hasOwnProperty(p)) {
+                    cardStyle[p] = selectedCardStyle[p];
+                }
             }
-
+            timer = this.formatTimer(this.props.timer);
+            spanStyle = {
+                width: this.props.cardStyle.width,
+                textAlign: 'center',
+                fontWeight: '400',
+                fontSize: '2.6em',
+                marginBottom: '20px'};
         }
 
         return (
@@ -127,11 +158,10 @@ var ActivityCard = React.createClass({
 
                 <div className='card-name'>
 
-                    <span> {this.props.configName} </span>
+                    <span style={spanStyle} >{this.props.configName}</span>
+                    <span>{timer}</span>
 
                 </div>
-
-
 
             </Paper>);
     }

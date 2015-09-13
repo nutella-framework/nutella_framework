@@ -50,7 +50,6 @@ var ActivitiesGrid = React.createClass({
         var cardStyle = {
             width: this._cardSize[0],
             height: this._cardSize[1],
-            //position: 'absolute',
             flexBasis: this._cardSize[0]
         };
 
@@ -58,11 +57,12 @@ var ActivitiesGrid = React.createClass({
             if(this.props.configs.hasOwnProperty(c)) {
                 cards.push(
                     <ActivityCard
+                        key={c}
                         configId={c}
                         configName={this.props.configs[c].name}
                         currentConfigId={this.props.currentConfig}
                         cardStyle={cardStyle}
-                        />
+                        timer={this.props.timer} />
                 );
             }
         }

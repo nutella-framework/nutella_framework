@@ -28,6 +28,17 @@ var Main = React.createClass({
                     self.setCurrentConfig(message);
                 });
 
+                // Get current selected config
+                nutella.net.request('launchTime/retrieve', '', function (time) {
+                    self.setTimer(time, self.updateTimer);
+
+                    // Subscribe for future changes
+                    nutella.net.subscribe('launchTime/updated', function (time, from) {
+                        self.setTimer(time, self.updateTimer);
+                    });
+
+                });
+
             });
 
         });
@@ -36,6 +47,7 @@ var Main = React.createClass({
     getInitialState: function () {
         return  {
             currentConfig: '1',
+            timer: null,
             configs: []
         }
     },
@@ -52,6 +64,44 @@ var Main = React.createClass({
         });
     },
 
+    /**
+     * Computes duration from absolute times and stores in state.
+     * @param time
+     */
+    setTimer: function(time) {
+        var self = this;
+
+        var callback = function() {
+            window.clearInterval(self._timeoutId);
+            var action = function() {
+                self.updateTimer(self.state.timer + 1000);
+            };
+            self._timeoutId = setInterval(action, 1000);
+        };
+
+        var now = new Date().getTime();
+        var then = new Date(time).getTime();
+        var duration = now - then;
+        if(duration < 100) {
+            duration = 0;
+        }
+        if(callback) {
+            this.setState({
+                timer: duration
+            }, callback);
+        } else {
+            this.setState({
+                timer: duration
+            });
+        }
+    },
+
+    updateTimer: function(t) {
+        this.setState({
+            timer: t
+        });
+    },
+
     render: function () {
 
         return (
@@ -60,7 +110,8 @@ var Main = React.createClass({
 
                 <ActivitiesGrid
                     configs={this.state.configs}
-                    currentConfig={this.state.currentConfig} />
+                    currentConfig={this.state.currentConfig}
+                    timer={this.state.timer} />
 
                 <Footer />
 
