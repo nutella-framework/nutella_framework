@@ -61,6 +61,7 @@ nutella.f.net.handle_requests_on_all_runs('configs/retrieve', lambda do |request
                                                                       }
                                                                   }
                                                                   configs_db['currentConfig'] = 1
+                                                                  configs_db['launchTime'] = Time.now.to_f
                                                                 end
                                                                 reply
                                                               end
@@ -92,10 +93,29 @@ nutella.f.net.subscribe_to_all_runs('currentConfig/update', lambda do |message, 
                                                             if new_config != nil
                                                               configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                               configs_db['currentConfig'] = new_config
+
+                                                              # Reset timer (enforces coupling new activity - new timer)
+                                                              new_time = Time.now.to_f
+                                                              configs_db['launchTime'] = new_time
+
+                                                              # Notify Update
+                                                              publish_current_config_update(app_id, run_id, new_config)
+                                                              publish_launch_time_update(app_id, run_id, new_time)
+                                                            end
+
+                                                          end)
+
+nutella.f.net.subscribe_to_all_runs('launchTime/update', lambda do |message, app_id, run_id, from|
+                                                            new_time = message
+
+                                                            # Update
+                                                            if new_time != nil
+                                                              configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
+                                                              configs_db['launchTime'] = new_time
                                                             end
 
                                                             # Notify Update
-                                                            publish_current_config_update(app_id, run_id, new_config)
+                                                            publish_launch_time_update(app_id, run_id, new_time)
                                                           end)
 
 # Reacts to updates to config id by publishing the updated mapping
@@ -116,6 +136,15 @@ nutella.f.net.handle_requests_on_all_runs('currentConfig/retrieve', lambda do |r
                                                                     reply = configs_db['currentConfig']
                                                                     if reply == nil
                                                                       reply = 1
+                                                                    end
+                                                                    reply
+                                                                  end)
+
+nutella.f.net.handle_requests_on_all_runs('launchTime/retrieve', lambda do |request, app_id, run_id, from|
+                                                                    configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
+                                                                    reply = configs_db['launchTime']
+                                                                    if reply == nil
+                                                                      reply = Time.now.to_f
                                                                     end
                                                                     reply
                                                                   end)
@@ -157,6 +186,11 @@ end
 # Sends the updated config id
 def publish_current_config_update(app_id, run_id, config_id)
   nutella.f.net.publish_to_run(app_id, run_id, 'currentConfig/ack_updated', config_id)
+end
+
+# Sends the updated config id
+def publish_launch_time_update(app_id, run_id, config_id)
+  nutella.f.net.publish_to_run(app_id, run_id, 'launchTime/updated', config_id)
 end
 
 # Sends the whole new current configuration
