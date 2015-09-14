@@ -3,7 +3,6 @@ var React = require('react');
 var Mui = require('material-ui');
 var Paper = Mui.Paper;
 var d3 = require('d3');
-var moment = require('moment');
 
 var ActivityCard = React.createClass({
 
@@ -50,6 +49,8 @@ var ActivityCard = React.createClass({
                 height: cardHeight
             });
 
+        var stroke = this.state.isSelected ? 'white' : null;
+
         svg.append('circle')
             .attr({
                 cx: cardWidth / 2,
@@ -57,7 +58,8 @@ var ActivityCard = React.createClass({
                 r: '0px'
             })
             .style({
-                fill: this._colorSelected
+                fill: this._colorSelected,
+                stroke: stroke
             })
             .transition()
             .call(publishAfterTransition)
