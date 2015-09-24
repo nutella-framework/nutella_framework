@@ -1,12 +1,25 @@
 var React = require('react');
 var Mui = require('material-ui');
 var Paper = Mui.Paper;
+var $ = require('jquery');
 
 /**
  * @prop selectedChannel
  * @prop channels
  */
 var ChannelCard = React.createClass({
+
+    componentDidMount: function() {
+        // Font-size adaptation based on card width
+        $('.text-fit').each(function() {
+            $(this).css('font-size', '2em');
+            var i =0;
+            while( $(this).width() > $('.name-wrapper').width() - 10 ) {
+                $(this).css('font-size', (parseInt($(this).css('font-size')) - 1) + "px" );
+                i++;
+            }
+        });
+    },
 
     handleSelectCard: function() {
 
@@ -66,7 +79,7 @@ var ChannelCard = React.createClass({
                                 <div className='channel-icon' ref='channelIcon' style={iconStyle} > </div>
 
                                 <div className='name-wrapper'>
-                                    <p className='channel-name'> {this.props.channelData.name} </p>
+                                    <span className='channel-name text-fit'>{this.props.channelData.name}</span>
                                 </div>
 
                             </div>

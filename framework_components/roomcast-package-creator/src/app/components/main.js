@@ -9,7 +9,6 @@ var Main = React.createClass({
 
     componentDidMount: function() {
         var self = this;
-
         // Get current channels catalogue
         nutella.net.request('channels/retrieve', 'all', function (response) {
             self.handleUpdatedChannelsCatalogue(response);
@@ -18,11 +17,8 @@ var Main = React.createClass({
             nutella.net.subscribe('channels/updated', function (message, from) {
                 self.handleUpdatedChannelsCatalogue(message);
             });
-
         });
-
         // TODO subscribe to changed configs
-
     },
 
     /**
