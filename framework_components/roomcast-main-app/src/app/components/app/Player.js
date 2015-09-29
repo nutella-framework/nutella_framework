@@ -39,7 +39,7 @@ var Player = React.createClass({
     showLoading: function() {
         var self = this;
 
-        d3.xml("assets/Logo_grid.svg", "image/svg+xml", function (logo) {
+        d3.xml("dist/assets/Logo_grid.svg", "image/svg+xml", function (logo) {
 
             self.refs['player'].getDOMNode().appendChild(logo.documentElement);
 

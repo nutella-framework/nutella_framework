@@ -80,7 +80,7 @@ var AppIdPage = React.createClass({
 
                 <div className='titles-div' style={titlesDivStyle} >
 
-                    <img src='assets/Logo_alpha.png' className='rc-logo' />
+                    <img src='dist/assets/Logo_alpha.png' className='rc-logo' />
                     <span className='title' > application name: </span>
 
                 </div>
