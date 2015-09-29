@@ -14,7 +14,7 @@
     injectTapEventPlugin();
 
     var query_parameters = NUTELLA.parseURLParameters();
-    if(query_parameters[0]) {
+    if(query_parameters.broker) {
         window.nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'roomcast-package-creator', function(connected) {
             if(connected) {
                 window.ReactMain = React.render( <Main /> , document.body);
