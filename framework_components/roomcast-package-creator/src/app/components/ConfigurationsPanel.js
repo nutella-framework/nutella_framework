@@ -48,7 +48,6 @@ var ConfigurationsPanel = React.createClass({
     },
 
     handleDeleteConfig: function(menuItem) {
-        console.log('deleting configId', menuItem.configId);
         this.props.onDeleteConfig(menuItem.configId);
     },
 
@@ -57,7 +56,6 @@ var ConfigurationsPanel = React.createClass({
     },
 
     render: function() {
-
         var self = this;
         var dropdown = null;
         var menuItems = [];

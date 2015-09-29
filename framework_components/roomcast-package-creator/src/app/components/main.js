@@ -94,7 +94,8 @@ var Main = React.createClass({
     },
 
     handleUndoChanges: function() {
-        this.nutellaRequestConfigs();
+        //this.nutellaRequestConfigs();
+        window.location.reload(true);
     },
 
     handleAddRow: function(family) {

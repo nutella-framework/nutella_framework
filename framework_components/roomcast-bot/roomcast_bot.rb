@@ -46,17 +46,14 @@ nutella.f.net.handle_requests_on_all_runs('configs/retrieve', lambda do |request
                                                                       "1"=> {
                                                                           "name"=> "Default activity",
                                                                           "mapping"=> [{
-                                                                                           "family"=> "iPad",
+                                                                                           "family"=> "Public",
                                                                                            "items"=> [{
                                                                                                           "name"=> "",
                                                                                                           "channels"=> []
                                                                                                       }]
                                                                                        }, {
-                                                                                           "family"=> "Mac",
-                                                                                           "items"=> [{
-                                                                                                          "name"=> "",
-                                                                                                          "channels"=> []
-                                                                                                      }]
+                                                                                           "family"=> "Personal",
+                                                                                           "items"=> []
                                                                                        }]
                                                                       }
                                                                   }

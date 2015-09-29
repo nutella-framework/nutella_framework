@@ -50,8 +50,6 @@ var DropDownMenu = React.createClass({
             classes += ' mui-open';
         }
 
-        //console.log('selected:', this.state.selectedIndex, this.props.menuItems); // TODO check performance
-
         return (
             <div className={classes}>
                 <div className="mui-menu-control" onClick={this._onControlClick}>
@@ -149,7 +147,6 @@ var DropDownMenu = React.createClass({
                         selectedIndex: 0
                     });
 
-                    console.log(this.refs.menu);
                     this.props.onAddEmptyConfig(this.refs.menu.refs['configField_true'].getValue());
 
                 }
