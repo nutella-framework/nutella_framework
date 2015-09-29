@@ -44,13 +44,8 @@ var ChannelsCatalogue = React.createClass({
             );
         }
 
-        var backgroundMessage = null; //TODO
-
         return (
             <div className='content-div'>
-
-                {backgroundMessage}
-
                 <div className="grid" ref='gridRef' >
                     {channels}
                 </div>

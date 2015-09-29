@@ -17,8 +17,10 @@ var Main = React.createClass({
             nutella.net.subscribe('channels/updated', function (message, from) {
                 self.handleUpdatedChannelsCatalogue(message);
             });
+            nutella.net.subscribe('configs/updated', function (message, from) {
+                self.handleNewConfigs(message);
+            });
         });
-        // TODO subscribe to changed configs
     },
 
     /**
@@ -40,10 +42,14 @@ var Main = React.createClass({
     nutellaRequestConfigs: function() {
         var self = this;
         nutella.net.request('configs/retrieve', 'all', function(response) {
-            self.handleUpdatedConfigs(response);
-            self.handleUpdatedCurrentConfigId(+Object.keys(response)[Object.keys(response).length - 1]);
-            self.handleUpdatedCurrentConfig(response[Object.keys(response)[Object.keys(response).length - 1]].mapping)
+            self.handleNewConfigs(response);
         });
+    },
+
+    handleNewConfigs: function(response) {
+        this.handleUpdatedConfigs(response);
+        this.handleUpdatedCurrentConfigId(+Object.keys(response)[Object.keys(response).length - 1]);
+        this.handleUpdatedCurrentConfig(response[Object.keys(response)[Object.keys(response).length - 1]].mapping)
     },
 
     handleSelection: function(selectedChannel) {
