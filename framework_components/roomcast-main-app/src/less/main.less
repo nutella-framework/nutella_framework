@@ -1,0 +1,363 @@
+/* Eric Meyer's Reset CSS v2.0 - http://cssreset.com */
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{border:0;font-size:100%;font:inherit;vertical-align:baseline;margin:0;padding:0}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:none}table{border-collapse:collapse;border-spacing:0}
+
+@import "node_modules/material-ui/src/less/scaffolding.less";
+//Define a custom less file to override any variables defined in scaffolding.less
+@import "my_overrides.less";
+@import "node_modules/material-ui/src/less/components.less";
+
+//////////// APP ////////////
+
+// VARIABLES
+@pad1: 5vh; // 50px
+@pad2: @pad1/2;
+
+.vendor(@property, @value) {
+  -webkit-@{property}: @value;
+  -moz-@{property}: @value;
+  -ms-@{property}: @value;
+  -o-@{property}: @value;
+  @{property}: @value;
+}
+
+// CODE
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: #e9eaed;
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+.outerDiv {
+}
+.grid {
+  z-index: 200;
+  padding: @pad1 0 @pad1 @pad1;
+  width: 100%;
+  min-height: 31vh;
+  white-space: nowrap;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  position: absolute;
+  background-color: rgba(1,1,1,0.8);
+  .vendor(transition, all 500ms ease-in-out);
+}
+.channel {
+  // aspect ratio: 10:7.23
+  width: 20vh*1.383;
+  height: 20vh;
+  display: inline-block;
+  position: relative;
+  background: white;
+  margin-right: 30px;
+  &:hover {
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.5);
+    cursor: pointer;
+  }
+  .channel-div {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    .channel-caption {
+      width: 100%;
+      height: 27%;
+      position: absolute;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      .icon-name-wrapper {
+        width: 100%;
+        position: absolute;
+        bottom: 10%;
+        overflow: auto;
+        .channel-icon {
+          width: 15%;
+          height: 0;
+          padding-bottom: 15%;
+          margin-left: 2%;
+          background-color: white;
+          position: relative;
+          float: left;
+          vertical-align: bottom;
+          border:1px solid transparent;
+        }
+        .name-wrapper {
+          width: 83%;
+          display: inline-block;
+          position: absolute;
+          float: right;
+          top: 20%;
+          .channel-name {
+            color: #ffffff;
+            font-size: 1.3vw;
+            cursor: default;
+            margin: 0 0 4% 3%;
+            padding: 0 0 0 0;
+            vertical-align: middle;
+            @media (min-width: 1025px) and (max-width: 1480px) {
+              margin: 0 0 3% 3%;
+            }
+            @media (max-width: 1024px) {
+              margin: 0 0 2% 3%;
+            }
+            @media (max-width: 900px) {
+              margin: 0 0 1% 3%;
+            }
+          }
+          .channel-description {
+            color: #ffffff;
+            font-size: 0.8vw;
+            cursor: default;
+            margin: 0 0 0 3%;
+            padding: 0 0 0 0;
+            line-height: 0;
+          }
+        }
+      }
+
+    }
+  }
+}
+.controlButton {
+  position: fixed;
+  bottom: 10px;
+  right: 15px;
+  z-index: 250;
+  cursor: pointer;
+  color: #9197a3;
+  font-size: 2em;
+  &:hover {
+    color: darken(#9197a3, 10);
+  }
+}
+.logout-button-div {
+  position: absolute;
+  bottom: 5%;
+  width: 100%;
+  text-align: center;
+  .logout-button {
+    .mui-paper-container {
+      padding: 0;
+    }
+  }
+}
+.mui-right-nav .mui-paper-container {
+  overflow: scroll;
+}
+
+.player {
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  .channel-frame {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .back-button {
+    //z-index: 110;
+  }
+}
+
+.tabs-button {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  i {
+    position: relative;
+    font-size: 38px;
+    color: white;
+    top: 2px;
+  }
+}
+
+.hidden-tabs {
+  .vendor(transform, translate(0,-31vh))
+}
+
+//////////// LOGIN ////////////
+
+// VARIABLES
+@external-margin: 20px;
+@card-margin: 20px;
+
+// MIXINS
+.clickable {
+  cursor: pointer;
+}
+
+
+// CODE
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: #e9eaed;
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+  -webkit-touch-callout: none;
+}
+*:not(input) {
+  -webkit-user-select: none;
+}
+
+////////////////////////////////
+
+.main-div {
+  //position: absolute;
+}
+
+.titles-div {
+  width: 100%;
+  text-align: center;
+
+  // flex container properties
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: stretch;
+
+  .rc-logo {
+    width: 20vw;
+    margin: auto;
+    margin-bottom: 0;
+    display: block;
+  }
+
+  .title {
+    font-size: 3em;
+    font-weight: 300;
+    cursor: default;
+
+    // flex item properties
+    width: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    &:first-child {
+      margin-top: 0.7em;
+      font-size: 6em;
+    }
+  }
+}
+
+.grid-div {
+  width: 100%;
+  position: absolute;
+
+  .identities-grid {
+    //width: 100%;
+    margin-left: @external-margin;
+    //margin-top: @external-margin;
+    margin-right: @external-margin;
+
+    // flex container properties
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: stretch;
+
+    .identity-card {
+      background: white;
+      .clickable;
+      margin: @card-margin;
+
+      // flex item properties
+      flex-grow: 0;
+      flex-shrink: 0;
+      //flex-basis: 0;  // TODO breaks Safari
+
+      .mui-paper-container {
+        position: relative;
+
+        .card-name {
+          // flex container properties
+          height: 100%;
+          width: 100%;
+          position: absolute;
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-items: center;
+          align-content: center;
+
+          span {
+            font-size: 1.5em;
+            font-weight: 300;
+
+            // flex item properties
+            flex-grow: 0;
+            flex-shrink: 0;
+            flex-basis: main-size;
+          }
+        }
+      }
+
+    }
+  }
+}
+
+.backgroundMessage {
+  position: absolute;
+  left: 0;
+  bottom: 50%;
+  width: 100%;
+  font-size: 2.5vw;
+  text-align: center;
+  color: #9197a3;
+  font-weight: 300;
+  cursor: default;
+}
+
+.text-field-broker {
+  margin: 0 auto;
+  width: 40%;
+  .mui-text-field {
+    font-size: 3em;
+    width: 100%;
+    height: 1.5em !important;
+  }
+}
+
+.submit-broker {
+  width: 100%;
+  margin: auto;
+  display: inline-block;
+  position: absolute;
+  bottom: 30px;
+  text-align: center;
+  .mui-raised-button {
+    min-width: 150px;
+    height: 55px;
+    .mui-raised-button-container {
+      height: 100%;
+    }
+    .mui-raised-button-label {
+      font-size: 20px;
+    }
+  }
+}
+
+///////////  LOADING  /////////
+
+#logo {
+  width: 100%;
+  height: 100vh;
+  display: block;
+  margin: auto;
+  background-color: rgba(1,1,1,0.7);
+}
