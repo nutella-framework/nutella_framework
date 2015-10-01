@@ -162,22 +162,17 @@ var Main = React.createClass({
         configs[newConfigId] = {
             "name": configName,
             "mapping": [{
-                "family": "iPad",
+                "family": "Public",
                 "items": [{
                     "name": "",
                     "channels": []
                 }]
             }, {
-                "family": "Mac",
-                "items": [{
-                    "name": "",
-                    "channels": []
-                }]
+                "family": "Personal",
+                "items": []
             }]
         };
         this.handleUpdatedConfigs(configs);
-
-        console.log('new assigned id', newConfigId);
 
         // Update current local configuration to selected one
         this.handleUpdatedCurrentConfigId(newConfigId);
