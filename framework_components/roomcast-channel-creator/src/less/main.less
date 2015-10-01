@@ -60,7 +60,7 @@ html, body {
 *, *:before, *:after {
   box-sizing: inherit;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
+  //-webkit-user-select: none;
 }
 
 /////////////   TopBar   ///////////////////
@@ -460,6 +460,12 @@ html, body {
 .mui-radio-button:last-child {
   margin-bottom: 10px;
 }
+
+.mui-menu .mui-menu-item * {
+  .vendor(user-select, text);
+}
+
+////////////////////////////
 
 .upload-button-container {
   position: absolute;

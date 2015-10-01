@@ -33,8 +33,7 @@ var DropDownMenu = React.createClass({
     },
 
     componentDidMount: function() {
-        if (this.props.autoWidth) this._setWidth();
-        this._setWidth();
+        //this._setWidth();
     },
 
     componentWillReceiveProps: function(nextProps) {

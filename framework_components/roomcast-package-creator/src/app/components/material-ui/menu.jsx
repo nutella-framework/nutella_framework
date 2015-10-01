@@ -41,6 +41,8 @@ var Menu = React.createClass({
         var menuWidth = document.getElementsByClassName('resources-panel')[0].offsetWidth / 2.4;
         //Update the menu width
         el.style.width = menuWidth + 'px';
+        var dropdownWidth = document.getElementsByClassName('mui-drop-down-menu')[0];
+        dropdownWidth.style.width = menuWidth + 'px';
 
         //Save the initial menu height and item height for later
         this._initialMenuHeight = el.offsetHeight + KeyLine.Desktop.GUTTER_LESS;
