@@ -21,7 +21,7 @@
             }
         });
     } else {
-        window.nutella = NUTELLA.init('52.1.142.215', 't1', 'default', 'roomcast-package-creator', function(connected) {
+        window.nutella = NUTELLA.init('ltg.evl.uic.edu', 'wallcology', 'default', 'roomcast-package-creator', function(connected) {
             window.ReactMain = React.render( <Main /> , document.body);
         });
     }
