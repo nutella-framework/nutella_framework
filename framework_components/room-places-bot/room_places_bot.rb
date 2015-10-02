@@ -728,6 +728,7 @@ while sleep 0.5
     Nutella.runlist.runs_for_app(app_id).each do |run_id|
       baseStations = []
       resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
+      resources.set_auto_save(false)
 
       resources.to_h.each do |_, resource|
         if resource['proximity'] != nil && resource['proximity']['timestamp'] != nil
@@ -754,6 +755,8 @@ while sleep 0.5
       cache.publish_update
       cache.publish_exit
       cache.publish_enter
+
+      resources.save # Save the resource on the DB
     end
   end
 
