@@ -174,7 +174,6 @@ nutella.f.net.subscribe_to_all_runs('location/resource/add', lambda do |message,
       end
       publishResourceAdd(app_id, run_id, resources[rid])
       cache.publish_add
-      puts('Added resource')
     end
 
   end
@@ -195,7 +194,6 @@ nutella.f.net.subscribe_to_all_runs('location/resource/remove', lambda do |messa
     resources.delete(rid)
     publishResourceRemove(app_id, run_id, resourceCopy)
     cache.publish_remove
-    puts('Removed resource')
 
   end
 end)
@@ -270,7 +268,7 @@ def updateResource(app_id, run_id, updatedResource)
   if proximity != nil && proximity['rid'] != nil && proximity['distance'] != nil
     baseStation = resources[proximity['rid']]
 
-    if baseStation != nil
+    if baseStation != nil && baseStation['proximity_range'] != nil
 
       if baseStation['proximity_range'] >= proximity['distance']
         if resource['proximity'] != nil && resource['proximity']['rid'] && resource['proximity']['distance']
@@ -358,9 +356,6 @@ def updateResource(app_id, run_id, updatedResource)
       if parameter['delete'] != nil
         ps.delete(parameter['key'])
       else
-        puts "--------"
-        puts parameter['key']
-        puts parameter['value']
         ps[parameter['key']] = parameter['value']
       end
     end
@@ -368,8 +363,6 @@ def updateResource(app_id, run_id, updatedResource)
   end
 
   if type != nil
-    puts 'Update type'
-
     if type == 'STATIC'
       resource['type'] = type
       resource.delete('proximity')
@@ -382,29 +375,18 @@ def updateResource(app_id, run_id, updatedResource)
       resource['type'] = type
       resource.delete('proximity_range')
     end
-
-    puts 'Stored resource'
   end
 
   if proximity_range != nil
-    puts 'Update proximity range'
-
     if resource['type'] == 'STATIC'
       resource['proximity_range']	= proximity_range
     end
-
-    puts 'Stored resource'
-
   end
 
   if proximity == nil && discrete == nil && continuous == nil && parameters == nil
-
     resource.delete('proximity')
     resource.delete('continuous')
     resource.delete('discrete')
-
-    puts 'Stored resource'
-
   end
 
   resources[rid]=resource
@@ -417,8 +399,6 @@ nutella.f.net.handle_requests_on_all_runs('location/resources', lambda do |reque
   # Persistent data
   resources = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'resources')
   groups = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'groups')
-
-  puts 'Send list of resources'
 
 	rid = request['rid']
 	group = request['group']
@@ -476,7 +456,6 @@ nutella.f.net.subscribe_to_all_runs('location/room/update', lambda do |message, 
     r['y'] = y
 
     publishRoomUpdate(app_id, run_id, r)
-    puts 'Room updated'
   end
 end)
 
@@ -488,27 +467,18 @@ def computeResourceUpdate(app_id, run_id, rid)
 
   if resource != nil
     if resource['proximity'] != nil
-      puts 'Proximity resource detected: take coordinates base station'
-
       if resource['proximity']['rid'] != nil
-        puts 'Search for base station ' + resource['proximity']['rid']
         baseStation = resources[resource['proximity']['rid']]
 
         if baseStation != nil && baseStation['continuous'] != nil
-          puts 'Copy continuous position base station'
           resource['proximity']['continuous'] = baseStation['continuous']
 
           # Update basic station
           computeResourceUpdate(app_id, run_id, resource['proximity']['rid'])
-        else
-          puts 'Continuous position not present'
         end
 
         if baseStation != nil && baseStation['discrete'] != nil
-          puts 'Copy discrete position base station'
           resource['proximity']['discrete'] = baseStation['discrete']
-        else
-          puts 'Discrete position not present'
         end
       end
     end
@@ -539,7 +509,6 @@ def computeResourceUpdate(app_id, run_id, rid)
 
     # Send update
     publishResourceUpdate(app_id, run_id, resource)
-    puts 'Sent update'
 
   end
 end
@@ -702,7 +671,6 @@ end
 # Request the size of the room
 nutella.f.net.handle_requests_on_all_runs('location/room', lambda do |request, app_id, run_id, from|
   room = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'room')
-	puts 'Send the room dimension'
 
 	r = {}
 
@@ -725,8 +693,6 @@ end)
 nutella.f.net.handle_requests_on_all_runs('location/tracking/discrete', lambda do |request, app_id, run_id, from|
 
   discrete_tracking = nutella.f.persist.get_run_mongo_object_store(app_id, run_id, 'discrete_tracking')
-
-  puts 'Send the discrete tracking system'
 
   x = discrete_tracking['x']
   y = discrete_tracking['y']
@@ -754,8 +720,6 @@ nutella.f.net.handle_requests_on_all_runs('location/tracking/discrete', lambda d
   end
 end)
 
-puts 'Initialization completed'
-
 # Routine that delete old proximity beacons
 
 while sleep 0.5
@@ -767,14 +731,13 @@ while sleep 0.5
 
       resources.to_h.each do |_, resource|
         if resource['proximity'] != nil && resource['proximity']['timestamp'] != nil
-          if Time.now.to_f - resource['proximity']['timestamp'] > 3.0
+          if Time.now.to_f - resource['proximity']['timestamp'] > 5.0
             if resource['proximity']['rid'] != nil
               baseStations.push(resource['proximity']['rid'])
               publishResourceExit(app_id, run_id, resource, resource['proximity']['rid'])
             end
             resource['proximity'] = {}
             resources[resource['rid']] = resource
-            puts 'Delete proximity resource'
             publishResourceUpdate(app_id, run_id, resource)
           end
         end
