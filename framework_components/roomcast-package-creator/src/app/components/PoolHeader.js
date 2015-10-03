@@ -46,7 +46,7 @@ var PoolHeader = React.createClass({
                     {buttonRemove}
             </th>
         } else {
-            buttonRemove = <GlobalButton type='remove' onRemovedChannels={this.handleRemovedChannels} />;
+            buttonRemove = <GlobalButton type='remove-all' onRemovedChannels={this.handleRemovedChannels} />;
             headerButtons = <th>
                     {buttonRemove}
             </th>

@@ -1,7 +1,9 @@
 .mui-menu-item {
 
-  * { user-select: none }
-  
+  * {
+    user-select: text !important;
+  }
+
   cursor: pointer;
   line-height: @menu-item-height;
   padding-left: @menu-item-padding;
@@ -60,7 +62,7 @@
   &.mui-is-selected {
     color: @menu-item-selected-text-color;
   }
-    
+
   &.mui-is-disabled {
     color: fade(@body-text-color, 30%) !important;
     cursor: default;

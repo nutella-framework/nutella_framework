@@ -23,18 +23,17 @@ var Main = React.createClass({
                 nutella.net.request('channels/retrieve', 'all', function (response) {
                     self.handleUpdatedChannelsCatalogue(response);
 
-                    // TODO check that rid is within current available rids: if rids changed, catch error and ask for new one
                     // If at startup info on id is already in state
                     if(self.state.rid) {
                         // Get current assigned channels (mapping)
                         nutella.net.request('mapping/retrieve', 'all', function (response) {
-                            self.updateChannelsForRid(response, self.state.rid);
+                            self.handleActivitySwitch(response);
                         });
                     }
 
                     // Subscribe for future changes
                     nutella.net.subscribe('mapping/updated', function (message, from) {
-                        self.updateChannelsForRid(message, self.state.rid);
+                        self.handleActivitySwitch(message);
                     });
                     nutella.net.subscribe('currentConfig/switched', function (message, from) {
                         self.handleActivitySwitch(message);

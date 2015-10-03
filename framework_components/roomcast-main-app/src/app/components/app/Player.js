@@ -111,7 +111,9 @@ var Player = React.createClass({
         var url = this.props.url;
         var qp = this.props.nutellaParams;
         var suffix = 'broker=' + qp.broker + '&app_id=' + qp.app_id + '&run_id=' + qp.run_id;
-        url = url.indexOf('?') === -1 ? url + '?' + suffix : url + '&' + suffix;
+        if(url !== '') {
+            url = url.indexOf('?') === -1 ? url + '?' + suffix : url + '&' + suffix;
+        }
 
         return (
 

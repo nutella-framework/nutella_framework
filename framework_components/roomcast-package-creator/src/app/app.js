@@ -14,14 +14,14 @@
     injectTapEventPlugin();
 
     var query_parameters = NUTELLA.parseURLParameters();
-    if(query_parameters[0]) {
+    if(query_parameters.broker) {
         window.nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'roomcast-package-creator', function(connected) {
             if(connected) {
                 window.ReactMain = React.render( <Main /> , document.body);
             }
         });
     } else {
-        window.nutella = NUTELLA.init('52.1.142.215', 't1', 'default', 'roomcast-package-creator', function(connected) {
+        window.nutella = NUTELLA.init('ltg.evl.uic.edu', 'wallcology', 'default', 'roomcast-package-creator', function(connected) {
             window.ReactMain = React.render( <Main /> , document.body);
         });
     }

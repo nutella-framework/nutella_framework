@@ -11,7 +11,7 @@ var NUTELLA = require('nutella_lib');
 var Main = React.createClass({
 
     componentDidMount: function() {
-        var broker = '52.1.142.215';
+        var broker = 'ltg.evl.uic.edu';
         this.initWithBroker(broker);
     },
 
