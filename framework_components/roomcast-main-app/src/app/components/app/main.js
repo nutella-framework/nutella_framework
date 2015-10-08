@@ -7,11 +7,14 @@ var RightNav = require('./material-ui/right-nav.jsx');
 var NUTELLA = require('nutella_lib');
 var IdentitySelector = require('../identity-selector/main');
 var Player = require('./Player');
+var NutellaMixin = require('./NutellaMixin');
 
 var $ = require('jquery');
 require('jquery-ui/draggable');
 
 var Main = React.createClass({
+
+    mixins: [NutellaMixin],
 
     componentDidMount: function() {
         var self = this;
@@ -205,8 +208,14 @@ var Main = React.createClass({
                 self.setState({backgroundMessage: null});
             }
         };
-
         this.setState({playing: id, players: players, tabs: false}, callback);
+
+        // #LOG action
+        this.logAction('playChannel', this.props.params.app_id, this.props.params.run_id, {
+            channelName: this.state.channelsCatalogue[id].name,
+            packageName: this.state.rid,
+            deviceId: 123456789
+        });
     },
 
     handleBacktoMenu: function() {

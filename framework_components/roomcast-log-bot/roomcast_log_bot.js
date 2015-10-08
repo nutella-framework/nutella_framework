@@ -1,16 +1,29 @@
 var NUTELLA = require('nutella_lib');
 
-// Get configuration parameters and init nutella
-var cliArgs = NUTELLA.parseArgs();
-var componentId = NUTELLA.parseComponentId();
-var nutella = NUTELLA.init(cliArgs.broker, cliArgs.app_id, cliArgs.run_id, componentId);
-//nutella.setResourceId('my_resource_id');
+console.log('Initializing roomcast_log_bot...');
+//NUTELLA.f
+var nutella = NUTELLA.init('localhost', 't1', 'default', 'log-bot', function(connected) {
+    console.log(connected);
+});
 
-console.log('running');
+/*
+nutella.f.net.subscribe_to_all_runs('configs/updated',
+    function(message, appId, runId, from) {
+        console.log(message, 'from ' + appId + " " + runId);
+    },
+    function() {
+
+    });
+    */
+
+console.log('Initialization complete.');
+
+//////////////////////////////////////////
 
 // 1. Subscribing to a channel
-nutella.net.subscribe('demo_channel', function(message, from) {
+nutella.net.subscribe('configs/updated', function(message, from) {
     // Your code to handle messages received on this channel goes here
+    console.log(message);
 });
 
 
