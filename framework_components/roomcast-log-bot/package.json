@@ -1,0 +1,28 @@
+{
+  "name": "roomcast-log-bot",
+  "version": "1.0.0",
+  "description": "A roomcast bot to keep track of the UI interactions",
+  "main": "roomcast_log_bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "nutella",
+    "framework",
+    "roomcast",
+    "log"
+  ],
+  "author": "Matteo Palvarini",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "nutella_lib": "*"
+  }
+}

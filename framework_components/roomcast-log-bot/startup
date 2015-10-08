@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Extract the path of the current directory.
+# From now on you can refer to any file in the
+# bot directory as: $BASEDIR/<my_file>
+BASEDIR=$(dirname $0)
+
+# Remember: nutella passes the `broker address`, the `app_id` and the `run_id`
+# as command line parameters that you can access via $1, $2 and $3 respectively.
+
+# Start your bot here with something like (example in ruby):
+# node $BASEDIR/node-bot.js $1 $2 $3
+node $BASEDIR/node-bot.js $1 $2 $3
