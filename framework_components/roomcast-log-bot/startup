@@ -10,4 +10,5 @@ BASEDIR=$(dirname $0)
 
 # Start your bot here with something like (example in ruby):
 # node $BASEDIR/node-bot.js $1 $2 $3
-node $BASEDIR/node-bot.js $1 $2 $3
+node $BASEDIR/node-bot.js $1 $2 $3 > /dev/null 2>&1 &
+echo $! > $BASEDIR/.pid
