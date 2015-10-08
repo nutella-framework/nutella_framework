@@ -121,6 +121,18 @@ var Main = React.createClass({
         if(myChannelsId.indexOf(this.state.playing) === -1) {
             this.setState({playing: null});
         }
+
+        // update players: if permanently deleted from catalogue they have to be destroyed
+        var catalogue = this.state.channelsCatalogue;
+        var players = this.state.players;
+        var newPlayers = [];
+        players.forEach(function(p) {
+            if(catalogue[+p]) {
+                newPlayers.push(p);
+            }
+        });
+        this.setState({players: newPlayers});
+        console.log(catalogue, players, newPlayers);
     },
 
     getInitialState: function() {
@@ -426,17 +438,19 @@ var Main = React.createClass({
         ids.forEach(function(id) {
             var p_id = self.state.playing;
             var playing = p_id === id;
-            var player =
-                <Player
-                    key={id}
-                    chId={id}
-                    ref={'player_' + id}
-                    playing={playing}
-                    url={self.state.channelsCatalogue[+id].url}
-                    name={self.state.channelsCatalogue[+id].name}
-                    nutellaParams={self.props.params}
-                    onBackButton={self.handleBacktoMenu} />;
-            players.push(player);
+            if(self.state.channelsCatalogue[+id]) {
+                var player =
+                    <Player
+                        key={id}
+                        chId={id}
+                        ref={'player_' + id}
+                        playing={playing}
+                        url={self.state.channelsCatalogue[+id].url}
+                        name={self.state.channelsCatalogue[+id].name}
+                        nutellaParams={self.props.params}
+                        onBackButton={self.handleBacktoMenu} />;
+                players.push(player);
+            }
         });
 
         var outerDivStyle = null;
