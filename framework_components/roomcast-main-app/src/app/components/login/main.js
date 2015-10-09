@@ -11,7 +11,11 @@ var NUTELLA = require('nutella_lib');
 var Main = React.createClass({
 
     componentDidMount: function() {
+        var query_parameters = NUTELLA.parseURLParameters();
         var broker = 'ltg.evl.uic.edu';
+        if(query_parameters.broker) {
+            broker = query_parameters.broker;
+        }
         this.initWithBroker(broker);
     },
 

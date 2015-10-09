@@ -16,10 +16,6 @@ var NutellaMixin = {
         doc.time = new Date();
         doc.info = info;
         nutella.net.publish('roomcast-log-bot/store', doc);
-        console.log('logging');
-        nutella.net.subscribe('roomcast-log-bot/store', function(message, from) {
-            console.log('listening on app', message);
-        });
     }
 
 };
