@@ -1,16 +1,12 @@
 var React = require('react');
 var Mui = require('material-ui');
 var Paper = Mui.Paper;
-var NutellaMixin = require('./NutellaMixin');
-var iOSMixin = require('./iOSMixin');
 var $ = require('jquery');
 
 /**
  * @prop channel
  */
 var Channel = React.createClass({
-
-    mixins: [NutellaMixin, iOSMixin],
 
     componentDidMount: function() {
         // Font-size adaptation based on card width
