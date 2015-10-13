@@ -4,7 +4,7 @@ var CssEvent = require('../../../../node_modules/material-ui/src/js/utils/css-ev
 var Classable = require('../../../../node_modules/material-ui/src/js/mixins/classable');
 var EnhancedButton = require('../../../../node_modules/material-ui/src/js/enhanced-button.jsx');
 var Paper = require('../../../../node_modules/material-ui/src/js/paper.jsx');
-var Ripple = require('../../../../node_modules/material-ui/src/js/ripple.jsx');
+var Ripple = require('./ripple.jsx');
 
 var RaisedButton_ = React.createClass({
 

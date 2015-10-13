@@ -4,7 +4,7 @@ var Classable = require('../../../../node_modules/material-ui/src/js/mixins/clas
 var EnhancedButton = require('../../../../node_modules/material-ui/src/js/enhanced-button.jsx');
 var Icon = require('../../../../node_modules/material-ui/src/js/icon.jsx');
 var Paper = require('../../../../node_modules/material-ui/src/js/paper.jsx');
-var Ripple = require('../../../../node_modules/material-ui/src/js/ripple.jsx');
+var Ripple = require('./ripple.jsx');
 
 var FloatingActionButton_ = React.createClass({
 

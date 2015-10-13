@@ -70,6 +70,7 @@ var Menu = React.createClass({
     },
 
     render: function() {
+        console.log('rendering menu');
 
         var classes = 'mui-menu';
         if(this.props.hideable) {
