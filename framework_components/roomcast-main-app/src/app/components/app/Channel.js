@@ -38,7 +38,7 @@ var Channel = React.createClass({
         };
 
         var border = this.props.playing ? {
-            outline: 'solid 5px rgba(255,255,0,0.5)'
+            outline: 'solid 5px rgba(255,255,0,0.75)'
         } : null;
 
         return (

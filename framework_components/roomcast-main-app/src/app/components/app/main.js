@@ -307,7 +307,7 @@ var Main = React.createClass({
             $( ".ui-draggable-iframeFix" ).remove();
         };
 
-        $(".tabs-button")
+        $(".moving-button")
             .draggable({
                 containment: ".outer-div",
                 start: function(event, ui) {
@@ -354,6 +354,12 @@ var Main = React.createClass({
             }
         });
         return ids;
+    },
+
+    handleReloadButton: function() {
+        if(this.state.playing != null) {
+            this.refs["player_" + this.state.playing].reloadFrame();
+        }
     },
 
     render: function() {
@@ -457,7 +463,8 @@ var Main = React.createClass({
                         url={self.state.channelsCatalogue[+id].url}
                         name={self.state.channelsCatalogue[+id].name}
                         nutellaParams={self.props.params}
-                        onBackButton={self.handleBacktoMenu} />;
+                        onBackButton={self.handleBacktoMenu}
+                        onReloadPlayer={self.handleReloadButton} />;
                 players.push(player);
             }
         });
@@ -476,7 +483,7 @@ var Main = React.createClass({
             zIndex: 110
         };
 
-        var tabsButton = <div className='tabs-button' style={buttonStyle} onTouchTap={this.handleTabsButton} >
+        var tabsButton = <div className='moving-button tabs-button' style={buttonStyle} onTouchTap={this.handleTabsButton} >
             <FloatingActionButton
                 primary={true}
                 mini={true} >
@@ -505,6 +512,14 @@ var Main = React.createClass({
             tabsClass = ' hidden-tabs';
         }
 
+        var reloadButton = <div className='moving-button reload-button' style={buttonStyle} onTouchTap={this.handleReloadButton} >
+            <FloatingActionButton
+                secondary={true}
+                mini={true} >
+                <i className="icon ion-android-refresh" ></i>
+            </FloatingActionButton>
+        </div>;
+
         return (
 
             <div className='outerDiv' style={outerDivStyle} >
@@ -512,6 +527,7 @@ var Main = React.createClass({
                 <div className={"grid" + tabsClass}>{backgroundMessageTabs},{channels}</div>
 
                 {tabsButton}
+                {reloadButton}
 
                 {overlayTabs}
 

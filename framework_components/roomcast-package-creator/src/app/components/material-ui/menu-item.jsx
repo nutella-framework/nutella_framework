@@ -23,7 +23,6 @@ var MenuItem = React.createClass({
   },
 
   render: function() {
-    console.log('rendering');
     var classes = 'mui-menu-item';
     if(this.props.selected) {
       classes += ' mui-is-selected';

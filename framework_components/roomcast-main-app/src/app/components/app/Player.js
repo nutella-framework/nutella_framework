@@ -91,8 +91,13 @@ var Player = React.createClass({
         clearInterval(this.interval_);
     },
 
-    render: function () {
+    reloadFrame: function() {
+        var url = this.refs.iframe.getDOMNode().src;
+        this.refs.iframe.getDOMNode().src = url;
+    },
 
+    render: function () {
+        var self = this;
         var playerStyle = null;
         if(!this.state.playing) {
             playerStyle = {
@@ -119,7 +124,10 @@ var Player = React.createClass({
 
             <div className='player' style={playerStyle} ref='player' >
 
-                <iframe className='channel-frame' src={url} > </iframe>
+                <iframe ref={'iframe'}
+                        className='channel-frame'
+                        src={url} >
+                </iframe>
 
             </div>
 
