@@ -14,12 +14,19 @@ var NutellaMixin = {
             cookie = (+new Date * Math.random()).toString(36).substring(0, 15);
             this.setCookie('roomcast_device', cookie, 365);
         }
+        var date = new Date();
         var doc = {};
         doc.action = action;
         doc.app_id = app_id;
         doc.run_id = run_id;
-        doc.deviceId = cookie;
-        doc.time = new Date();
+        doc.device_id = cookie;
+        doc.time = {
+            timestamp: date,
+            year: date.getFullYear(),
+            month: date.getMonth() + 1,
+            day: date.getDate(),
+            time: date.getHours() + ":" +date.getMinutes() + ":" +date.getSeconds()
+        };
         doc.info = info;
         nutella.net.publish('roomcast-log-bot/store', doc);
     },
