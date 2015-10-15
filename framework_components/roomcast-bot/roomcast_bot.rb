@@ -12,6 +12,29 @@ puts 'Initializing RoomCast...'
 #channels_db = nutella.persist.get_json_object_store('channels')
 #channelsData_db = nutella.persist.get_json_object_store('channels-data')
 
+def load_default_configs(app_id, run_id, config_id)
+  configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
+  reply = {
+      "1"=> {
+          "name"=> "Default activity",
+          "mapping"=> [{
+                           "family"=> "Public",
+                           "items"=> [{
+                                          "name"=> "",
+                                          "channels"=> []
+                                      }]
+                       }, {
+                           "family"=> "Personal",
+                           "items"=> []
+                       }]
+      }
+  }
+  configs_db['configs'] = reply
+  configs_db['currentConfig'] = 1
+  configs_db['launchTime'] = Time.now.to_f * 1000
+  reply
+end
+
 nutella.f.net.subscribe_to_all_runs('configs/update', lambda do |message, app_id, run_id, from|
                                                       new_configs = message
 
@@ -42,36 +65,19 @@ nutella.f.net.handle_requests_on_all_runs('configs/retrieve', lambda do |request
                                                                 configs_db = nutella.f.persist.get_run_json_object_store(app_id, run_id, 'configs')
                                                                 reply = configs_db['configs']
                                                                 if reply == nil
-                                                                  reply = {
-                                                                      "1"=> {
-                                                                          "name"=> "Default activity",
-                                                                          "mapping"=> [{
-                                                                                           "family"=> "Public",
-                                                                                           "items"=> [{
-                                                                                                          "name"=> "",
-                                                                                                          "channels"=> []
-                                                                                                      }]
-                                                                                       }, {
-                                                                                           "family"=> "Personal",
-                                                                                           "items"=> []
-                                                                                       }]
-                                                                      }
-                                                                  }
+                                                                  reply = load_default_configs(app_id, run_id, 'configs')
                                                                 end
-
                                                                 if configs_db['currentConfig'] == nil
                                                                   configs_db['currentConfig'] = 1
                                                                 end
-
                                                                 if configs_db['launchTime'] == nil
                                                                   configs_db['launchTime'] = Time.now.to_f * 1000
                                                                 end
-
                                                                 reply
                                                               end
                                                             end)
 
-# 'mapping' is the current running configuration
+# 'mapping' is the current running configuration (used from main app)
 nutella.f.net.handle_requests_on_all_runs('mapping/retrieve', lambda do |request, app_id, run_id, from|
                                                               reply = {}
                                                               if request == {}
@@ -81,10 +87,15 @@ nutella.f.net.handle_requests_on_all_runs('mapping/retrieve', lambda do |request
                                                                 if configs_db == nil
                                                                   reply = []
                                                                 else
-                                                                  configs = configs_db['configs']
-                                                                  id = '%d' % configs_db['currentConfig']
-                                                                  config = configs[id]
-                                                                  reply = config['mapping']
+                                                                  if configs_db['configs'] == nil
+                                                                    load_default_configs(app_id, run_id, 'configs')
+                                                                    reply = []
+                                                                  else
+                                                                    configs = configs_db['configs']
+                                                                    id = '%d' % configs_db['currentConfig']
+                                                                    config = configs[id]
+                                                                    reply = config['mapping']
+                                                                  end
                                                                 end
                                                                 reply
                                                               end
