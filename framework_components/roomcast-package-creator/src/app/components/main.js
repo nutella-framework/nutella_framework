@@ -1,14 +1,18 @@
 var React = require('react'),
     mui = require('material-ui'),
-    RaisedButton = mui.RaisedButton;
+    RaisedButton = mui.RaisedButton,
+    NutellaMixin = require('./NutellaMixin');
 
 var ResourcesPanel = require('./ResourcesPanel.js');
 var ChannelsPanel = require('./ChannelsPanel');
 
 var Main = React.createClass({
 
+    mixins: [NutellaMixin],
+
     componentDidMount: function() {
         var self = this;
+        self._cookie = (+new Date * Math.random()).toString(36).substring(0, 15);
         // Get current channels catalogue
         nutella.net.request('channels/retrieve', 'all', function (response) {
             self.handleUpdatedChannelsCatalogue(response);
@@ -18,7 +22,13 @@ var Main = React.createClass({
                 self.handleUpdatedChannelsCatalogue(message);
             });
             nutella.net.subscribe('configs/updated', function (message, from) {
-                self.handleNewConfigs(message);
+                // workaround to manage sync between multiple parallell changes: reload page
+                // on all the interfaces other than the one which has saved the changes
+                if(self.getCookie('roomcast-id') !== self._cookie) {
+                    window.location.reload(true);
+                }
+                // reset local cookie
+                self._cookie = (+new Date * Math.random()).toString(36).substring(0, 15);
             });
         });
     },
@@ -91,6 +101,9 @@ var Main = React.createClass({
     handleSaveChanges: function() {
         var publish = true;
         this.saveLocalConfigs(publish);
+        // identify current device when message comes back
+        this._cookie = (+new Date * Math.random()).toString(36).substring(0, 15);
+        this.setCookie('roomcast-id', this._cookie, 365);
     },
 
     handleUndoChanges: function() {

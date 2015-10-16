@@ -22,7 +22,7 @@
         });
     } else {
         // for debugging purposes - works with tests outside of nutella
-        window.nutella = NUTELLA.init('ltg.evl.uic.edu', 'wallcology', '6TV', 'roomcast-package-creator', function(connected) {
+        window.nutella = NUTELLA.init('ltg.evl.uic.edu', 'wallcology', 'workshop_complete', 'roomcast-package-creator', function(connected) {
             window.ReactMain = React.render( <Main /> , document.body);
         });
     }
