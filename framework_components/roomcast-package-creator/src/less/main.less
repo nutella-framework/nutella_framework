@@ -235,9 +235,16 @@ html, body {
   //line-height: 10px;
 }
 .mui-raised-button {
-  //height: 50%;
   .mui-raised-button-label {
-    font-size: 0.75vw !important;
+    @media (min-width: 1784px) {
+      font-size: 14px;
+    }
+    @media (min-width: 1643px) and (max-width: 1783px) {
+      font-size: 12px;
+    }
+    @media (max-width: 1642px) {
+      font-size: 10px;
+    }
   }
   .mui-raised-button-container {
     //height: 50%;

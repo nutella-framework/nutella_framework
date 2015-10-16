@@ -8,22 +8,14 @@ var ChannelsCatalogue = React.createClass({
         this.props.onSelectedChannel(ch);
     },
 
-    handleStyleRespectiveChannel: function() {
-        var selected = this.props.selectedChannel;
-        for(ref in this.refs) {
-            console.log(ref, selected);
-            if(this.refs[ref].props.id===selected.id) {
-                console.log(selected.imgNode);
-                break;
-            }
-        }
-    },
-
     render: function() {
 
         var channels = [];
         var chs = this.props.channels;
         var keys = Object.keys(chs).sort();
+        keys = keys.sort(function(a, b) {
+            return (+a) - (+b);
+        });
         for(var i = 0; i < keys.length; i++) {
             var key = keys[i];
 
