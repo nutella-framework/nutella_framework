@@ -12,8 +12,8 @@ var Main = React.createClass({
 
     componentDidMount: function() {
         var query_parameters = NUTELLA.parseURLParameters();
-        var broker = 'ltg.evl.uic.edu';
-        //var broker = 'localhost';
+        //var broker = 'ltg.evl.uic.edu';
+        var broker = 'localhost';
         if(query_parameters.broker) {
             broker = query_parameters.broker;
         }

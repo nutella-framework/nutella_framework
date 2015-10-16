@@ -1,12 +1,12 @@
-
 var React = require('react');
 var Mui = require('material-ui');
 var Paper = Mui.Paper;
 var iOSMixin = require('./iOSMixin');
+var NutellaMixin = require('../NutellaMixin');
 
 var IdentityCard = React.createClass({
 
-    mixins: [iOSMixin],
+    mixins: [iOSMixin, NutellaMixin],
 
     componentDidMount: function() {
         var self= this;
@@ -34,6 +34,23 @@ var IdentityCard = React.createClass({
 
             // Trigger native animation
             var callback = function() {
+
+                // #LOG action
+                console.log(self.props.mode);
+                if(self.props.mode === 'id') {
+                    self.logAction('login', self.props.app_id, self.props.run_id, {
+                        package_name: self.props.name
+                    });
+                } else {
+                    if(self.props.mode === 'activity') {
+                        self.logAction('transitionActivity', self.props.app_id, self.props.run_id, {
+                            old_package_name: self.props.old_rid,
+                            new_package_name: self.props.name,
+                            transparent: self.props.name === self.props.old_rid
+                        });
+                    }
+                }
+
                 // Exit point from identity-selector
                 self.props.onSetRid(self.props.name);
             };

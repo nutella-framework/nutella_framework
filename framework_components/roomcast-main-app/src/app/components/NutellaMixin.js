@@ -27,7 +27,9 @@ var NutellaMixin = {
             day: date.getDate(),
             time: date.getHours() + ":" +date.getMinutes() + ":" +date.getSeconds()
         };
-        doc.info = info;
+        if(Object.keys(info).length !== 0) {
+            doc.info = info;
+        }
         nutella.net.publish('roomcast-log-bot/store', doc);
     },
 

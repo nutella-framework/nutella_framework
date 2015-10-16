@@ -74,7 +74,11 @@ var IdentitiesGrid = React.createClass({
                         cardStyle={cardStyle}
                         hasBeenSelected={self.state.hasBeenSelected}
                         onSelectedIdentity={self.setHasBeenSelected}
-                        onSetRid = {self.props.onSetRid} />);
+                        onSetRid = {self.props.onSetRid}
+                        mode = {self.props.mode}
+                        app_id={self.props.app_id}
+                        run_id={self.props.run_id}
+                        old_rid={self.props.old_rid} />);
         });
 
         return (

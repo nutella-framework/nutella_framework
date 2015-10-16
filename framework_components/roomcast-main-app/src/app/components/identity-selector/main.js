@@ -91,7 +91,11 @@ var Main = React.createClass({
 
                     <IdentitiesGrid
                         identities={this.state.identities}
-                        onSetRid = {this.props.onSetRid} />
+                        onSetRid={this.props.onSetRid}
+                        mode={this.props.mode}
+                        app_id={this.props.params.app_id}
+                        run_id={this.props.params.run_id}
+                        old_rid={this.props.old_rid} />
 
                 </div>
 

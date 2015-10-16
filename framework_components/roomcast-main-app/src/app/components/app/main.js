@@ -88,7 +88,6 @@ var Main = React.createClass({
      * @param rid current identity
      */
     updateChannelsForRid: function(message, rid) {
-
         var self = this;
         var myChannelsId = [];
         var myChannels = [];
@@ -135,7 +134,6 @@ var Main = React.createClass({
             }
         });
         this.setState({players: newPlayers});
-        console.log(catalogue, players, newPlayers);
     },
 
     getInitialState: function() {
@@ -212,8 +210,8 @@ var Main = React.createClass({
 
         // #LOG action
         this.logAction('playChannel', this.props.params.app_id, this.props.params.run_id, {
-            channelName: this.state.channelsCatalogue[id].name,
-            packageName: this.state.rid,
+            channel_name: this.state.channelsCatalogue[id].name,
+            package_name: this.state.rid
         });
     },
 
@@ -256,7 +254,11 @@ var Main = React.createClass({
     },
 
     handleLogout: function() {
-        //this.handleSelectedResource(null);
+        // #LOG action
+        this.logAction('logout', this.props.params.app_id, this.props.params.run_id, {
+            package_name: this.state.rid
+        });
+
         this.props.onSwitchPage(1);
     },
 
@@ -265,7 +267,8 @@ var Main = React.createClass({
             <IdentitySelector
                 params = {this.props.params}
                 onSetRid = {this.handleSetRid}
-                mode = {mode}/>);
+                mode = {mode}
+                old_rid = {this._old_rid} />);
     },
 
     componentWillUnmount: function() {
@@ -330,10 +333,18 @@ var Main = React.createClass({
         if(id) {
             if(ids.indexOf(id) !== -1) {
                 this.updateChannelsForRid(mapping, this.state.rid);
+                // #LOG action
+                this.logAction('transitionActivity', this.props.app_id, this.props.run_id, {
+                    old_package_name: id,
+                    new_package_name: id,
+                    transparent: true
+                });
             } else {
+                this._old_rid = id;
                 this.setState({rid: null, modal: 'activity'});
             }
         } else {
+            this._old_rid = id;
             this.setState({rid: null, modal: 'activity'});
         }
     },
