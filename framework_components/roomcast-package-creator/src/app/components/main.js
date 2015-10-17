@@ -104,6 +104,12 @@ var Main = React.createClass({
         // identify current device when message comes back
         this._cookie = (+new Date * Math.random()).toString(36).substring(0, 15);
         this.setCookie('roomcast-id', this._cookie, 365);
+
+        // #LOG action
+        this.logAction('savePackageCreator', {
+            configuration: this.state.configs,
+            channels_catalogue: this.state.channelsCatalogue
+        });
     },
 
     handleUndoChanges: function() {

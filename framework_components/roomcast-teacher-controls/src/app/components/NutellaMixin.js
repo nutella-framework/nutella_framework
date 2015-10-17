@@ -4,8 +4,6 @@ var NutellaMixin = {
     /**
      * Stores a user interaction as a document in the MongoDB database.
      * @param action name of the action fired
-     * @param app_id
-     * @param run_id
      * @param info additional properties to be stored for the specific interaction
      */
     logAction: function(action, info) {

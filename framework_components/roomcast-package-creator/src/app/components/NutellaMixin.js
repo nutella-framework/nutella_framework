@@ -1,14 +1,16 @@
+var NUTELLA = require('nutella_lib');
 
 var NutellaMixin = {
 
     /**
      * Stores a user interaction as a document in the MongoDB database.
      * @param action name of the action fired
-     * @param app_id
-     * @param run_id
      * @param info additional properties to be stored for the specific interaction
      */
-    logAction: function(action, app_id, run_id, info) {
+    logAction: function(action, info) {
+        var query_parameters = NUTELLA.parseURLParameters();
+        var app_id = query_parameters.app_id;
+        var run_id = query_parameters.run_id;
         var cookie = this.getCookie('roomcast_device');
         if(cookie === '') {
             cookie = (+new Date * Math.random()).toString(36).substring(0, 15);
@@ -27,7 +29,9 @@ var NutellaMixin = {
             day: date.getDate(),
             time: date.getHours() + ":" +date.getMinutes() + ":" +date.getSeconds()
         };
-        doc.info = info;
+        if(Object.keys(info).length !== 0) {
+            doc.info = info;
+        }
         nutella.net.publish('roomcast-log-bot/store', doc);
     },
 
