@@ -3,8 +3,11 @@ var React = require('react');
 var Mui = require('material-ui');
 var Paper = Mui.Paper;
 var d3 = require('d3');
+var NutellaMixin = require('./NutellaMixin');
 
 var ActivityCard = React.createClass({
+
+    mixins: [NutellaMixin],
 
     componentDidMount: function() {
         var self= this;
@@ -36,6 +39,11 @@ var ActivityCard = React.createClass({
 
         var publishAfterTransition = function() {
             var action = function() {
+                // #LOG action
+                self.logAction('launchActivity', {
+                    activity_name: self.props.configName,
+                    timer: self.props.timer
+                });
                 nutella.net.publish('currentConfig/update', +self.props.configId);
             };
             self._timeoutId = setTimeout(action, self._timerDuration);
