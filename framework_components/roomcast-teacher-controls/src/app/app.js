@@ -3,20 +3,26 @@
 
     var React = require('react'),
         injectTapEventPlugin = require("react-tap-event-plugin"),
-        Main = require('./components/main.js'); // Our custom react component
+        Main = require('./components/main.js'), // Our custom react component
+        NUTELLA = require('nutella_lib');
 
     //Needed for React Developer Tools
     window.React = React;
 
-    //Needed for onTouchTap
-    //Can go away when react 1.0 release
-    //Check this repo:
-    //https://github.com/zilverline/react-tap-event-plugin
     injectTapEventPlugin();
 
-    // Render the main app react component into the document body.
-    // For more details see: https://facebook.github.io/react/docs/top-level-api.html#react.render
-    //window.ReactMain = 'Main component';
-    window.ReactMain = React.render(<Main />, document.body);
+    var query_parameters = NUTELLA.parseURLParameters();
+    if(query_parameters.broker) {
+        window.nutella = NUTELLA.init(query_parameters.broker, query_parameters.app_id, query_parameters.run_id, 'roomcast-teacher-controls', function(connected) {
+            if(connected) {
+                window.ReactMain = React.render( <Main /> , document.body);
+            }
+        });
+    } else {
+        // for debugging purposes - works with tests outside of nutella
+        window.nutella = NUTELLA.init('ltg.evl.uic.edu', 'wallcology', '6BAM', 'roomcast-teacher-controls', function(connected) {
+            window.ReactMain = React.render( <Main /> , document.body);
+        });
+    }
 
 })();

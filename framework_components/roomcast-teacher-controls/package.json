@@ -31,7 +31,7 @@
   "dependencies": {
     "d3": "^3.5.5",
     "material-ui": "^0.7.0",
-    "nutella_lib": "^0.5.1",
+    "nutella_lib": "^0.5.10",
     "react": "^0.13.0",
     "react-tap-event-plugin": "^0.1.3"
   }

@@ -151,13 +151,13 @@ var ActivityCard = React.createClass({
                     cardStyle[p] = selectedCardStyle[p];
                 }
             }
-            timer = this.formatTimer(this.props.timer);
+            timer = <span>{this.formatTimer(this.props.timer)}</span>;
             spanStyle = {
                 width: this.props.cardStyle.width,
                 textAlign: 'center',
                 fontWeight: '400',
-                fontSize: '2.6em',
-                marginBottom: '20px'};
+                fontSize: '2.6em'
+            };
         }
 
         return (
@@ -168,8 +168,10 @@ var ActivityCard = React.createClass({
 
                 <div className='card-name'>
 
-                    <span style={spanStyle} >{this.props.configName}</span>
-                    <span>{timer}</span>
+                    <div className='card-text'>
+                        <span style={spanStyle} >{this.props.configName}</span>
+                        {timer}
+                    </div>
 
                 </div>
 

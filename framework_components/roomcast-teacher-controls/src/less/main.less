@@ -70,21 +70,31 @@ html, body {
         height: 100%;
         width: 100%;
         position: absolute;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
+        //display: flex;
+        //flex-direction: row;
+        //flex-wrap: wrap;
         justify-content: center;
         align-items: center;
         align-content: center;
+        display: table;
+        text-align: center;
+
+        .card-text {
+          display: table-cell;
+          vertical-align: middle;
+        }
 
         span {
           font-size: 2em;
           font-weight: 300;
+          display: block;
+          line-height: 1.2em;
+          padding: 10px;
 
           // flex item properties
-          flex-grow: 0;
-          flex-shrink: 0;
-          flex-basis: main-size;
+          //flex-grow: 0;
+          //flex-shrink: 0;
+          //flex-basis: main-size;
         }
       }
     }

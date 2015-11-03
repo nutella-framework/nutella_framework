@@ -1,3 +1,4 @@
+var NUTELLA = require('nutella_lib');
 
 var NutellaMixin = {
 
