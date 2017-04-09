@@ -61,7 +61,12 @@ module Nutella
       git_semver = lambda do
         out = `git --version`
         out.slice!(0,12)
-        Semantic::Version.new out[0..4]
+        begin  
+          semver = Semantic::Version.new(out[0..4]) 
+        rescue
+          semver = Semantic::Version.new(out[0..5])
+        end
+        semver
       end
       # Tmux version lambda
       tmux_semver = lambda do
