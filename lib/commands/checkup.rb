@@ -51,11 +51,12 @@ module Nutella
     
     
     def all_dependencies_installed?
-      # Node version lambda
-      node_semver = lambda do
-        out = `node --version`
-        out[0] = ''
-        Semantic::Version.new out
+      # Docker version lambda
+      docker_semver = lambda do
+        out = `docker --version`
+        token = out.split(' ')
+        token[2].slice(0..1)
+        Semantic::Version.new token[2].slice(0..1).concat('.0.0')
       end
       # Git version lambda
       git_semver = lambda do
@@ -81,7 +82,7 @@ module Nutella
         Semantic::Version.new out[0..4]
       end
       # Check versions
-      return true if check_version?('node', '0.10.0', node_semver) && check_version?('git', '1.8.0', git_semver) && check_version?('tmux', '1.8.0', tmux_semver) && check_version?('mongodb', '2.6.9', mongo_semver)
+      return true if check_version?('docker', '17.0.0', docker_semver) && check_version?('git', '1.8.0', git_semver) && check_version?('tmux', '1.8.0', tmux_semver) && check_version?('mongodb', '2.6.9', mongo_semver)
       # If even one of the checks fails, return false
       false
     end
