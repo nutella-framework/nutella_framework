@@ -35,13 +35,21 @@ module Nutella
   
     def broker_exists
       # Check if Docker image for the broker was already pulled
-      `docker images matteocollina/mosca:v2.3.0 --format "{{.ID}}"` != ""
+      if `docker images matteocollina/mosca:v2.3.0 --format "{{.ID}}"` != ""
+        # If so, check that a broker configuration exists and create one if it doesn't
+        Nutella.config['broker'] = '127.0.0.1' if Nutella.config['broker'].nil? 
+        true
+      else
+        false
+      end
     end
 
 
     def install_local_broker
       # Docker pull to install
       system "docker pull matteocollina/mosca:v2.3.0 > /dev/null 2>&1"
+      # Write broker setting inside config.json
+      Nutella.config['broker'] = '127.0.0.1'
     end
     
     
