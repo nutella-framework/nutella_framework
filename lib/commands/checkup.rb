@@ -38,6 +38,7 @@ module Nutella
       `docker images matteocollina/mosca:v2.3.0 --format "{{.ID}}"` != ""
     end
 
+
     def install_local_broker
       # Docker pull to install
       system "docker pull matteocollina/mosca:v2.3.0 > /dev/null 2>&1"

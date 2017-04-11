@@ -7,16 +7,12 @@ class ComponentsStarter
   # Starts the internal broker if it's not started already
   # @return [boolean] true if the broker is correctly started, false otherwise
   def self.start_internal_broker
-    pid_file_path = "#{Nutella.config['broker_dir']}bin/.pid"
-    # Check if the process with pid indicated in the pidfile is alive
-    return true if sanitize_pid_file pid_file_path
+    # Check if the broker has been started already, if it is, return
+    return true if broker_started?
     # Check that broker is not running 'unsupervised' (i.e. check port 1883), if it is, return
     return true unless broker_port_free?
-    # Broker is not running and there is no pid file so we try to start
-    # the internal broker and create a new pid file. Note that the pid file is created by
-    # the `startup` script, not here.
-    pid = fork
-    exec("#{Nutella.config['broker_dir']}/startup") if pid.nil?
+    # Broker is not running  so we try to start the internal broker
+    cid = `docker run -p 1883:1883 -p 1884:80 -d -v #{Nutella.config['broker_dir']}:/db matteocollina/mosca:v2.3.0`
     # Wait a bit to give the chance to the broker to actually start up
     sleep 1
     # All went well so we return true
@@ -133,6 +129,13 @@ class ComponentsStarter
   end
   private_class_method :sanitize_pid_file
 
+
+  # Checks if the broker is running already
+  # @return [boolean] true if there is a container for the broker running already
+  def self.broker_started?
+    `docker ps --filter ancestor=matteocollina/mosca:v2.3.0 --format "{{.ID}}"` != ""
+  end
+  private_class_method :broker_started?
 
   # Checks if port 1883 (MQTT broker port) is free
   # or some other service is already listening on it

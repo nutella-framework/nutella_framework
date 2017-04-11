@@ -76,8 +76,8 @@ module Nutella
 
 
     def stop_internal_broker
-      pid_file_path = "#{Nutella.config['broker_dir']}/bin/.pid"
-      kill_process_with_pid pid_file_path
+      cid = `docker ps --filter ancestor=matteocollina/mosca:v2.3.0 --format "{{.ID}}"`
+      `docker kill #{cid}`
     end
 
 
