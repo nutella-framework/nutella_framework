@@ -3,26 +3,12 @@ require_relative '../../lib/config/config'
 require_relative '../../nutella_lib/framework_core'
 require_relative '../../lib/commands/util/components_list'
 require 'active_support/core_ext/object/deep_dup'
-require 'mandrill'
 require 'mongo'
 require 'bson'
-
-# Framework bots can access all the parameters they need directly
-# from the configuration file and the runlist,
-# to which they have full access to.
-
-# Access the config file like so:
-# Nutella.config['broker']
-
-# Access the runs list like so:
-# Nutella.runlist.all_runs
 
 
 # Initialize this bot as framework component
 nutella.f.init(Nutella.config['broker'], 'monitoring_bot')
-
-# Mandrill access key
-$m = Mandrill::API.new 'i4frQYcTBMyZ6bYyLkEVOQ'
 
 # Open the resources database
 $messages = nutella.f.persist.get_json_object_store('messages')
@@ -69,8 +55,6 @@ def send_subscription_mail(mail, application, instance = nil, component = nil)
       ],
       :from_email=>'nutellamonitoring@gmail.com'
   }
-
-  sending = $m.messages.send_template template_name, template_content, message
 end
 
 def send_notification_mail(mail, application, instance = nil, component = nil)
@@ -105,10 +89,6 @@ def send_notification_mail(mail, application, instance = nil, component = nil)
       ],
       :from_email=>'nutellamonitoring@gmail.com'
   }
-
-  sending = $m.messages.send_template template_name, template_content, message
-  puts sending
-
 end
 
 # Add an alert on a specific application/instance/component

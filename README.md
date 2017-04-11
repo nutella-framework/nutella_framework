@@ -11,7 +11,7 @@ Nutella is written in ruby but it leverages a bunch of other technologies that n
 1. _ruby_ (version >= 2.1.0). Do yourself a favor and use [RVM](https://rvm.io/rvm/install) to install Ruby.
 1. _git_ (version >= 1.8.0). Do yourself a favor and use [Homebrew](http://brew.sh/) to install git, if you are on OSX.
 1. _tmux_ (version >= 1.8.0). Do yourself a favor and use [Homebrew](http://brew.sh/) to install tmux, if you are on OSX.
-1. _node.js_ (version >= 0.10.0). Yes, really, you need to install node becaue we use it to run the broker that handles all communications between all the pieces of the framework. Do yourself a favor and use [nvm](https://github.com/creationix/nvm).
+1. _Docker_ (version >= 17.03.0). We use Docker to run the broker that handles all communications between all the pieces of the framework. Do yourself a favor and use [Docker for mac](https://store.docker.com/editions/community/docker-ce-desktop-mac), if you are on OSX.
 1. _mongoDB_ (optional). You'll need mongoDB if you want to use it with `nutella.persist`.
 
 Once you have all of these, to install nutella simply do:
