@@ -12,7 +12,7 @@ module Nutella
       
       # Check if we have a local broker installed
       # and install one if we don't
-      if File.directory? Nutella.config['broker_dir']
+      if broker_exists
         console.info 'You have a local broker installed. Yay!'
       else
         console.warn 'You don\'t seem to have a local broker installed so we are going to go ahead and install one for you. This might take some time...'
@@ -33,20 +33,14 @@ module Nutella
     private 
     
   
+    def broker_exists
+      # Check if Docker image for the broker was already pulled
+      `docker images matteocollina/mosca:v2.3.0 --format "{{.ID}}"` != ""
+    end
+
     def install_local_broker
-      # Clone, cd and npm install
-      broker_version = 'v0.28.1'
-      out1 = system "git clone -b #{broker_version} --depth 1 git://github.com/mcollina/mosca.git #{Nutella.config['broker_dir']} > /dev/null 2>&1"
-      Dir.chdir(Nutella.config['broker_dir'])
-      out2 = system 'npm install > /dev/null 2>&1'
-    
-      # Add startup script and make it executable
-      File.open('startup', 'w') { |file| file.write("#!/bin/sh\n\nBASEDIR=$(dirname $0)\n$BASEDIR/bin/mosca --disable-stats --http-port 1884 > /dev/null 2>&1 &\necho $! > $BASEDIR/bin/.pid\n") }
-      File.chmod( 0755, 'startup' )
-    
-      # Write configuration into config.json
-      Nutella.config['broker'] = '127.0.0.1'
-      out1 && out2
+      # Docker pull to install
+      system "docker pull matteocollina/mosca:v2.3.0 > /dev/null 2>&1"
     end
     
     
