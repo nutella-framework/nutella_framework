@@ -6,6 +6,8 @@
 nutella is a framework to build and run Macroworlds. It's still _very_ under development so any help [finding and fixing bugs](https://github.com/nutella-framework/nutella_framework/issues) will be greatly appreciated!
 
 # Installing
+
+[![Join the chat at https://gitter.im/nutella-framework/nutella_framework](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nutella-framework/nutella_framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Nutella is written in ruby but it leverages a bunch of other technologies that need to be installed. You will need:
 
 1. _ruby_ (version >= 2.1.0). Do yourself a favor and use [RVM](https://rvm.io/rvm/install) to install Ruby.
