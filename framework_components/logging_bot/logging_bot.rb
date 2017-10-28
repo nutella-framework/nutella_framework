@@ -22,8 +22,6 @@ nutella.f.init(Nutella.config['broker'], 'example_framework_bot')
 
 # Get a mongo persisted collection
 logs = nutella.f.persist.get_mongo_collection_store 'logs'
-dump = nutella.f.persist.get_mongo_collection_store 'dump'
-
 
 # Listen for run-level log messages
 nutella.f.net.subscribe_to_all_runs('logging', lambda do |payload, app_id, run_id, from|
@@ -38,17 +36,6 @@ end)
 # Listen for framework-level log messages
 nutella.f.net.subscribe('logging', lambda do |payload, from|
   logs.push assemble_log(payload, from)
-end)
-
-
-# Listen for low-level messages that are archived in the 'dump' collection
-bare_mqtt_client = SimpleMQTTClient.new Nutella.config['broker']
-bare_mqtt_client.subscribe('/nutella/#', lambda do |message, channel|
-  begin
-    dump.push assemble_dump(JSON.parse(message), channel)
-  rescue
-    # Ignore non JSON
-  end
 end)
 
 # Listen and process messages as they come
