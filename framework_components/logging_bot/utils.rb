@@ -6,7 +6,3 @@ def assemble_log(payload, from)
   h['from'] = from
   h
 end
-
-def assemble_dump(message, channel)
-  {'channel' => channel, 'message' => message}
-end
