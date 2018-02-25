@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Run not found</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+  <style type="text/css">
+	  div {
+		  margin-top: 4em;
+		  text-align: center;
+		  font-size: 3em;
+	  }
+  </style>
+</head>
+<body>
+
+<!-- Content -->
+<div>
+  <% if locals[:not_found_type] == 'run' %>
+      <p>Sorry, we don't have that run ID!</p>
+      <p>(?_?)</p>
+  <% elsif locals[:not_found_type] == 'idx' %>
+      <p>Sorry, this interface doesn't seem to exist for this application</p>
+      <p>(゜_゜)</p>
+  <% elsif locals[:not_found_type] == 'file' %>
+      <p>The page you are looking for doesn't seem to exist</p>
+      <p>(;_;)</p>
+  <% end %>
+
+
+</div>
+
+</body>
+</html>
