@@ -1,6 +1,0 @@
-{
-  "name": "roomcast-main-app",
-  "version": "0.1.0",
-  "type": "interface",
-  "description": "The main web interface of RoomCast, where users can log in and play channels."
-}
