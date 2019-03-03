@@ -1,6 +1,0 @@
-{
-    "name": "room-places-bot",
-    "version": "0.0.1",
-    "type": "bot",
-    "description": "This bot keeps track of the location of physical resources in a 2D or 3D spcace"
-}
