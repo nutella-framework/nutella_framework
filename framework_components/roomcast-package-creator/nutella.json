@@ -1,6 +1,0 @@
-{
-  "name": "roomcast-package-creator",
-  "version": "0.1.0",
-  "type": "interface",
-  "description": "The web interface of RoomCast package creator"
-}
