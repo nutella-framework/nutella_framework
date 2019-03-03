@@ -1,10 +1,5 @@
 [
-  "monitoring-bot",
-  "logging_bot",
   "runs_list_bot",
   "main_interface",
-  "beacon-cloud-bot",
-  "binary-files-manager",
-  "roomcast-bot",
-  "room-places-bot"
+  "binary-files-manager"
 ]
