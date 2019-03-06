@@ -21,9 +21,5 @@ nutella.f.net.handle_requests_on_all_runs('start_run', lambda do |req, app_id, r
   "Executing command #{req} on #{app_id} run #{run_id}"
 end)
 
-# Your code goes here! Go crazy!
-
-
-# Does your bot die? If all your bot is doing is waiting for message on the network
-# and responding to them, the main thread will terminate unless you call...
-# nutella.f.net.listen
+# Listen and process messages as they come
+nutella.f.net.listen
