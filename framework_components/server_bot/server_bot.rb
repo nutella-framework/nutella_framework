@@ -1,24 +1,22 @@
-require_relative '../../lib/config/runlist'
-require_relative '../../lib/config/config'
+require_relative '../../lib/nutella_framework'
 require_relative '../../nutella_lib/framework_core'
-
-# Framework bots can access all the parameters they need directly
-# from the configuration file and the runlist,
-# to which they have full access to.
-
-# Access the config file like so:
-# Nutella.config['broker']
-
-# Access the runs list like so:
-# Nutella.runlist.all_runs
 
 
 # Initialize this bot as framework component
 nutella.f.init(Nutella.config['broker'], 'nutella_server_bot')
 
-
-nutella.f.net.handle_requests_on_all_runs('start_run', lambda do |req, app_id, run_id, from|
-  "Executing command #{req} on #{app_id} run #{run_id}"
+# Responds to nutella commands
+nutella.f.net.handle_requests_on_all_runs('execute_command', lambda do |req, app_id, run_id, from|
+  # Process request
+  req_hash = JSON.parse req
+  params = req_hash['params'].dup
+  # Change Directory
+  Dir.chdir(Nutella.runlist.app_path(app_id)) do
+    # Execute command
+    Nutella.execute_command req_hash['command'], req_hash['params']
+  end
+  #TODO collect command output, for now return confirmation message
+  "Executed command #{req_hash['command']} with parameters #{params} on #{'app_id'}"
 end)
 
 # Listen and process messages as they come
