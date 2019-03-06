@@ -1,5 +1,6 @@
 [
   "runs_list_bot",
   "main_interface",
-  "binary-files-manager"
+  "binary-files-manager",
+  "server_bot"
 ]
