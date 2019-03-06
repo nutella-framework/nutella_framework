@@ -1,6 +1,11 @@
 require_relative '../../lib/nutella_framework'
 require_relative '../../nutella_lib/framework_core'
 
+# This bot allows you to execute nutella commands remotely
+# You can submit payloads like this one:
+# - { "command": "start", "params": ["run-1"]}
+# or this one:
+# - { "command": "stop", "params": ["run-1"]}
 
 # Initialize this bot as framework component
 nutella.f.init(Nutella.config['broker'], 'nutella_server_bot')
