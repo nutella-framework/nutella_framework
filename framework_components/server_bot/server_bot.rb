@@ -15,7 +15,7 @@ nutella.f.net.handle_requests_on_all_runs('execute_command', lambda do |req, app
   # Process request
   params = req['params'].dup
   # Change Directory
-  Dir.chdir(Nutella.runlist.app_path(app_id)) do
+  Dir.chdir(Nutella.runlist.app_path(req['app_id'])) do
     # Execute command
     Nutella.execute_command req['command'], req['params']
   end
