@@ -22,4 +22,5 @@ end
 group :test do
   gem 'rake'
   gem 'rspec', '~> 3.8'
+  gem 'fuubar', '~> 2.4'
 end
