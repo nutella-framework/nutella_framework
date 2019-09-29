@@ -17,7 +17,6 @@ group :development do
   gem 'rdoc', '~> 4.0'
   gem 'bundler', '~> 2.0'
   gem 'jeweler', '~> 2.3'
-  gem 'simplecov', '~> 0.17'
 end
 
 group :test do

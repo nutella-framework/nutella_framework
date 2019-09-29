@@ -1,4 +1,4 @@
-# Nutella
+# nutella
 config.json
 runlist.json
 broker/
@@ -16,6 +16,7 @@ doc/
 .yardoc
 .bundle
 Gemfile.lock
+spec/examples.txt
 
 # Mac crap
 .DS_Store
