@@ -1,43 +1,46 @@
 
 [![Gem Version](https://badge.fury.io/rb/nutella_framework.svg)](http://badge.fury.io/rb/nutella_framework) 
 [![Build Status](https://travis-ci.org/nutella-framework/nutella_framework.svg?branch=master)](https://travis-ci.org/nutella-framework/nutella_framework)
-[![Code Climate](https://codeclimate.com/github/nutella-framework/nutella_framework/badges/gpa.svg)](https://codeclimate.com/github/nutella-framework/nutella_framework)
 
-nutella is a framework to build and run Macroworlds. It's still _very_ under development so any help [finding and fixing bugs](https://github.com/nutella-framework/nutella_framework/issues) will be greatly appreciated!
+nutella is a framework to build and run Macroworlds. The original prototype was built as part of my dissertation and the code was hastly cobbled together at times. I have tried to cleanup over the years but please don't hate me if you find some skeletons. ☠️ If you want to help clean things up, give me a shout: help is greatly appreciated!
 
 # Installing
-Nutella is written in ruby but it leverages a bunch of other technologies that need to be installed. You will need:
+nutella works on OSX and Linux (tested on Ubuntu) and it depends on a couple other things to work correctly. You will need:
 
 1. _ruby_ (version >= 2.1.0). Do yourself a favor and use [RVM](https://rvm.io/rvm/install) to install Ruby.
-1. _git_ (version >= 1.8.0). Do yourself a favor and use [Homebrew](http://brew.sh/) to install git, if you are on OSX.
+1. _git_ (version >= 1.8.0). Should come with the OS, yay!
 1. _tmux_ (version >= 1.8.0). Do yourself a favor and use [Homebrew](http://brew.sh/) to install tmux, if you are on OSX.
 1. _Docker_ (version >= 17.03.0). We use Docker to run the broker that handles all communications between all the pieces of the framework. Do yourself a favor and use [Docker for mac](https://store.docker.com/editions/community/docker-ce-desktop-mac), if you are on OSX.
-1. _mongoDB_ (optional). You'll need mongoDB if you want to use it with `nutella.persist`.
 
-Once you have all of these, to install nutella simply do:
+Once you have all of  installed, simply do:
 ```
 gem install nutella_framework
 ```
 Once the installation is complete you should be able to type `nutella` in your shell and get a welcome message. 
 
 ## nutella checkup
-If you are reading this you probably already saw the warning: "Looks like this is a fresh installation of nutella. Please run 'nutella checkup' to check all dependencies are installed".
+If you are reading this you probably already saw the warning: "Looks like this is a fresh installation of nutella. Please run `nutella checkup` to check all dependencies are installed".
 
-nutella is written in ruby but it's designed to run bots and interfaces written in virtually any programming language. All communications among these components are handled by an _MQTT broker_ which needs to be installed (together with its dependencies) before nutella can actually work correctly. Therefore **right after your install nutella** you should run:
 ```
 nutella checkup
 ```
-This will install the [Mosca](http://www.mosca.io/) MQTT broker and make sure all the dependencies required by nutella are installed as well.
-
 Congratulations! nutella is ready to use!
 
 
 # Where next?
-If you already have an application you want to tinker with (like [RoomQuake](https://github.com/ltg-uic/roomquake)) simply checkout the application to a local folder, `cd /to/my/local/folder` and start tinkering away. Not sure how? Check out the [man page for the nutella command line tool](https://github.com/nutella-framework/nutella_framework/wiki).
+If you **already have an application** you want to tinker with (like [RoomQuake](https://github.com/ltg-uic/roomquake)) simply clone the application to your local folder of choice, `cd /to/my/local/folder` and start tinkering away. Not sure how? Check out the [docs](https://github.com/nutella-framework/docs)!
 
-If you want to create your own application, hold on tight, a tutorial is coming soon.
+If you want to **create your first application** check out [this tutorial](https://github.com/nutella-framework/docs/blob/master/getting_started/tutorial_1.md).
 
 
-# Building (for contributors)
-Clone the repo, `bundle install` to take care of the dependencies and then `rake` to run all the tests. If you want to build and install the gem just `rake install`. If you want a list of available build tasks, simply type `rake -T`. 
+# Contributing to nutella
+Clone the repo, make sure you have [bundler](https://bundler.io/) installed, `bundle install` to take care of the dependencies, and then `rake` to run all the tests. If you want to build and install the gem just `rake install`. If you want a list of available build tasks, simply type `rake -T`. 
 
+# nutella 2.0
+In the summer of 2019, as a result of the feedback from nutella users (a.k.a. Tom), it became apparent to me that I needed to re-architect nutella into two separate components
+1. A CLI that provided a way to interface with nutella
+2. A "server" component that processes and executes the commands sent by either the CLI or other nutella components.
+
+It also became clear I needed to improve the documentation of the nutella protocol and how it works in order to allow the expansion to more languages than the ones currently supported.
+
+Work on nutella 2 can be tracked on [this project](https://github.com/orgs/nutella-framework/projects/2).

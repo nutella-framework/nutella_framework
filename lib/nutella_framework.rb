@@ -1,22 +1,24 @@
-# Import all the modules
-require 'logging/nutella_logging'
-require 'core/nutella_core'
-require 'core/nutella_cli'
-require 'config/config'
-require 'config/runlist'
-require 'config/current_app_utils'
+# This is the entry point to the gem. The code here gets executed BEFORE
+# anything else. For this reason, this is a great place to import all the
+# nutella modules.
+require 'config_files_management/config'
+require 'cli/nutella_cli'
+# require 'logging/nutella_logging'
+# require 'cli/nutella_core'
+
+# require 'config/runlist'
+# require 'config/current_app_utils'
 
 module Nutella
 
-  # Initialize nutella home and temporary folder
-  home_dir = File.dirname(__FILE__)
-  NUTELLA_HOME = home_dir[0..-4]
+  # Initialize nutella home to the folder where this source code is
+  NUTELLA_HOME = File.dirname(__FILE__)[0..-4]
   NUTELLA_TMP = "#{NUTELLA_HOME}.tmp/"
 
   # If the nutella configuration file (config.json) is empty (or doesn't exist) we're going to initialize it
   # with nutella constants and defaults
-  if Nutella.config.empty?
-    Nutella.init
+  if Config.file.empty?
+    Config.init
   end
   
 end

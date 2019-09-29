@@ -102,7 +102,6 @@ module Nutella
       File.open(@file, 'w+') do |f|
         f.write(JSON.pretty_generate(hash))
       end
-      File.chmod(0777, @file)
     end
 
     def load_hash
