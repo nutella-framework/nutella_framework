@@ -1,3 +1,10 @@
+# Require all commands by iterating through all the files
+# in the commands directory
+Dir["#{File.dirname(__FILE__)}/../commands/*.rb"].each do |file|
+  # noinspection RubyResolve
+  require "cli/commands/#{File.basename(file, File.extname(file))}"
+end
+
 module Nutella
 
   class NutellaCLI
@@ -27,15 +34,35 @@ module Nutella
 
       # If nutella is not ready to be used (i.e. nobody has invoked the "nutella checkup" command yet),
       # append warning/reminder message
-      if Nutella.config['ready'].nil? && command!='checkup'
+      if Config.file['ready'].nil? && command!='checkup'
         console.warn 'Looks like this is a fresh installation of nutella. Please run \'nutella checkup\' to check all dependencies are installed.'
       end
 
       # Execute the appropriate command
-      Nutella.execute_command command, args
+      execute_command(command, args)
       exit 0
     end
 
+    # This method executes a particular command
+    # @param command [String] the name of the command
+    # @param args [Array<String>] command line parameters passed to the command
+    def self.execute_command (command, args=nil)
+      # Check that the command exists and if it does,
+      # execute its run method passing the args parameters
+      if command_exists?(command)
+        Object::const_get("Nutella::#{command.capitalize}").new.run(args)
+      else
+        console.error "Unknown command #{command}"
+      end
+    end
+    
+    # This method checks that a particular command exists
+    # @return [Boolean] true if the command exists, false otherwise
+    def self.command_exists?(command)
+      return Nutella.const_get("Nutella::#{command.capitalize}").is_a?(Class)
+    rescue NameError
+      return false
+    end
 
     # Print nutella logo
     def self.print_nutella_logo
