@@ -1,17 +1,17 @@
-require 'commands/meta/command'
+require_relative 'meta/command'
 
 module Nutella
     
   class Help < Command
-    @description = 'Displays what every command does and how to use it'
+    @description = 'Displays what every command does'
   
     def run(args=nil)
       message=''
-      Dir["#{File.dirname(__FILE__)}/*.rb"].each do |file|
+      Dir["#{File.dirname(__FILE__)}/*.rb"].sort.each do |file|
         message += add_cmd_help(file)
       end
       console.info message
-      console.success 'For more details on individual commands, see https://github.com/nutella-framework/nutella_framework/wiki/Nutella-Command-Line-Interface'
+      console.info 'For more details on individual commands, see http://nutella-framework.github.io'
     end
 
     private

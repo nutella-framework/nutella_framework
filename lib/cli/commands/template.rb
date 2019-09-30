@@ -1,4 +1,4 @@
-require 'commands/meta/template_command'
+require_relative 'meta/template_command'
 
 module Nutella
 

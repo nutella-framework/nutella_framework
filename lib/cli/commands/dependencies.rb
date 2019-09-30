@@ -1,4 +1,4 @@
-require 'commands/meta/run_command'
+require_relative 'meta/run_command'
 require 'tmux/tmux'
 
 module Nutella

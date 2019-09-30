@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'semantic', '~> 1.4'
-gem 'logging', '~> 2.2'
+gem "ansi", "~> 1.5"
 gem 'git', '~> 1.2'
 gem 'sinatra', '~>1.4'
 gem 'sinatra-cross_origin', '~> 0.3.2'
@@ -24,3 +24,5 @@ group :test do
   gem 'rspec', '~> 3.8'
   gem 'fuubar', '~> 2.4'
 end
+
+

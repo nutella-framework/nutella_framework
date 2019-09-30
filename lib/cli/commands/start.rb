@@ -1,5 +1,5 @@
-require 'commands/meta/run_command'
-require 'commands/util/components_starter'
+require_relative 'meta/run_command'
+require_relative 'util/components_starter'
 
 module Nutella
   class Start < RunCommand

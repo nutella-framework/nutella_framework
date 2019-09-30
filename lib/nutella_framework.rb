@@ -4,8 +4,6 @@
 require 'config_files_management/config'
 require 'cli/nutella_cli'
 # require 'logging/nutella_logging'
-# require 'cli/nutella_core'
-
 # require 'config/runlist'
 # require 'config/current_app_utils'
 

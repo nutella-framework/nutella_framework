@@ -1,5 +1,5 @@
-require 'commands/meta/command'
-require 'commands/util/components_list'
+require_relative 'command'
+require_relative '../util/components_list'
 require 'slop'
 
 module Nutella
@@ -7,7 +7,7 @@ module Nutella
   # It is mostly a commodity class for code reuse.
   class RunCommand < Command
 
-    def run (args=nil)
+    def run(args=nil)
       console.error 'Running the generic RunCommand!!! WAT? https://www.destroyallsoftware.com/talks/wat'
     end
 

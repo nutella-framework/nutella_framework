@@ -1,9 +1,8 @@
-# Require all commands by iterating through all the files
-# in the commands directory
-Dir["#{File.dirname(__FILE__)}/../commands/*.rb"].each do |file|
-  # noinspection RubyResolve
-  require "cli/commands/#{File.basename(file, File.extname(file))}"
+require_relative 'cli_utils'
+Dir["#{File.dirname(__FILE__)}/commands/*.rb"].each do |file|
+  require_relative "commands/#{File.basename(file, File.extname(file))}"
 end
+
 
 module Nutella
 
@@ -46,7 +45,7 @@ module Nutella
     # This method executes a particular command
     # @param command [String] the name of the command
     # @param args [Array<String>] command line parameters passed to the command
-    def self.execute_command (command, args=nil)
+    def self.execute_command(command, args=nil)
       # Check that the command exists and if it does,
       # execute its run method passing the args parameters
       if command_exists?(command)

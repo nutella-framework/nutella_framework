@@ -1,4 +1,4 @@
-require 'commands/meta/command'
+require_relative 'meta/command'
 require 'fileutils'
 
 module Nutella

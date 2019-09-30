@@ -1,4 +1,4 @@
-require 'commands/meta/command'
+require_relative 'command'
 require 'json'
 
 module Nutella
@@ -7,7 +7,7 @@ module Nutella
 
   class TemplateCommand < Command
 
-    def run (args=nil)
+    def run(args=nil)
       console.error 'Running generic TemplateCommand!!! WAT?'
     end
 

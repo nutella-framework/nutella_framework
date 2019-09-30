@@ -1,4 +1,4 @@
-require 'commands/util/components_list'
+require_relative 'components_list'
 require 'tmux/tmux'
 
 # Utility functions to start components

@@ -1,4 +1,4 @@
-require 'commands/meta/template_command'
+require_relative 'meta/template_command'
 require 'git'
 require 'net/http'
 
@@ -76,7 +76,7 @@ module Nutella
     end
 
 
-    def add_local_template ( template, template_dir, prj_dir, dest_dir_name)
+    def add_local_template( template, template_dir, prj_dir, dest_dir_name)
       template_nutella_file_json = JSON.parse(IO.read("#{template_dir}/nutella.json"))
     
       # If destination is not specified, set it to the template name
@@ -108,7 +108,7 @@ module Nutella
     end
   
   
-    def add_remote_template ( template, prj_dir, dest_dir)
+    def add_remote_template( template, prj_dir, dest_dir)
       template_name = template[template.rindex('/')+1 .. template.length-5]
       template_dir = "#{Nutella::NUTELLA_TMP}/#{template_name}"
       add_local_template( template, template_dir, prj_dir, dest_dir )
