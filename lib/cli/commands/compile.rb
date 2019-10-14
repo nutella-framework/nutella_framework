@@ -1,5 +1,4 @@
 require_relative 'meta/run_command'
-require 'tmux/tmux'
 
 module Nutella
   class Compile < RunCommand

@@ -1,4 +1,5 @@
 require_relative 'cli_utils'
+# Require all the commands
 Dir["#{File.dirname(__FILE__)}/commands/*.rb"].each do |file|
   require_relative "commands/#{File.basename(file, File.extname(file))}"
 end

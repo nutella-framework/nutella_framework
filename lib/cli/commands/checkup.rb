@@ -1,4 +1,5 @@
 require_relative 'meta/command'
+require 'config/config'
 require 'semantic'
 
 module Nutella
@@ -23,7 +24,7 @@ module Nutella
       end
           
       # Set ready flag in config.json
-      Nutella.config['ready'] = true
+      Config.file['ready'] = true
 
       # Output success message
       console.success 'All systems go! You are ready to use nutella!'
@@ -37,7 +38,7 @@ module Nutella
       # Check if Docker image for the broker was already pulled
       if `docker images matteocollina/mosca:v2.3.0 --format "{{.ID}}"` != ""
         # If so, check that a broker configuration exists and create one if it doesn't
-        Nutella.config['broker'] = '127.0.0.1' if Nutella.config['broker'].nil? 
+        Config.file['broker'] = '127.0.0.1' if Config.file['broker'].nil? 
         true
       else
         false
@@ -49,7 +50,7 @@ module Nutella
       # Docker pull to install
       system "docker pull matteocollina/mosca:v2.3.0 > /dev/null 2>&1"
       # Write broker setting inside config.json
-      Nutella.config['broker'] = '127.0.0.1'
+      Config.file['broker'] = '127.0.0.1'
     end
     
     
@@ -72,11 +73,11 @@ module Nutella
         end
         semver
       end
-      # Tmux version lambda
-      tmux_semver = lambda do
-        out = `tmux -V`
-        out.slice!(0,5)
-        Semantic::Version.new "#{out[0..2]}.0"
+      # Immortal version lambda
+      immortal_semver = lambda do
+        out = `immortal -v`
+        out.gsub("\n",'')
+        Semantic::Version.new out
       end
       # Mongo version lambda
       mongo_semver = lambda do
@@ -85,7 +86,7 @@ module Nutella
         Semantic::Version.new out[0..4]
       end
       # Check versions
-      return true if check_version?('docker', '17.0.0', docker_semver) && check_version?('git', '1.8.0', git_semver) && check_version?('tmux', '1.8.0', tmux_semver) && check_version?('mongodb', '2.6.9', mongo_semver)
+      return true if check_version?('docker', '17.0.0', docker_semver) && check_version?('git', '1.8.0', git_semver) && check_version?('immortal', '0.23.0', immortal_semver) && check_version?('mongodb', '2.6.9', mongo_semver)
       # If even one of the checks fails, return false
       false
     end

@@ -1,10 +1,11 @@
-require 'config_files_management/persisted_hash'
+require_relative 'persisted_hash'
 
 module Nutella
   class Config
     # This method initializes the nutella configuration file (config.json) with:
     # - config_dir: directory where the configuration files are stored in
     # - broker_dir: directory where the local broker is installed in
+    # - immortal_dir: directory used to store immortal yaml files
     # - main_interface_port: the port used to serve interfaces
     def self.init
       file['config_dir'] = "#{ENV['HOME']}/.nutella/"

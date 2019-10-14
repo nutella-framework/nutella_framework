@@ -1,5 +1,3 @@
-
-
 module Nutella
 
   # Nutella command
