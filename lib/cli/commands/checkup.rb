@@ -22,6 +22,9 @@ module Nutella
           return
         end
       end
+
+      # Check that supervisor is properly configured
+      return unless supervisor_configured_correctly?
           
       # Set ready flag in config.json
       Config.file['ready'] = true
@@ -74,8 +77,8 @@ module Nutella
         semver
       end
       # Immortal version lambda
-      immortal_semver = lambda do
-        out = `immortal -v`
+      supervisor_semver = lambda do
+        out = `supervisorctl version`
         out.gsub("\n",'')
         Semantic::Version.new out
       end
@@ -86,7 +89,7 @@ module Nutella
         Semantic::Version.new out[0..4]
       end
       # Check versions
-      return true if check_version?('docker', '17.0.0', docker_semver) && check_version?('git', '1.8.0', git_semver) && check_version?('immortal', '0.23.0', immortal_semver) && check_version?('mongodb', '2.6.9', mongo_semver)
+      return true if check_version?('docker', '17.0.0', docker_semver) && check_version?('git', '1.8.0', git_semver) && check_version?('supervisor', '4.1.0', supervisor_semver) && check_version?('mongodb', '2.6.9', mongo_semver)
       # If even one of the checks fails, return false
       false
     end
@@ -108,6 +111,14 @@ module Nutella
         console.info "Your #{dep} version is #{actual_version}. Yay!"
         true
       end
+    end
+
+
+    def supervisor_configured_correctly?
+      # TODO Check that supervisor's MAC_CONFIG_DIR exists, if not create 
+      # TODO Make sure the MAC_CONFIG_DIR is inluded in supervisor's MAC_CONFIG_FILE, if not include
+      # TODO Make sure that [inet_http_server] (rpc server) is enabled in MAC_CONFIG_FILE
+      true
     end
 
   end

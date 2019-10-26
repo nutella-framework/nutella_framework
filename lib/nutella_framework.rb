@@ -1,11 +1,5 @@
-# This is the entry point to the gem. The code here gets executed BEFORE
-# anything else. For this reason, this is a great place to import all the
-# nutella modules.
-require 'config_files_management/config'
-require 'cli/nutella_cli'
-# require 'logging/nutella_logging'
-# require 'config/runlist'
-# require 'config/current_app_utils'
+require 'config/config'
+require 'cli/cli'
 
 module Nutella
 

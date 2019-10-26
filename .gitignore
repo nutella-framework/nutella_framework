@@ -4,6 +4,8 @@ runlist.json
 broker/
 .tmp/
 .pid
+.mongo_pid
+stdout.log
 
 # Test app
 test_app/

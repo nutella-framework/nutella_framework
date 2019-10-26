@@ -2,16 +2,15 @@ require 'json'
 require 'sinatra'
 require 'nokogiri'
 
-require_relative '../../lib/config/runlist'
-require_relative '../../lib/config/config'
-require_relative '../../nutella_lib/framework_core'
+require_relative '../../config/config'
+require_relative '../../config/runlist'
 
 
 # Set Sinatra to run in production mode
 set :environment, :production
 
 # Set Sinatra's port to nutella's main_interface_port
-set :port, Nutella.config['main_interface_port']
+set :port, Nutella::Config.file['main_interface_port']
 # Disable X-Frame-Options header to allow iframes
 set :protection, :except => :frame_options
 
@@ -63,7 +62,7 @@ get '/:app_id/:run_id/runs/:interface' do
   # If the index file doesn't exist, render error page
   return erb( :not_found_404, :locals => {:not_found_type => 'idx'} ) unless File.exist? index_file_path
   # If the index file exists, compose query string and redirect
-  index_with_query_url = "#{request.path}/index.html?broker=#{Nutella.config['broker']}&app_id=#{app_id}&run_id=#{run_id}"
+  index_with_query_url = "#{request.path}/index.html?broker=#{Nutella::Config.file['broker']}&app_id=#{app_id}&run_id=#{run_id}"
   redirect index_with_query_url
 end
 

@@ -7,19 +7,19 @@ nutella is a framework to build and run Macroworlds. The original prototype was 
 # Installing
 nutella works on OSX and Linux (tested on Ubuntu) and it depends on a couple other things to work correctly. You will need:
 
-1. _ruby_ (version >= 2.1.0). Do yourself a favor and use [RVM](https://rvm.io/rvm/install) to install Ruby.
+1. _ruby_ (version >= 2.3.0). Do yourself a favor and use [RVM](https://rvm.io/rvm/install) to install Ruby.
 1. _git_ (version >= 1.8.0). Should come with the OS, yay!
-1. _tmux_ (version >= 1.8.0). Do yourself a favor and use [Homebrew](http://brew.sh/) to install tmux, if you are on OSX.
-1. _Docker_ (version >= 17.03.0). We use Docker to run the broker that handles all communications between all the pieces of the framework. Do yourself a favor and use [Docker for mac](https://store.docker.com/editions/community/docker-ce-desktop-mac), if you are on OSX.
+1. _supervisor_ (version >= 4.1.0). You can use [Homebrew](http://brew.sh/) to install supervisor on OSX.
+1. _docker_ (version >= 17.03.0). We use Docker to run the broker that handles all communications between all the pieces of the framework. Do yourself a favor and use [Docker for mac](https://store.docker.com/editions/community/docker-ce-desktop-mac), if you are on OSX.
 
-Once you have all of  installed, simply do:
+Once you have all of thi stuff installed you can do:
 ```
 gem install nutella_framework
 ```
 Once the installation is complete you should be able to type `nutella` in your shell and get a welcome message. 
 
 ## nutella checkup
-If you are reading this you probably already saw the warning: "Looks like this is a fresh installation of nutella. Please run `nutella checkup` to check all dependencies are installed".
+If you are reading this you probably already saw the warning: "Looks like this is a fresh installation of nutella. Please run `nutella checkup` to check all dependencies are installed correctly". **Please follow the prompt!**
 
 ```
 nutella checkup

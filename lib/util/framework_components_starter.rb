@@ -1,32 +1,33 @@
-# require_relative 'components_list'
+require 'util/supervisor'
 
 module Nutella
   # Utility functions to start components
   class FrameworkComponentsStarter
-    include PidFile
 
     def self.start
-      FrameworkComponentsStarter.new.start_framework_components
+      FrameworkComponentsStarter.new.start
     end
 
-    # Starts all framework components. If order.json is present, components are started
-    # in that order.
+    # Starts all framework components. 
     # @return [boolean] true if all components are started correctly, false otherwise
-    def start_framework_components
-      nutella_components_dir = "#{NUTELLA_HOME}framework_components"
-      if File.exist? "#{nutella_components_dir}/order.json"
-        components_list = JSON.parse IO.read "#{nutella_components_dir}/order.json"
-      else
-        components_list = ComponentsList.components_in_dir nutella_components_dir
-      end
-      components_list.each do |component|
-        if File.exist? "#{nutella_components_dir}/#{component}/startup"
-          unless start_framework_component "#{nutella_components_dir}/#{component}"
-            return false
-          end
+    def start
+      supervisor = Supervisor.new
+      nutella_components_dir = "#{Nutella::NUTELLA_HOME}lib/bots"
+      framework_components.each do |c|
+        if File.exist? "#{nutella_components_dir}/#{c}/startup"
+          supervisor.add("nutella_f_#{c}", "#{nutella_components_dir}/#{c}/startup")
         end
       end
+      framework_components.each do |c|
+        supervisor.start("nutella_f_#{c}")
+      end
       true
+    end
+
+    # Finds the framework level components that need to be started
+    def framework_components
+      d = "#{Nutella::NUTELLA_HOME}lib/bots"
+      Dir.entries(d).select {|entry| File.directory?(File.join(d, entry)) && !(entry =='.' || entry == '..') }
     end
 
 
@@ -68,28 +69,6 @@ module Nutella
 
 
     #--- Private class methods --------------
-
-
-    # Starts a single framework component
-    # @return [boolean] true if the component has been started successfully, false otherwise
-    def self.start_framework_component( component_dir )
-      pid_file_path = "#{component_dir}/.pid"
-      return true if sanitize_pid_file pid_file_path
-      # Component is not running and there is no pid file so we try to start it
-      # and create a new pid file. Note that the pid file is created by
-      # the startup script!
-      # Framework components are started without any parameters passed to them because they have
-      # full access to config, runlist and framework APIs using 'require_relative'
-      command = "#{component_dir}/startup"
-      pid = fork
-      exec(command) if pid.nil?
-      # Give it a second so they can start properly
-      sleep 1
-      # All went well so we return true
-      true
-    end
-    private_class_method :start_framework_component
-
 
     # Starts a run level bot
     def self.start_run_level_bot( bots_dir, bot, tmux )

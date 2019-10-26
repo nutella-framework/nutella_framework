@@ -1,3 +1,6 @@
+module Nutella
+  
+end
 # Utility methods to list components
 class ComponentsList
 
