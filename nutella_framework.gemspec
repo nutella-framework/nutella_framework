@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Alessandro Gnoli".freeze]
-  s.date = "2019-03-03"
+  s.date = "2019-10-26"
   s.description = "utella is a framework to create and run RoomApps".freeze
   s.email = "tebemis@gmail.com".freeze
   s.executables = ["nutella".freeze]
@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".document",
+    ".rspec",
     ".travis.yml",
     "Gemfile",
     "LICENSE",
@@ -28,178 +29,133 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/nutella",
-    "data/index.html",
-    "data/startup",
-    "example_framework_components/example_framework_bot/example_framework_bot.rb",
-    "example_framework_components/example_framework_bot/startup",
-    "example_framework_components/example_framework_web_interface/index.html",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/.npmignore",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/.travis.yml",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/LICENSE",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/README.md",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/dist/nutella_lib.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/dist/nutella_lib.js.map",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/examples/browser_hello_world.html",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/examples/node_hello_world.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/gulpfile.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/package.json",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/app_core.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/app_core_browser.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/app_log.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/app_net.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/app_persist.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/fr_core_browser.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/fr_log.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/fr_net.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/nutella_i.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/nutella_i_browser.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/nutella_lib.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/nutella_lib_browser.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/run_log.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/run_net.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/run_persist.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/src/util/net.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/test/nutella.test.js",
-    "example_framework_components/example_framework_web_interface/node_modules/nutella_lib/test/runner.html",
-    "example_framework_components/example_framework_web_interface/package.json",
-    "framework_components/binary-files-manager/bin_files_mngr.rb",
-    "framework_components/binary-files-manager/startup",
-    "framework_components/main_interface/main_interface_bot.rb",
-    "framework_components/main_interface/public/index.html",
-    "framework_components/main_interface/startup",
-    "framework_components/main_interface/views/index.erb",
-    "framework_components/main_interface/views/not_found_404.erb",
-    "framework_components/order.json",
-    "framework_components/room-debugger/README.md",
-    "framework_components/room-debugger/css/bootstrap-theme.css",
-    "framework_components/room-debugger/css/bootstrap-theme.css.map",
-    "framework_components/room-debugger/css/bootstrap-theme.min.css",
-    "framework_components/room-debugger/css/bootstrap.css",
-    "framework_components/room-debugger/css/bootstrap.css.map",
-    "framework_components/room-debugger/css/bootstrap.min.css",
-    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.eot",
-    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.svg",
-    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.ttf",
-    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.woff",
-    "framework_components/room-debugger/fonts/glyphicons-halflings-regular.woff2",
-    "framework_components/room-debugger/index.html",
-    "framework_components/room-debugger/js/bootstrap.js",
-    "framework_components/room-debugger/js/bootstrap.min.js",
-    "framework_components/room-debugger/js/jquery.min.js",
-    "framework_components/room-debugger/js/npm.js",
-    "framework_components/room-debugger/js/nutella_lib.js",
-    "framework_components/room-debugger/main.css",
-    "framework_components/room-debugger/main.js",
-    "framework_components/room-debugger/nutella.json",
-    "framework_components/room-debugger/package.json",
-    "framework_components/room-debugger/room_places_simulator.js",
-    "framework_components/runs_list_bot/runs_list_bot.rb",
-    "framework_components/runs_list_bot/startup",
-    "lib/commands/broker.rb",
-    "lib/commands/checkup.rb",
-    "lib/commands/compile.rb",
-    "lib/commands/dependencies.rb",
-    "lib/commands/help.rb",
-    "lib/commands/install.rb",
-    "lib/commands/meta/command.rb",
-    "lib/commands/meta/run_command.rb",
-    "lib/commands/meta/template_command.rb",
-    "lib/commands/new.rb",
-    "lib/commands/reset.rb",
-    "lib/commands/runs.rb",
-    "lib/commands/start.rb",
-    "lib/commands/stop.rb",
-    "lib/commands/template.rb",
-    "lib/commands/util/components_list.rb",
-    "lib/commands/util/components_starter.rb",
+    "lib/bots/binary-files-manager/bin_files_mngr.rb",
+    "lib/bots/commands_server/commands_server.rb",
+    "lib/bots/commands_server/startup",
+    "lib/bots/main_interface/main_interface_bot.rb",
+    "lib/bots/main_interface/public/index.html",
+    "lib/bots/main_interface/views/index.erb",
+    "lib/bots/main_interface/views/not_found_404.erb",
+    "lib/bots/room-debugger/README.md",
+    "lib/bots/room-debugger/css/bootstrap-theme.css",
+    "lib/bots/room-debugger/css/bootstrap-theme.css.map",
+    "lib/bots/room-debugger/css/bootstrap-theme.min.css",
+    "lib/bots/room-debugger/css/bootstrap.css",
+    "lib/bots/room-debugger/css/bootstrap.css.map",
+    "lib/bots/room-debugger/css/bootstrap.min.css",
+    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.eot",
+    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.svg",
+    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.ttf",
+    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.woff",
+    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.woff2",
+    "lib/bots/room-debugger/index.html",
+    "lib/bots/room-debugger/js/bootstrap.js",
+    "lib/bots/room-debugger/js/bootstrap.min.js",
+    "lib/bots/room-debugger/js/jquery.min.js",
+    "lib/bots/room-debugger/js/npm.js",
+    "lib/bots/room-debugger/js/nutella_lib.js",
+    "lib/bots/room-debugger/main.css",
+    "lib/bots/room-debugger/main.js",
+    "lib/bots/room-debugger/nutella.json",
+    "lib/bots/room-debugger/package.json",
+    "lib/bots/room-debugger/room_places_simulator.js",
+    "lib/bots/runs_list_bot/runs_list_bot.rb",
+    "lib/cli/cli.rb",
+    "lib/cli/cli_utils.rb",
+    "lib/cli/commands/broker.rb",
+    "lib/cli/commands/checkup.rb",
+    "lib/cli/commands/compile.rb",
+    "lib/cli/commands/dependencies.rb",
+    "lib/cli/commands/help.rb",
+    "lib/cli/commands/install.rb",
+    "lib/cli/commands/meta/command.rb",
+    "lib/cli/commands/meta/run_command.rb",
+    "lib/cli/commands/meta/template_command.rb",
+    "lib/cli/commands/new.rb",
+    "lib/cli/commands/reset.rb",
+    "lib/cli/commands/runs.rb",
+    "lib/cli/commands/server.rb",
+    "lib/cli/commands/start.rb",
+    "lib/cli/commands/stop.rb",
+    "lib/cli/commands/template.rb",
     "lib/config/config.rb",
     "lib/config/current_app_utils.rb",
     "lib/config/persisted_hash.rb",
     "lib/config/runlist.rb",
-    "lib/core/nutella_cli.rb",
-    "lib/core/nutella_core.rb",
-    "lib/logging/nutella_logger-remote.rb",
-    "lib/logging/nutella_logger.rb",
-    "lib/logging/nutella_logging.rb",
     "lib/nutella_framework.rb",
-    "lib/tmux/tmux.rb",
+    "lib/templates/index.html",
+    "lib/templates/startup",
+    "lib/util/components_list.rb",
+    "lib/util/framework_components_starter.rb",
+    "lib/util/mongo.rb",
+    "lib/util/mqtt_broker.rb",
+    "lib/util/pid.rb",
+    "lib/util/supervisor.rb",
     "nutella_framework.gemspec",
-    "nutella_lib/framework_core.rb",
-    "nutella_lib/framework_log.rb",
-    "nutella_lib/framework_net.rb",
-    "nutella_lib/framework_persist.rb",
-    "test/commands/test_cmd_cli_params_parsing.rb",
-    "test/commands/test_command_template.rb",
-    "test/config/test_current_app_utils.rb",
-    "test/config/test_persisted_hash.rb",
-    "test/config/test_runlist.rb",
-    "test/framework_apis/test_framework_api.rb",
-    "test/helper.rb",
-    "test/logging/test_logging.rb"
+    "spec/cli/commands/checkup_spec.rb",
+    "spec/cli/commands/help_spec.rb",
+    "spec/cli/commands/server_spec.rb",
+    "spec/config/config_spec.rb",
+    "spec/config/persisted_hash_spec.rb",
+    "spec/spec_helper.rb"
   ]
   s.homepage = "https://github.com/nutella-framework/nutella_framework".freeze
   s.licenses = ["MIT".freeze]
-  s.rubygems_version = "2.7.6".freeze
+  s.rubygems_version = "3.0.6".freeze
   s.summary = "A rails-inspired framework for RoomApps".freeze
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<semantic>.freeze, ["~> 1.4"])
-      s.add_runtime_dependency(%q<logging>.freeze, ["~> 2.2"])
+      s.add_runtime_dependency(%q<ansi>.freeze, ["~> 1.5"])
+      s.add_runtime_dependency(%q<bson>.freeze, ["~> 3.0"])
       s.add_runtime_dependency(%q<git>.freeze, ["~> 1.2"])
+      s.add_runtime_dependency(%q<nutella_lib>.freeze, ["~> 0.4", ">= 0.4.24"])
+      s.add_runtime_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
+      s.add_runtime_dependency(%q<slop>.freeze, ["~> 4.0"])
+      s.add_runtime_dependency(%q<semantic>.freeze, ["~> 1.4"])
       s.add_runtime_dependency(%q<sinatra>.freeze, ["~> 1.4"])
       s.add_runtime_dependency(%q<sinatra-cross_origin>.freeze, ["~> 0.3.2"])
       s.add_runtime_dependency(%q<thin>.freeze, ["~> 1.6"])
-      s.add_runtime_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
-      s.add_runtime_dependency(%q<slop>.freeze, ["~> 4.0"])
-      s.add_runtime_dependency(%q<nutella_lib>.freeze, [">= 0.4.24", "~> 0.4"])
-      s.add_runtime_dependency(%q<activesupport>.freeze, ["~> 4.2"])
-      s.add_runtime_dependency(%q<bson>.freeze, ["~> 3.0"])
-      s.add_development_dependency(%q<shoulda>.freeze, ["~> 3.0"])
+      s.add_runtime_dependency(%q<xmlrpc>.freeze, ["~> 0.3.0"])
       s.add_development_dependency(%q<yard>.freeze, ["~> 0.9.11"])
       s.add_development_dependency(%q<rdoc>.freeze, ["~> 4.0"])
-      s.add_development_dependency(%q<bundler>.freeze, ["~> 1.0"])
-      s.add_development_dependency(%q<jeweler>.freeze, ["~> 2.0"])
-      s.add_development_dependency(%q<simplecov>.freeze, ["~> 0.9"])
+      s.add_development_dependency(%q<bundler>.freeze, ["~> 2.0"])
+      s.add_development_dependency(%q<jeweler>.freeze, ["~> 2.3"])
     else
-      s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])
-      s.add_dependency(%q<logging>.freeze, ["~> 2.2"])
+      s.add_dependency(%q<ansi>.freeze, ["~> 1.5"])
+      s.add_dependency(%q<bson>.freeze, ["~> 3.0"])
       s.add_dependency(%q<git>.freeze, ["~> 1.2"])
+      s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.4", ">= 0.4.24"])
+      s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
+      s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
+      s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])
       s.add_dependency(%q<sinatra>.freeze, ["~> 1.4"])
       s.add_dependency(%q<sinatra-cross_origin>.freeze, ["~> 0.3.2"])
       s.add_dependency(%q<thin>.freeze, ["~> 1.6"])
-      s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
-      s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
-      s.add_dependency(%q<nutella_lib>.freeze, [">= 0.4.24", "~> 0.4"])
-      s.add_dependency(%q<activesupport>.freeze, ["~> 4.2"])
-      s.add_dependency(%q<bson>.freeze, ["~> 3.0"])
-      s.add_dependency(%q<shoulda>.freeze, ["~> 3.0"])
+      s.add_dependency(%q<xmlrpc>.freeze, ["~> 0.3.0"])
       s.add_dependency(%q<yard>.freeze, ["~> 0.9.11"])
       s.add_dependency(%q<rdoc>.freeze, ["~> 4.0"])
-      s.add_dependency(%q<bundler>.freeze, ["~> 1.0"])
-      s.add_dependency(%q<jeweler>.freeze, ["~> 2.0"])
-      s.add_dependency(%q<simplecov>.freeze, ["~> 0.9"])
+      s.add_dependency(%q<bundler>.freeze, ["~> 2.0"])
+      s.add_dependency(%q<jeweler>.freeze, ["~> 2.3"])
     end
   else
-    s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])
-    s.add_dependency(%q<logging>.freeze, ["~> 2.2"])
+    s.add_dependency(%q<ansi>.freeze, ["~> 1.5"])
+    s.add_dependency(%q<bson>.freeze, ["~> 3.0"])
     s.add_dependency(%q<git>.freeze, ["~> 1.2"])
+    s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.4", ">= 0.4.24"])
+    s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
+    s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
+    s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])
     s.add_dependency(%q<sinatra>.freeze, ["~> 1.4"])
     s.add_dependency(%q<sinatra-cross_origin>.freeze, ["~> 0.3.2"])
     s.add_dependency(%q<thin>.freeze, ["~> 1.6"])
-    s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
-    s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
-    s.add_dependency(%q<nutella_lib>.freeze, [">= 0.4.24", "~> 0.4"])
-    s.add_dependency(%q<activesupport>.freeze, ["~> 4.2"])
-    s.add_dependency(%q<bson>.freeze, ["~> 3.0"])
-    s.add_dependency(%q<shoulda>.freeze, ["~> 3.0"])
+    s.add_dependency(%q<xmlrpc>.freeze, ["~> 0.3.0"])
     s.add_dependency(%q<yard>.freeze, ["~> 0.9.11"])
     s.add_dependency(%q<rdoc>.freeze, ["~> 4.0"])
-    s.add_dependency(%q<bundler>.freeze, ["~> 1.0"])
-    s.add_dependency(%q<jeweler>.freeze, ["~> 2.0"])
-    s.add_dependency(%q<simplecov>.freeze, ["~> 0.9"])
+    s.add_dependency(%q<bundler>.freeze, ["~> 2.0"])
+    s.add_dependency(%q<jeweler>.freeze, ["~> 2.3"])
   end
 end
 
