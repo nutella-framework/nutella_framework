@@ -1,3 +1,11 @@
+# Command server
+# Connects to MQTT broker and listens for commands over (RPC)
+# Executes the commands and returns the output
+# require 'nutella_lib'
+Dir["#{File.dirname(__FILE__)}/commands/*.rb"].each do |file|
+  require_relative "commands/#{File.basename(file, File.extname(file))}"
+end
+
 $stdout.sync = true ## nutella woudl do this
 # $stdout.sync = true 
 puts "Hi, I'm a basic ruby bot and all I do is idle and print stuff"

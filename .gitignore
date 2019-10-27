@@ -19,6 +19,7 @@ doc/
 .bundle
 Gemfile.lock
 spec/examples.txt
+.gem
 
 # Mac crap
 .DS_Store
