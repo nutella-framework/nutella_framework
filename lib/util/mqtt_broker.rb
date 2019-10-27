@@ -1,5 +1,5 @@
 require 'socket'
-require 'config/config'
+require 'util/config'
 
 module Nutella
   class MQTTBroker

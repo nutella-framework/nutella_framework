@@ -5,7 +5,7 @@ broker/
 .tmp/
 .pid
 .mongo_pid
-stdout.log
+*.log
 
 # Test app
 test_app/

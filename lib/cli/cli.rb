@@ -1,4 +1,4 @@
-require_relative 'cli_utils'
+require_relative 'logger'
 # Require all the commands
 Dir["#{File.dirname(__FILE__)}/commands/*.rb"].each do |file|
   require_relative "commands/#{File.basename(file, File.extname(file))}"

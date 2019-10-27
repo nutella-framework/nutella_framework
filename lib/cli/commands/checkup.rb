@@ -1,5 +1,5 @@
 require_relative 'meta/command'
-require 'config/config'
+require 'util/config'
 require 'semantic'
 
 module Nutella
@@ -80,7 +80,6 @@ module Nutella
       supervisor_semver = lambda do
         out = `supervisorctl version`
         out.gsub("\n",'')
-        puts Semantic::Version.new out
         Semantic::Version.new out
       end
       # Mongo version lambda

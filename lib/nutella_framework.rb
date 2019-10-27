@@ -1,4 +1,4 @@
-require 'config/config'
+require 'util/config'
 require 'cli/cli'
 
 module Nutella

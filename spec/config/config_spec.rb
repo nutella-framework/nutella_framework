@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'config/config'
+require 'util/config'
 require 'securerandom'
 
 module Nutella

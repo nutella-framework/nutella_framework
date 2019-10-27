@@ -3,7 +3,7 @@ require 'ansi/code'
 
 module Nutella
 
-  class CLIUtils
+  class CLILogger
     include Singleton
 
     def debug(message)
@@ -35,7 +35,7 @@ end
 module Kernel
   
   def console
-    Nutella::CLIUtils.instance
+    Nutella::CLILogger.instance
   end
   
 end
