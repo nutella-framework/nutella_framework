@@ -92,7 +92,6 @@ Gem::Specification.new do |s|
     "lib/util/pid.rb",
     "lib/util/runlist.rb",
     "lib/util/supervisor.rb",
-    "nutella_framework-0.8.0.gem",
     "nutella_framework.gemspec",
     "spec/cli/commands/checkup_spec.rb",
     "spec/cli/commands/help_spec.rb",
@@ -103,6 +102,7 @@ Gem::Specification.new do |s|
   ]
   s.homepage = "https://github.com/nutella-framework/nutella_framework".freeze
   s.licenses = ["MIT".freeze]
+  s.required_ruby_version = Gem::Requirement.new("~> 2.0".freeze)
   s.rubygems_version = "3.0.6".freeze
   s.summary = "A rails-inspired framework for RoomApps".freeze
 

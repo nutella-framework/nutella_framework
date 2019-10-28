@@ -1,7 +1,7 @@
 # Command server
 # Connects to MQTT broker and listens for commands over (RPC)
 # Executes the commands and returns the output
-# require 'nutella_lib'
+require 'nutella_lib'
 Dir["#{File.dirname(__FILE__)}/commands/*.rb"].each do |file|
   require_relative "commands/#{File.basename(file, File.extname(file))}"
 end

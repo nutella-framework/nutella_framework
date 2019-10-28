@@ -1,9 +1,12 @@
 source 'http://rubygems.org'
 
+ruby '2.3.8'
+
 gem "ansi", "~> 1.5"
 gem 'bson', '~> 3.0'
 gem 'git', '~> 1.2'
-gem 'nutella_lib','~>0.4', '>=0.4.24'
+gem "grpc", "~> 1.24"
+gem 'nutella_lib','~>0.5'
 gem 'nokogiri', '~>1.6'
 gem 'slop', '~>4.0'
 gem 'semantic', '~> 1.4'
@@ -17,6 +20,7 @@ group :development do
   gem 'rdoc', '~> 4.0'
   gem 'bundler', '~> 2.0'
   gem 'jeweler', '~> 2.3'
+  gem "grpc-tools", "~> 1.24"
 end
 
 group :test do

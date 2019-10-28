@@ -21,6 +21,7 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{utella is a framework to create and run RoomApps}
   gem.email = "tebemis@gmail.com"
   gem.authors = ["Alessandro Gnoli"]
+  gem.required_ruby_version = "~> 2.0"
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new

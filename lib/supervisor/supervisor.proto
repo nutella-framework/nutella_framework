@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+service Supervisor {
+  rpc StartProcess (StartProcessRequest) returns (StartProcessResponse);
+}
+
+message StartProcessRequest {
+  string process_name = 1;
+  string process_command = 2;
+  string process_log = 3;
+}
+
+message StartProcessResponse {
+  bool success = 1;
+  string process_pid = 2;
+}

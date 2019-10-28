@@ -19,8 +19,12 @@ module Nutella
     # Adds a process to supervision
     def add(name, command)
       write_config_file(name, command)
-      @rpc.call("supervisor.reloadConfig")
-      @rpc.call("supervisor.addProcessGroup", name)
+      begin
+        @rpc.call("supervisor.addProcessGroup", name)  
+      rescue => exception
+        # Yup, we're swallowing this one because it returns true if it adds it and
+        # exceptions out if it can't... ^___^
+      end
     end
 
     # Adds a group of process to supervision
@@ -54,6 +58,11 @@ module Nutella
     # Stops a process, retuns false if error
     def stop(name)
       @rpc.call("supervisor.stopProcess", name)
+    end
+
+    # Gets all the info about a process
+    def getInfo(name)
+      @rpc.call("supervisor.getProcessInfo", name)
     end
 
 
