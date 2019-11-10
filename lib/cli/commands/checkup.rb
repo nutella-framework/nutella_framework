@@ -1,6 +1,7 @@
 require_relative 'meta/command'
 require 'util/config'
 require 'semantic'
+require 'docker-api'
 
 module Nutella
   class Checkup < Command
@@ -12,19 +13,16 @@ module Nutella
       return unless all_dependencies_installed?
       
       # Check if we have a local broker installed
-      # and install one if we don't
-      if broker_exists
-        console.info 'You have a local broker installed. Yay!'
-      else
-        console.warn 'You don\'t seem to have a local broker installed so we are going to go ahead and install one for you. This might take some time...'
-        unless install_local_broker
-          console.error 'Whoops...something went wrong while installing the broker'
-          return
-        end
-      end
+      # and installs one if we don't
+      return unless broker_docker_image_ready?
 
-      # Check that supervisor is properly configured
-      return unless supervisor_configured_correctly?
+      # Check if we have a mongo installed locally
+      # and installs one if we don't
+      return unless mongo_docker_image_ready?
+
+      # Check that we have a nutella ruby image built
+      # if not, build one
+      return unless nutella_docker_image_ready?
           
       # Set ready flag in config.json
       Config.file['ready'] = true
@@ -34,36 +32,13 @@ module Nutella
     end
     
   
-    private 
+    private   
     
-  
-    def broker_exists
-      # Check if Docker image for the broker was already pulled
-      if `docker images matteocollina/mosca:v2.3.0 --format "{{.ID}}"` != ""
-        # If so, check that a broker configuration exists and create one if it doesn't
-        Config.file['broker'] = '127.0.0.1' if Config.file['broker'].nil? 
-        true
-      else
-        false
-      end
-    end
 
-
-    def install_local_broker
-      # Docker pull to install
-      system "docker pull matteocollina/mosca:v2.3.0 > /dev/null 2>&1"
-      # Write broker setting inside config.json
-      Config.file['broker'] = '127.0.0.1'
-    end
-    
-    
     def all_dependencies_installed?
       # Docker version lambda
       docker_semver = lambda do
-        out = `docker --version`
-        token = out.split(' ')
-        token[2].slice(0..1)
-        Semantic::Version.new token[2].slice(0..1).concat('.0.0')
+        Semantic::Version.new(Docker.version['Version'].slice(0..1).concat('.0.0'))
       end
       # Git version lambda
       git_semver = lambda do
@@ -76,21 +51,9 @@ module Nutella
         end
         semver
       end
-      # Immortal version lambda
-      supervisor_semver = lambda do
-        out = `supervisorctl version`
-        out.gsub("\n",'')
-        Semantic::Version.new out
-      end
-      # Mongo version lambda
-      mongo_semver = lambda do
-        out = `mongod --version`
-        out.slice!(0,12)
-        Semantic::Version.new out[0..4]
-      end
       # Check versions
-      return true if check_version?('docker', '17.0.0', docker_semver) && check_version?('git', '1.8.0', git_semver) && check_version?('supervisor', '4.1.0', supervisor_semver) && check_version?('mongodb', '2.6.9', mongo_semver)
-      # If even one of the checks fails, return false
+      return true if check_version?('docker', '17.0.0', docker_semver) && check_version?('git', '1.8.0', git_semver)
+      # If any of the checks fail, return false instead
       false
     end
     
@@ -114,14 +77,101 @@ module Nutella
     end
 
 
-    def supervisor_configured_correctly?
-      # TODO Check that supervisor's MAC_CONFIG_DIR exists, if not create 
-      # TODO Make sure the MAC_CONFIG_DIR is inluded in supervisor's MAC_CONFIG_FILE, if not include
-      # TODO Make sure that [inet_http_server] (rpc server) is enabled in MAC_CONFIG_FILE
+  # Checks that the broker image has been pulled and pulls it if not
+    def broker_docker_image_ready?
+      if broker_image_exists?
+        console.info 'You have a local broker installed. Yay!'
+      else
+        console.warn 'You don\'t seem to have a local broker installed so we are going to go ahead and install one for you. This might take some time...'
+        begin
+          install_local_broker
+        rescue => e
+          puts e
+          console.error 'Whoops...something went wrong while installing the broker, try running \'nutella checkup\' again'
+          false
+        end
+        console.info 'Broker installed successfully!'
+      end
       true
     end
 
+
+    # Checks that: 1. The Docker image for the broker has been pulled and
+    # 2. config.json has been correctly configured
+    def broker_image_exists?
+      Docker::Image.exist?('matteocollina/mosca:v2.3.0') && !Config.file['broker'].nil?
+    end
+
+
+    def install_local_broker
+      # Docker pull to install
+      Docker::Image.create('fromImage': 'matteocollina/mosca:v2.3.0')
+      # Write broker setting inside config.json
+      Config.file['broker'] = '127.0.0.1'
+    end
+
+
+    # Checks that the mongo image has been pulled and pulls it if not
+    def mongo_docker_image_ready?
+      if mongo_image_exists?
+        console.info 'You have mongo installed locally. Yay!'
+      else
+        console.warn 'You don\'t seem to have a mongo installed locally so we are going to go ahead and install it for you. This might take some time...'
+        begin
+          install_local_mongo
+        rescue => e
+          puts e
+          console.error 'Whoops...something went wrong while installing mongo, try running \'nutella checkup\' again'
+          return false
+        end
+        console.info 'Mongo installed successfully!'
+      end
+      true
+    end
+      
+    
+    # Checks that: 1. The Docker image for mongo has been pulled and
+    # 2. config.json has been correctly configured
+    def mongo_image_exists?
+      Docker::Image.exist?('mongo:3.2.21') && !Config.file['mongo'].nil?
+    end
+
+
+    def install_local_mongo
+      # Docker pull to install
+      Docker::Image.create('fromImage': 'mongo:3.2.21')
+      # Write mongo setting inside config.json
+      Config.file['mongo'] = '127.0.0.1'
+    end
+
+
+    def nutella_docker_image_ready?
+      if nutella_image_exists?
+        console.info 'You have a nutella docker image ready. Yay!'
+      else
+        console.warn 'You don\'t seem to have a nutella docker image ready. We\'re gonna go ahead and build one for you. This might take some time...'
+        begin
+          build_nutella_docker_image
+        rescue => e
+          puts e
+          console.error 'Whoops...something went wrong while building the nutella docker image, try running \'nutella checkup\' again'
+          return false
+        end
+        console.info 'nutella docker image built successfully!'
+      end
+      true
+    end
+
+    # Checks that the nutella image exists and if not tries to build it
+    def nutella_image_exists?
+      Docker::Image.exist?('nutella:1.0.0')
+    end
+
+
+    def build_nutella_docker_image
+      img = Docker::Image.build_from_dir(NUTELLA_SRC, { 'dockerfile': 'Dockerfile.rubyimage' })
+      img.tag('repo': 'nutella', 'tag': '1.0.0', force: true)
+    end
+
   end
-
 end
-

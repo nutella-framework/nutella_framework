@@ -14,7 +14,7 @@ module Nutella
     # installs mongo as a service and runs it.
     # @return [boolean] true if mongo has been correctly started, false otherwise
     def start_mongo_db
-      pid_file_path = "#{Config.file['config_dir']}.mongo_pid"
+      pid_file_path = "#{Config.file['home_dir']}.mongo_pid"
       # Check if the process with pid indicated in the pidfile is alive
       return true if PidFile.sanitize pid_file_path
       # Check that mongo is not running 'unsupervised' (i.e. check port 27017), if it is, return

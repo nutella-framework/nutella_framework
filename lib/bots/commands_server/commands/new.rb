@@ -46,7 +46,7 @@ module Nutella
       config_file_hash = {
         :name => app_id,
         :version => '0.1.0',
-        :nutella_version => File.open("#{Nutella::NUTELLA_HOME}VERSION", 'rb').read,
+        :nutella_version => File.open("#{Nutella::NUTELLA_SRC}VERSION", 'rb').read,
         :type => 'application',
         :description => 'A quick description of your application'
       }

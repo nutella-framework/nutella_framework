@@ -15,7 +15,7 @@ module Nutella
       return true unless broker_port_free?
       # Broker is not running so we try to start it broker
       # TODO need to check that this is actually successfull...
-      `docker run -p 1883:1883 -p 1884:80 -d -v #{Config.file['broker_dir']}:/db matteocollina/mosca:v2.3.0`
+      `docker run -p 1883:1883 -p 1884:80 -d -v #{Config.file['home_dir']}broker/:/db matteocollina/mosca:v2.3.0`
       # Wait until the broker is up
       wait_for_broker
       # All went well so we return true

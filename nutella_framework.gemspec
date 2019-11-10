@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Alessandro Gnoli".freeze]
-  s.date = "2019-10-27"
+  s.date = "2019-11-10"
   s.description = "utella is a framework to create and run RoomApps".freeze
   s.email = "tebemis@gmail.com".freeze
   s.executables = ["nutella".freeze]
@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/nutella",
     "lib/bots/binary-files-manager/bin_files_mngr.rb",
+    "lib/bots/commands_server/Gemfile",
     "lib/bots/commands_server/commands/broker.rb",
     "lib/bots/commands_server/commands/compile.rb",
     "lib/bots/commands_server/commands/dependencies.rb",
@@ -80,6 +81,7 @@ Gem::Specification.new do |s|
     "lib/cli/commands/server.rb",
     "lib/cli/logger.rb",
     "lib/nutella_framework.rb",
+    "lib/templates/Dockerfile",
     "lib/templates/index.html",
     "lib/templates/startup",
     "lib/util/components_list.rb",
@@ -91,7 +93,6 @@ Gem::Specification.new do |s|
     "lib/util/persisted_hash.rb",
     "lib/util/pid.rb",
     "lib/util/runlist.rb",
-    "lib/util/supervisor.rb",
     "nutella_framework.gemspec",
     "spec/cli/commands/checkup_spec.rb",
     "spec/cli/commands/help_spec.rb",
@@ -112,8 +113,10 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<ansi>.freeze, ["~> 1.5"])
       s.add_runtime_dependency(%q<bson>.freeze, ["~> 3.0"])
+      s.add_runtime_dependency(%q<docker-api>.freeze, ["~> 1.34"])
       s.add_runtime_dependency(%q<git>.freeze, ["~> 1.2"])
-      s.add_runtime_dependency(%q<nutella_lib>.freeze, ["~> 0.4", ">= 0.4.24"])
+      s.add_runtime_dependency(%q<grpc>.freeze, ["~> 1.24"])
+      s.add_runtime_dependency(%q<nutella_lib>.freeze, ["~> 0.5"])
       s.add_runtime_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
       s.add_runtime_dependency(%q<slop>.freeze, ["~> 4.0"])
       s.add_runtime_dependency(%q<semantic>.freeze, ["~> 1.4"])
@@ -125,11 +128,14 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rdoc>.freeze, ["~> 4.0"])
       s.add_development_dependency(%q<bundler>.freeze, ["~> 2.0"])
       s.add_development_dependency(%q<jeweler>.freeze, ["~> 2.3"])
+      s.add_development_dependency(%q<grpc-tools>.freeze, ["~> 1.24"])
     else
       s.add_dependency(%q<ansi>.freeze, ["~> 1.5"])
       s.add_dependency(%q<bson>.freeze, ["~> 3.0"])
+      s.add_dependency(%q<docker-api>.freeze, ["~> 1.34"])
       s.add_dependency(%q<git>.freeze, ["~> 1.2"])
-      s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.4", ">= 0.4.24"])
+      s.add_dependency(%q<grpc>.freeze, ["~> 1.24"])
+      s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.5"])
       s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
       s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
       s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])
@@ -141,12 +147,15 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rdoc>.freeze, ["~> 4.0"])
       s.add_dependency(%q<bundler>.freeze, ["~> 2.0"])
       s.add_dependency(%q<jeweler>.freeze, ["~> 2.3"])
+      s.add_dependency(%q<grpc-tools>.freeze, ["~> 1.24"])
     end
   else
     s.add_dependency(%q<ansi>.freeze, ["~> 1.5"])
     s.add_dependency(%q<bson>.freeze, ["~> 3.0"])
+    s.add_dependency(%q<docker-api>.freeze, ["~> 1.34"])
     s.add_dependency(%q<git>.freeze, ["~> 1.2"])
-    s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.4", ">= 0.4.24"])
+    s.add_dependency(%q<grpc>.freeze, ["~> 1.24"])
+    s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.5"])
     s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
     s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
     s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])
@@ -158,6 +167,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rdoc>.freeze, ["~> 4.0"])
     s.add_dependency(%q<bundler>.freeze, ["~> 2.0"])
     s.add_dependency(%q<jeweler>.freeze, ["~> 2.3"])
+    s.add_dependency(%q<grpc-tools>.freeze, ["~> 1.24"])
   end
 end
 

@@ -8,8 +8,9 @@ module Nutella
     # - immortal_dir: directory used to store immortal yaml files
     # - main_interface_port: the port used to serve interfaces
     def self.init
-      file['config_dir'] = "#{ENV['HOME']}/.nutella/"
-      file['broker_dir'] = "#{file['config_dir']}broker/"
+      file['src_dir'] = NUTELLA_SRC
+      file['tmp_dir'] = NUTELLA_TMP
+      file['home_dir'] = NUTELLA_HOME
       file['main_interface_port'] = 57880
     end
 

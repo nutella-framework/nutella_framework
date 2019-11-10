@@ -20,7 +20,7 @@ module Nutella
       context 'invoked once' do
         it 'initializes config correctly' do
           Config.init
-          expect(@ph.length).to eq(3)
+          expect(@ph.length).to eq(4)
         end
       end
   
@@ -28,7 +28,7 @@ module Nutella
         it 'initializes config file correctly' do
           Config.init
           Config.init
-          expect(@ph.length).to eq(3)
+          expect(@ph.length).to eq(4)
         end
       end
     end
@@ -39,7 +39,7 @@ module Nutella
         it 'returns a valid persisted hash with configuration' do
           Config.init
           @ph = Config.file
-          expect(@ph.length).to eq(3)
+          expect(@ph.length).to eq(4)
         end
       end
 

@@ -25,7 +25,8 @@ end
 
 
 # Set data folder
-data_folder = "#{ENV['HOME']}/.nutella/data/binary-files-manager"
+# We should use nutella config!!!!
+# data_folder = "#{ENV['HOME']}/.nutella/data/binary-files-manager"
 
 # If data folder doesn't exist, create it
 unless Dir.exists? data_folder

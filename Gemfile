@@ -4,6 +4,7 @@ ruby '2.3.8'
 
 gem "ansi", "~> 1.5"
 gem 'bson', '~> 3.0'
+gem "docker-api", "~> 1.34"
 gem 'git', '~> 1.2'
 gem "grpc", "~> 1.24"
 gem 'nutella_lib','~>0.5'

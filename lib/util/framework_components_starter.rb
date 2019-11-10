@@ -1,4 +1,4 @@
-require 'util/supervisor'
+require 'docker-api'
 
 module Nutella
   # Utility functions to deal with framework components
@@ -11,7 +11,7 @@ module Nutella
     # Starts all framework components. 
     # @return [boolean] true if all components are started correctly, false otherwise
     def start
-      nutella_components_dir = "#{Nutella::NUTELLA_HOME}lib/bots"
+      nutella_components_dir = "#{Nutella::NUTELLA_SRC}lib/bots"
       # Todo, refactor so we don't reload 20 times
       framework_components.each do |c|
         Supervisor.instance.add("nutella_f_#{c}", "#{nutella_components_dir}/#{c}/startup")
@@ -26,7 +26,7 @@ module Nutella
 
     # Finds the framework level components
     def framework_components
-      d = "#{Nutella::NUTELLA_HOME}lib/bots"
+      d = "#{Nutella::NUTELLA_SRC}lib/bots"
       Dir.entries(d)
         .select {|entry| File.directory?(File.join(d, entry)) && !(entry =='.' || entry == '..') }
         .select { |c| File.exist? "#{d}/#{c}/startup" }
