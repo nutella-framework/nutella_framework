@@ -3,9 +3,6 @@ config.json
 runlist.json
 broker/
 .tmp/
-.pid
-.mongo_pid
-*.log
 
 # Test app
 test_app/

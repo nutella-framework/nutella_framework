@@ -109,7 +109,9 @@ module Nutella
       # Write broker setting inside config.json
       Config.file['broker'] = '127.0.0.1'
       # Create data directory for the broker
-      Dir.mkdir("#{NUTELLA_HOME}broker")
+      unless File.directory?("#{NUTELLA_HOME}broker")
+        Dir.mkdir("#{NUTELLA_HOME}broker")
+      end
     end
 
 
@@ -144,6 +146,10 @@ module Nutella
       Docker::Image.create('fromImage': 'mongo:3.2.21')
       # Write mongo setting inside config.json
       Config.file['mongo'] = '127.0.0.1'
+      # Create data directory for mongo
+      unless File.directory?("#{NUTELLA_HOME}mongodb")
+        Dir.mkdir("#{NUTELLA_HOME}mongodb")
+      end
     end
 
 

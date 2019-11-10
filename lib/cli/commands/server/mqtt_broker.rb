@@ -1,6 +1,6 @@
+require 'docker-api'
 require 'socket'
 require 'util/config'
-require 'docker-api'
 
 module Nutella
   class MQTTBroker
@@ -28,9 +28,9 @@ module Nutella
     end
 
     def stop_internal_broker
-      # Find the broker'scontainer
+      # Find the broker's container
       begin
-        c = Docker::Container.get('nutella_broker')
+        c = Docker::Container.get(broker_container_name)
       rescue Docker::Error::NotFoundError
         # There is no container so the broker 
         # is definitely not runnning, we're done
@@ -48,11 +48,15 @@ module Nutella
   
     private
 
+    def broker_container_name 
+      @broker_container_name ||= 'mqtt_broker'
+    end
+
     # Checks if the broker is running already
     # @return [boolean] true if there is a container for the broker running already
     def broker_started?
       begin
-        Docker::Container.get('nutella_broker')
+        Docker::Container.get(broker_container_name)
       rescue Docker::Error::NotFoundError
         return false
       end
@@ -74,17 +78,17 @@ module Nutella
 
     # Starts the broker using docker
     def start_broker
-      # Remove any other 'nutella_broker' containers
+      # Remove any other containers with the same name to avoid conflicts
       begin
-        old_c = Docker::Container.get('nutella_broker')
+        old_c = Docker::Container.get(broker_container_name)
         old_c.delete(force: true)
       rescue Docker::Error::NotFoundError
         # If the container is not there we just proceed
       end
-      # Try to create and start the container
+      # Try to create and start the container for the broker
       Docker::Container.create(
         'Image': 'matteocollina/mosca:v2.3.0',
-        'name': 'nutella_broker',
+        'name': broker_container_name,
         'Detach': true,
         'HostConfig': {
           'PortBindings': { 

@@ -1,7 +1,7 @@
 require_relative 'meta/command'
-require 'util/mqtt_broker'
-require 'util/mongo'
-require 'util/framework_components_starter'
+require_relative 'server/mqtt_broker'
+require_relative 'server/mongo'
+require_relative 'server/framework_bots'
 
 module Nutella
   class Server < Command
@@ -13,11 +13,11 @@ module Nutella
       else
         console.error('Failed to start MQTT broker')
       end 
-      # if Mongo.start
-      #   console.success('Mongo started')
-      # else
-      #   console.error('Failed to start Mongo')
-      # end 
+      if Mongo.start
+        console.success('Mongo started')
+      else
+        console.error('Failed to start Mongo')
+      end 
       # if FrameworkComponents.start
       #   console.success('Framework level components started')
       # else

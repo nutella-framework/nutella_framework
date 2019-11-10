@@ -1,4 +1,6 @@
 require 'docker-api'
+require 'socket'
+require 'util/config'
 
 module Nutella
   # Utility functions to deal with framework components
