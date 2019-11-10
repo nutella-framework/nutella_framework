@@ -72,7 +72,7 @@ module Nutella
         ).start
       rescue => e
         console.error "Failed to start #{bot_name}!"
-        console.error e
+        puts e
         return false
       end
       true

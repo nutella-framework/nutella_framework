@@ -7,16 +7,27 @@ nutella is a framework to build and run Macroworlds. The original prototype was 
 # Installing
 nutella works on OSX and Linux (tested on Ubuntu) and it depends on a couple other things to work correctly. You will need:
 
-1. _ruby_ (version >= 2.3.0). Do yourself a favor and use [RVM](https://rvm.io/rvm/install) to install Ruby.
-1. _git_ (version >= 1.8.0). Should come with the OS, yay!
-1. _supervisor_ (version >= 4.1.0). You can use [Homebrew](http://brew.sh/) to install supervisor on OSX.
-1. _docker_ (version >= 17.03.0). We use Docker to run the broker that handles all communications between all the pieces of the framework. Do yourself a favor and use [Docker for mac](https://store.docker.com/editions/community/docker-ce-desktop-mac), if you are on OSX.
+1. _ruby_ (version >= 2.3.8). Do yourself a favor and use [RVM](https://rvm.io/rvm/install) to install Ruby.
+1. _docker_ (version >= 17.03.0). If you are on OSX, do yourself a favor and use [Docker for mac](https://store.docker.com/editions/community/docker-ce-desktop-mac).
+1. _git_ (version >= 1.8.0). Should come with the OS, nothing to do, yay!
 
-Once you have all of thi stuff installed you can do:
+Once you have all the nutella dependencies installed you can do:
 ```
 gem install nutella_framework
 ```
-Once the installation is complete you should be able to type `nutella` in your shell and get a welcome message. 
+You should then be able to type `nutella` in your shell and get a welcome message that looks like this
+
+```
+                   _       _ _
+                  | |     | | |
+       _ __  _   _| |_ ___| | | __ _
+      |  _ \| | | | __/ _ \ | |/ _  |
+      | | | | |_| | ||  __/ | | (_| |
+      |_| |_|\__,_|\__\___|_|_|\__,_|
+
+Welcome to nutella version 1.0.0! For a complete lists of available commands type 'nutella help'
+Looks like this is a fresh installation of nutella. Please run 'nutella checkup' to check all dependencies are installed.
+```
 
 ## nutella checkup
 If you are reading this you probably already saw the warning: "Looks like this is a fresh installation of nutella. Please run `nutella checkup` to check all dependencies are installed correctly". **Please follow the prompt!**
