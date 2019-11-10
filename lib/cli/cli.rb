@@ -21,6 +21,9 @@ module Nutella
     # the method that gets called.
     # It reads the command line parameters and it invokes the right sub-command
     def self.run
+      # Flush output immediately
+      $stdout.sync = true
+      
       # Read parameters
       args = ARGV.dup
       args.shift

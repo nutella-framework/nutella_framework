@@ -1,5 +1,0 @@
-# frozen_string_literal: true
-
-source "https://rubygems.org"
-
-gem "nutella_lib", "~> 0.5.0"

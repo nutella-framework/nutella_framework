@@ -56,7 +56,8 @@ module Nutella
     # @return [boolean] true if there is a container for the broker running already
     def broker_started?
       begin
-        Docker::Container.get(broker_container_name)
+        c = Docker::Container.get(broker_container_name)
+        return c.info['State']['Running']
       rescue Docker::Error::NotFoundError
         return false
       end

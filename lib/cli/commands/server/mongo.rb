@@ -56,11 +56,11 @@ module Nutella
     # @return [boolean] true if there is a container for mongo running already
     def mongo_started?
       begin
-        Docker::Container.get(mongo_container_name)
+        c = Docker::Container.get(mongo_container_name)
+        return c.info['State']['Running']
       rescue Docker::Error::NotFoundError
         return false
       end
-      true
     end
 
     # Checks if port 27017 (MongoDB standard port) is free

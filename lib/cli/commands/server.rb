@@ -18,11 +18,11 @@ module Nutella
       else
         console.error('Failed to start Mongo')
       end 
-      # if FrameworkComponents.start
-      #   console.success('Framework level components started')
-      # else
-      #   console.error('Failed to start Framework level components')
-      # end
+      if FrameworkBots.start
+        console.success('Framework-level bots started')
+      else
+        console.error('Failed to start Framework-level bots')
+      end
     end
   end
 
