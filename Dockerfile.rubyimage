@@ -1,7 +1,7 @@
 # Builds an image to run framework level bots
 FROM ruby:2.3.8
+RUN gem install bundler
 RUN bundle config --global frozen 1
 WORKDIR /app
 COPY Gemfile Gemfile.lock ./
-RUN gem install bundler
 RUN bundle install

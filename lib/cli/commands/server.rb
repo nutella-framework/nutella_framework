@@ -13,16 +13,16 @@ module Nutella
       else
         console.error('Failed to start MQTT broker')
       end 
-      if Mongo.start
-        console.success('Mongo started')
-      else
-        console.error('Failed to start Mongo')
-      end 
-      if FrameworkComponents.start
-        console.success('Framework level components started')
-      else
-        console.error('Failed to start Framework level components')
-      end
+      # if Mongo.start
+      #   console.success('Mongo started')
+      # else
+      #   console.error('Failed to start Mongo')
+      # end 
+      # if FrameworkComponents.start
+      #   console.success('Framework level components started')
+      # else
+      #   console.error('Failed to start Framework level components')
+      # end
     end
   end
 

@@ -22,10 +22,12 @@ group :development do
   gem 'bundler', '~> 2.0'
   gem 'jeweler', '~> 2.3'
   gem "grpc-tools", "~> 1.24"
+  gem "awesome_print", "~> 1.8"
 end
 
 group :test do
   gem 'rake'
   gem 'rspec', '~> 3.8'
   gem 'fuubar', '~> 2.4'
+  gem "awesome_print", "~> 1.8"
 end

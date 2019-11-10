@@ -108,6 +108,8 @@ module Nutella
       Docker::Image.create('fromImage': 'matteocollina/mosca:v2.3.0')
       # Write broker setting inside config.json
       Config.file['broker'] = '127.0.0.1'
+      # Create data directory for the broker
+      Dir.mkdir("#{NUTELLA_HOME}broker")
     end
 
 
@@ -167,7 +169,7 @@ module Nutella
       Docker::Image.exist?('nutella:1.0.0')
     end
 
-
+    # Builds a docker image that we can use to run framework level bots in a dockerized way
     def build_nutella_docker_image
       img = Docker::Image.build_from_dir(NUTELLA_SRC, { 'dockerfile': 'Dockerfile.rubyimage' })
       img.tag('repo': 'nutella', 'tag': '1.0.0', force: true)

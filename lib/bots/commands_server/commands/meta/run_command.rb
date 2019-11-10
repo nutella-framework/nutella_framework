@@ -1,5 +1,5 @@
 require_relative 'command'
-require 'util/components_list'
+require_relative '../../util/components_list'
 require 'slop'
 
 module Nutella
