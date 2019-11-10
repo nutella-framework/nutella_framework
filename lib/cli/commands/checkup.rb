@@ -1,5 +1,5 @@
 require_relative 'meta/command'
-require 'util/config'
+require 'config/config'
 require 'semantic'
 require 'docker-api'
 

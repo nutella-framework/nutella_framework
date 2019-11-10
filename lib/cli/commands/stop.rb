@@ -7,7 +7,7 @@ module Nutella
   
     def run(args=nil)
       nutella.f.init(Config.file['broker'], 'nutella_cli')
-      response = nutella.f.net.sync_request( 'commands', { "command": "stop", "params": args} )
+      response = nutella.f.net.sync_request( 'commands', { 'command': 'start', 'opts': {'current_dir': Dir.pwd, 'args': args}} )
       if response['success']
         console.success response['message']
       else

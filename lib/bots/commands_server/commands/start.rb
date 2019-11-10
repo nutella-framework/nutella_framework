@@ -1,44 +1,37 @@
 require_relative 'meta/run_command'
-# require 'util/components_starter'
 
 module Nutella
   class Start < RunCommand
     @description = 'Starts all or some of the bots in the current application'
 
     def run(args=nil)
-      if rand < 0.5
-        { success: true, message: "This is a success for command Start with args #{args}"}
-      else
-        { success: false, message: "This is a failure for command Start with args #{args}"}
+      # If the current directory is not a nutella application, return
+      unless Nutella.current_app.exist?
+        console.warn 'The current directory is not a nutella application'
+        return
       end
 
-      # # If the current directory is not a nutella application, return
-      # unless Nutella.current_app.exist?
-      #   console.warn 'The current directory is not a nutella application'
-      #   return
-      # end
+      begin
+        run_id, params = parse_cli_arguments args
+      rescue StandardError => e
+        console.error e.message
+        return
+      end
 
-      # begin
-      #   run_id, params = parse_cli_arguments args
-      # rescue StandardError => e
-      #   console.error e.message
-      #   return
-      # end
+      app_id, app_path = fetch_app_details
 
-      # app_id, app_path = fetch_app_details
+      if no_app_bot_to_start app_id, app_path, params
+        console.warn "Run #{run} not created: your application bots are already started and you specified no regular bots exclusively for this run"
+        return
+      end
 
-      # if no_app_bot_to_start app_id, app_path, params
-      #   console.warn "Run #{run} not created: your application bots are already started and you specified no regular bots exclusively for this run"
-      #   return
-      # end
+      return if run_exist?( app_id, run_id)
 
-      # return if run_exist?( app_id, run_id)
+      return unless start_all_components(app_id, app_path, run_id, params)
 
-      # return unless start_all_components(app_id, app_path, run_id, params)
+      return unless Nutella.runlist.add?(app_id, run_id, app_path)
 
-      # return unless Nutella.runlist.add?(app_id, run_id, app_path)
-
-      # print_confirmation(run_id, params, app_id, app_path)
+      print_confirmation(run_id, params, app_id, app_path)
     end
 
 
@@ -141,5 +134,56 @@ module Nutella
 
 
   end
-
 end
+
+# # Starts the application level bots
+    # # @return [boolean] true if all bots are started correctly, false otherwise
+    # def self.start_app_bots( app_id, app_path )
+    #   app_bots_list = Nutella.current_app.config['app_bots']
+    #   bots_dir = "#{app_path}/bots/"
+    #   # If app bots have been started already, then do nothing
+    #   unless Nutella::Tmux.session_exist? Nutella::Tmux.app_bot_session_name app_id
+    #     # Start all app bots in the list into a new tmux session
+    #     tmux = Nutella::Tmux.new app_id, nil
+    #     ComponentsList.for_each_component_in_dir bots_dir do |bot|
+    #       unless app_bots_list.nil? || !app_bots_list.include?( bot )
+    #         # If there is no 'startup' script output a warning (because
+    #         # startup is mandatory) and skip the bot
+    #         unless File.exist?("#{bots_dir}#{bot}/startup")
+    #           console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
+    #           next
+    #         end
+    #         # Create a new window in the session for this run
+    #         tmux.new_app_bot_window bot
+    #       end
+    #     end
+    #   end
+    #   true
+    # end
+
+
+    # def self.start_run_bots( bots_list, app_path, app_id, run_id )
+    #   # Create a new tmux instance for this run
+    #   tmux = Nutella::Tmux.new app_id, run_id
+    #   # Fetch bots dir
+    #   bots_dir = "#{app_path}/bots/"
+    #   # Start the appropriate bots
+    #   bots_list.each { |bot| start_run_level_bot(bots_dir, bot, tmux) }
+    #   true
+    # end
+
+
+    # #--- Private class methods --------------
+
+    # # Starts a run level bot
+    # def self.start_run_level_bot( bots_dir, bot, tmux )
+    #   # If there is no 'startup' script output a warning (because
+    #   # startup is mandatory) and skip the bot
+    #   unless File.exist?("#{bots_dir}#{bot}/startup")
+    #     console.warn "Impossible to start bot #{bot}. Couldn't locate 'startup' script."
+    #     return
+    #   end
+    #   # Create a new window in the session for this run
+    #   tmux.new_bot_window bot
+    # end
+    # private_class_method :start_run_level_bot

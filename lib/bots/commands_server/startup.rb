@@ -22,13 +22,11 @@ end)
 
 # This function executes a particular command
 # @param command [String] the name of the command
-# @param args [Array<String>] command line parameters passed to the command
-def execute_command(command, args=nil)
-  # Check that the command exists and if it does,
-  # execute its run method passing the args parameters
+# @param opts [Hash] parameters passed to the command
+def execute_command(command, opts=nil)
   if command_exists?(command)
     begin
-      return Object::const_get("Nutella::#{command.capitalize}").new.run(args)  
+      return Object::const_get("Nutella::#{command.capitalize}").new.run(opts)  
     rescue => e
       return { success: false, message: "Unexpected failure of command #{command}", exception: e }
     end

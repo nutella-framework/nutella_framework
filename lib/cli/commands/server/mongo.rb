@@ -1,6 +1,6 @@
 require 'docker-api'
 require 'socket'
-require 'util/config'
+require 'config/config'
 
 module Nutella
   class Mongo

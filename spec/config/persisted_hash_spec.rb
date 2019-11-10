@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-require 'util/persisted_hash'
+require 'config/persisted_hash'
 require 'securerandom'
 
 module Nutella
