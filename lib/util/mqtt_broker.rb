@@ -67,14 +67,14 @@ module Nutella
         s = TCPServer.new('0.0.0.0', 1883)
         s.close
       rescue
-        return false
+        return true
       end
-      true
+      false
     end
 
     # Starts the broker using docker
     def start_broker
-      # remove any other 'nutella_broker' containers
+      # Remove any other 'nutella_broker' containers
       begin
         old_c = Docker::Container.get('nutella_broker')
         old_c.delete(force: true)
