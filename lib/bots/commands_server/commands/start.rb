@@ -6,34 +6,39 @@ module Nutella
     @description = 'Starts all or some of the bots in the current application'
 
     def run(args=nil)
-
-      # If the current directory is not a nutella application, return
-      unless Nutella.current_app.exist?
-        console.warn 'The current directory is not a nutella application'
-        return
+      if rand < 0.5
+        { success: true, message: "This is a success for command Start with args #{args}"}
+      else
+        { success: false, message: "This is a failure for command Start with args #{args}"}
       end
 
-      begin
-        run_id, params = parse_cli_arguments args
-      rescue StandardError => e
-        console.error e.message
-        return
-      end
+      # # If the current directory is not a nutella application, return
+      # unless Nutella.current_app.exist?
+      #   console.warn 'The current directory is not a nutella application'
+      #   return
+      # end
 
-      app_id, app_path = fetch_app_details
+      # begin
+      #   run_id, params = parse_cli_arguments args
+      # rescue StandardError => e
+      #   console.error e.message
+      #   return
+      # end
 
-      if no_app_bot_to_start app_id, app_path, params
-        console.warn "Run #{run} not created: your application bots are already started and you specified no regular bots exclusively for this run"
-        return
-      end
+      # app_id, app_path = fetch_app_details
 
-      return if run_exist?( app_id, run_id)
+      # if no_app_bot_to_start app_id, app_path, params
+      #   console.warn "Run #{run} not created: your application bots are already started and you specified no regular bots exclusively for this run"
+      #   return
+      # end
 
-      return unless start_all_components(app_id, app_path, run_id, params)
+      # return if run_exist?( app_id, run_id)
 
-      return unless Nutella.runlist.add?(app_id, run_id, app_path)
+      # return unless start_all_components(app_id, app_path, run_id, params)
 
-      print_confirmation(run_id, params, app_id, app_path)
+      # return unless Nutella.runlist.add?(app_id, run_id, app_path)
+
+      # print_confirmation(run_id, params, app_id, app_path)
     end
 
 

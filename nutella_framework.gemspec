@@ -30,8 +30,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/nutella",
-    "lib/bots/binary-files-manager/bin_files_mngr.rb",
-    "lib/bots/commands_server/Gemfile",
+    "lib/bots/binary_files_manager/bin_files_mngr.rb",
     "lib/bots/commands_server/commands/broker.rb",
     "lib/bots/commands_server/commands/compile.rb",
     "lib/bots/commands_server/commands/dependencies.rb",
@@ -45,53 +44,53 @@ Gem::Specification.new do |s|
     "lib/bots/commands_server/commands/start.rb",
     "lib/bots/commands_server/commands/stop.rb",
     "lib/bots/commands_server/commands/template.rb",
-    "lib/bots/commands_server/commands_server.rb",
-    "lib/bots/commands_server/startup",
+    "lib/bots/commands_server/startup.rb",
     "lib/bots/commands_server/util/components_list.rb",
     "lib/bots/main_interface/main_interface_bot.rb",
     "lib/bots/main_interface/public/index.html",
     "lib/bots/main_interface/views/index.erb",
     "lib/bots/main_interface/views/not_found_404.erb",
-    "lib/bots/room-debugger/README.md",
-    "lib/bots/room-debugger/css/bootstrap-theme.css",
-    "lib/bots/room-debugger/css/bootstrap-theme.css.map",
-    "lib/bots/room-debugger/css/bootstrap-theme.min.css",
-    "lib/bots/room-debugger/css/bootstrap.css",
-    "lib/bots/room-debugger/css/bootstrap.css.map",
-    "lib/bots/room-debugger/css/bootstrap.min.css",
-    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.eot",
-    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.svg",
-    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.ttf",
-    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.woff",
-    "lib/bots/room-debugger/fonts/glyphicons-halflings-regular.woff2",
-    "lib/bots/room-debugger/index.html",
-    "lib/bots/room-debugger/js/bootstrap.js",
-    "lib/bots/room-debugger/js/bootstrap.min.js",
-    "lib/bots/room-debugger/js/jquery.min.js",
-    "lib/bots/room-debugger/js/npm.js",
-    "lib/bots/room-debugger/js/nutella_lib.js",
-    "lib/bots/room-debugger/main.css",
-    "lib/bots/room-debugger/main.js",
-    "lib/bots/room-debugger/nutella.json",
-    "lib/bots/room-debugger/package.json",
-    "lib/bots/room-debugger/room_places_simulator.js",
+    "lib/bots/room_debugger/README.md",
+    "lib/bots/room_debugger/css/bootstrap-theme.css",
+    "lib/bots/room_debugger/css/bootstrap-theme.css.map",
+    "lib/bots/room_debugger/css/bootstrap-theme.min.css",
+    "lib/bots/room_debugger/css/bootstrap.css",
+    "lib/bots/room_debugger/css/bootstrap.css.map",
+    "lib/bots/room_debugger/css/bootstrap.min.css",
+    "lib/bots/room_debugger/fonts/glyphicons-halflings-regular.eot",
+    "lib/bots/room_debugger/fonts/glyphicons-halflings-regular.svg",
+    "lib/bots/room_debugger/fonts/glyphicons-halflings-regular.ttf",
+    "lib/bots/room_debugger/fonts/glyphicons-halflings-regular.woff",
+    "lib/bots/room_debugger/fonts/glyphicons-halflings-regular.woff2",
+    "lib/bots/room_debugger/index.html",
+    "lib/bots/room_debugger/js/bootstrap.js",
+    "lib/bots/room_debugger/js/bootstrap.min.js",
+    "lib/bots/room_debugger/js/jquery.min.js",
+    "lib/bots/room_debugger/js/npm.js",
+    "lib/bots/room_debugger/js/nutella_lib.js",
+    "lib/bots/room_debugger/main.css",
+    "lib/bots/room_debugger/main.js",
+    "lib/bots/room_debugger/nutella.json",
+    "lib/bots/room_debugger/package.json",
+    "lib/bots/room_debugger/room_places_simulator.js",
     "lib/bots/runs_list_bot/runs_list_bot.rb",
     "lib/cli/cli.rb",
     "lib/cli/commands/checkup.rb",
     "lib/cli/commands/help.rb",
     "lib/cli/commands/meta/command.rb",
     "lib/cli/commands/server.rb",
+    "lib/cli/commands/server/framework_bots.rb",
+    "lib/cli/commands/server/mongo.rb",
+    "lib/cli/commands/server/mqtt_broker.rb",
+    "lib/cli/commands/start.rb",
+    "lib/cli/commands/stop.rb",
     "lib/cli/logger.rb",
     "lib/nutella_framework.rb",
     "lib/templates/index.html",
     "lib/templates/startup",
     "lib/util/config.rb",
     "lib/util/current_app_utils.rb",
-    "lib/util/framework_components_starter.rb",
-    "lib/util/mongo.rb",
-    "lib/util/mqtt_broker.rb",
     "lib/util/persisted_hash.rb",
-    "lib/util/pid.rb",
     "lib/util/runlist.rb",
     "nutella_framework.gemspec",
     "spec/cli/commands/checkup_spec.rb",
@@ -115,7 +114,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<bson>.freeze, ["~> 3.0"])
       s.add_runtime_dependency(%q<docker-api>.freeze, ["~> 1.34"])
       s.add_runtime_dependency(%q<git>.freeze, ["~> 1.2"])
-      s.add_runtime_dependency(%q<nutella_lib>.freeze, ["~> 0.5"])
+      s.add_runtime_dependency(%q<nutella_lib>.freeze, ["~> 0.6"])
       s.add_runtime_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
       s.add_runtime_dependency(%q<slop>.freeze, ["~> 4.0"])
       s.add_runtime_dependency(%q<semantic>.freeze, ["~> 1.4"])
@@ -131,7 +130,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<bson>.freeze, ["~> 3.0"])
       s.add_dependency(%q<docker-api>.freeze, ["~> 1.34"])
       s.add_dependency(%q<git>.freeze, ["~> 1.2"])
-      s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.5"])
+      s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.6"])
       s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
       s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
       s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])
@@ -148,7 +147,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<bson>.freeze, ["~> 3.0"])
     s.add_dependency(%q<docker-api>.freeze, ["~> 1.34"])
     s.add_dependency(%q<git>.freeze, ["~> 1.2"])
-    s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.5"])
+    s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.6"])
     s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
     s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
     s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])

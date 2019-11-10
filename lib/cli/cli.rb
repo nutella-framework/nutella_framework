@@ -62,7 +62,8 @@ module Nutella
     # This method checks that a particular command exists
     # @return [Boolean] true if the command exists, false otherwise
     def self.command_exists?(command)
-      return Nutella.const_get("Nutella::#{command.capitalize}").is_a?(Class)
+      return Nutella.const_get("Nutella::#{command.capitalize}").is_a?(Class) &&
+        Nutella.const_get("Nutella::#{command.capitalize}").method_defined?(:run)
     rescue NameError
       return false
     end

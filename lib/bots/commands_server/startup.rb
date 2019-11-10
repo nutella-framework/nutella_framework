@@ -1,26 +1,50 @@
 # Commands server
-# Connects to MQTT broker, listens for commands (basically RPC over MQTT),
+# Connects to the MQTT broker, listens for commands (basically RPC over MQTT),
 # executes the commands, and returns the output to the client
+# This is the heart of nutella and implements all the nutella logic really
+
 require 'nutella_lib'
+# Load all available commands
 Dir["#{File.dirname(__FILE__)}/commands/*.rb"].each do |file|
   require_relative "commands/#{File.basename(file, File.extname(file))}"
 end
 
-## nutella shuold do this... we need this!
-$stdout.sync = true 
-puts "Hi, I'm a basic ruby bot and all I do is idle and print stuff"
-puts "Certainly first param is set to: #{ARGV[0]}"
+# Parse command line arguments and initialize nutella
+broker = nutella.f.parse_args ARGV
+component_id = nutella.f.extract_component_id
+nutella.f.init(broker, component_id)
 
-begin
-  i = 0
-  while i < 10
-    puts "#{i} A log line!"
-    i = i + 1
-    sleep 1
+# Commands handler
+nutella.f.net.handle_requests('commands', lambda do |message, component_id|
+  nutella.log.info("[#{Time.now}] Command received: #{message}")
+  execute_command(message['command'], message['params'])
+end)
+
+# This function executes a particular command
+# @param command [String] the name of the command
+# @param args [Array<String>] command line parameters passed to the command
+def execute_command(command, args=nil)
+  # Check that the command exists and if it does,
+  # execute its run method passing the args parameters
+  if command_exists?(command)
+    begin
+      return Object::const_get("Nutella::#{command.capitalize}").new.run(args)  
+    rescue => e
+      return { success: false, message: "Unexpected failure of command #{command}", exception: e }
+    end
+  else
+    return { success: false, message: "Unknown command #{command}" }
   end
-  raise StandardError, "Oh no! Standard error! Good thing someone will restart me..."
-rescue SignalException => e
-  puts "This is printed when I get SIGINT"
 end
 
-puts "This is the last line before I really die"
+# This function checks that a particular command exists
+# @return [Boolean] true if the command exists, false otherwise
+def self.command_exists?(command)
+  return Nutella.const_get("Nutella::#{command.capitalize}").is_a?(Class) &&
+    Nutella.const_get("Nutella::#{command.capitalize}").method_defined?(:run)
+rescue NameError
+  return false
+end
+
+nutella.log.success "Starting commands server..."
+nutella.f.net.listen
