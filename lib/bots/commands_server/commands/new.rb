@@ -38,11 +38,13 @@ module Nutella
       FileUtils.mkdir_p("#{app_dir}/interfaces")
       # Create nutella.json hash
       config_file_hash = {
-        :name => app_id,
-        :version => '0.1.0',
-        # TODO figure out how to do this :nutella_version => File.open("#{Nutella::NUTELLA_SRC}VERSION", 'rb').read,
-        :type => 'application',
-        :description => 'A quick description of your application'
+        name: app_id,
+        version: '0.1.0',
+        # TODO figure out how to do make this dynamic 
+        # :nutella_version => File.open("#{Nutella::NUTELLA_SRC}VERSION", 'rb').read,
+        nutella_version: '2.0.0',
+        type: 'application',
+        description: 'A quick description of your application'
       }
       # Write nutella.json hash
       File.open("#{app_dir}/nutella.json", 'w') do |f|

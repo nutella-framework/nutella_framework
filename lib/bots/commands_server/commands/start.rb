@@ -9,26 +9,26 @@ module Nutella
       unless is_nutella_app?(opts['current_dir'])
         return failure('The current directory is not a nutella application')
       end
+      # Extract app path and id (i.e. name)
+      app_path = opts['current_dir']
+      app_id = app_config(app_path)['name']
       # If there is an error parsing the run_id, return an error
       begin
         run_id = parse_run_id_from_args(opts['args'])
       rescue StandardError => e
         return failure(e.message)
       end
-
-      app_id, app_path = fetch_app_details
-
-      if no_app_bot_to_start app_id, app_path, params
-        console.warn "Run #{run} not created: your application bots are already started and you specified no regular bots exclusively for this run"
-        return
+      # TODO resume from here
+      # Check if there are actully bots that need to be started...
+      if app_bots_running_already(app_id)
+        return success("Run #{run} not created: your app bots are running already and your application has no run bots)"
       end
-
-      return if run_exist?( app_id, run_id)
-
+      if run_exist?( app_id, run_id)
+        return failure("Impossible to start nutella app: an instance of this app with the same run_id is already running!\nYou might want to kill it with 'nutella stop #{run_id}'")
+      end
+      # Start bots
       return unless start_all_components(app_id, app_path, run_id, params)
-
       return unless Nutella.runlist.add?(app_id, run_id, app_path)
-
       print_confirmation(run_id, params, app_id, app_path)
     end
 
@@ -58,28 +58,12 @@ module Nutella
       true
     end
 
-
-    # Parses command line arguments
-    def parse_cli_arguments( args )
-      # Parse run_id
-      run_id = parse_run_id_from_args(args)
-      # Extract parameters
-      params = parse_cli_parameters args
-      # Check that we are not using 'with' and 'without' options at the same time
-      unless params[:with].empty? || params[:without].empty?
-        raise StandardError.new 'You can\'t use both --with and --without at the same time'
-      end
-      return run_id, params
+    # Builds a PersistedHash of the application nutella.json file and returns it.
+    # This method is used to ease access to the app nutella.json file.
+    # @return [PersistedHash] the PersistedHash of the app nutella.json file
+    def app_config(dir)
+      PersistedHash.new("#{dir}/nutella.json")
     end
-
-
-    # Fetches the app_id and app_path
-    def fetch_app_details
-      # Extract app_id
-      app_id = Nutella.current_app.config['name']
-      return app_id, Dir.pwd
-    end
-
 
     # Returns true if both the list of run level bots is empty and the app bots
     # have been started already
