@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Alessandro Gnoli".freeze]
-  s.date = "2019-11-10"
+  s.date = "2019-11-11"
   s.description = "utella is a framework to create and run RoomApps".freeze
   s.email = "tebemis@gmail.com".freeze
   s.executables = ["nutella".freeze]
@@ -46,6 +46,8 @@ Gem::Specification.new do |s|
     "lib/bots/commands_server/commands/template.rb",
     "lib/bots/commands_server/startup.rb",
     "lib/bots/commands_server/util/components_list.rb",
+    "lib/bots/commands_server/util/current_app_utils.rb",
+    "lib/bots/commands_server/util/runlist.rb",
     "lib/bots/main_interface/main_interface_bot.rb",
     "lib/bots/main_interface/public/index.html",
     "lib/bots/main_interface/views/index.erb",
@@ -78,6 +80,7 @@ Gem::Specification.new do |s|
     "lib/cli/commands/checkup.rb",
     "lib/cli/commands/help.rb",
     "lib/cli/commands/meta/command.rb",
+    "lib/cli/commands/new.rb",
     "lib/cli/commands/server.rb",
     "lib/cli/commands/server/framework_bots.rb",
     "lib/cli/commands/server/mongo.rb",
@@ -85,13 +88,11 @@ Gem::Specification.new do |s|
     "lib/cli/commands/start.rb",
     "lib/cli/commands/stop.rb",
     "lib/cli/logger.rb",
+    "lib/config/config.rb",
+    "lib/config/persisted_hash.rb",
     "lib/nutella_framework.rb",
     "lib/templates/index.html",
     "lib/templates/startup",
-    "lib/util/config.rb",
-    "lib/util/current_app_utils.rb",
-    "lib/util/persisted_hash.rb",
-    "lib/util/runlist.rb",
     "nutella_framework.gemspec",
     "spec/cli/commands/checkup_spec.rb",
     "spec/cli/commands/help_spec.rb",
@@ -116,7 +117,6 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<git>.freeze, ["~> 1.2"])
       s.add_runtime_dependency(%q<nutella_lib>.freeze, ["~> 0.6"])
       s.add_runtime_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
-      s.add_runtime_dependency(%q<slop>.freeze, ["~> 4.0"])
       s.add_runtime_dependency(%q<semantic>.freeze, ["~> 1.4"])
       s.add_runtime_dependency(%q<sinatra>.freeze, ["~> 1.4"])
       s.add_runtime_dependency(%q<sinatra-cross_origin>.freeze, ["~> 0.3.2"])
@@ -132,7 +132,6 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<git>.freeze, ["~> 1.2"])
       s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.6"])
       s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
-      s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
       s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])
       s.add_dependency(%q<sinatra>.freeze, ["~> 1.4"])
       s.add_dependency(%q<sinatra-cross_origin>.freeze, ["~> 0.3.2"])
@@ -149,7 +148,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<git>.freeze, ["~> 1.2"])
     s.add_dependency(%q<nutella_lib>.freeze, ["~> 0.6"])
     s.add_dependency(%q<nokogiri>.freeze, ["~> 1.6"])
-    s.add_dependency(%q<slop>.freeze, ["~> 4.0"])
     s.add_dependency(%q<semantic>.freeze, ["~> 1.4"])
     s.add_dependency(%q<sinatra>.freeze, ["~> 1.4"])
     s.add_dependency(%q<sinatra-cross_origin>.freeze, ["~> 0.3.2"])

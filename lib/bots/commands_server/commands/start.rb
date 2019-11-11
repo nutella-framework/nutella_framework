@@ -4,18 +4,16 @@ module Nutella
   class Start < RunCommand
     @description = 'Starts all or some of the bots in the current application'
 
-    def run(args=nil)
-      # If the current directory is not a nutella application, return
-      unless Nutella.current_app.exist?
-        console.warn 'The current directory is not a nutella application'
-        return
+    def run(opts=nil)
+      # If opts['current_dir'] is not a nutella application, return and error
+      unless is_nutella_app?(opts['current_dir'])
+        return failure('The current directory is not a nutella application')
       end
-
+      # If there is an error parsing the run_id, return an error
       begin
-        run_id, params = parse_cli_arguments args
+        run_id = parse_run_id_from_args(opts['args'])
       rescue StandardError => e
-        console.error e.message
-        return
+        return failure(e.message)
       end
 
       app_id, app_path = fetch_app_details
@@ -35,14 +33,36 @@ module Nutella
     end
 
 
-
     private
+
+
+    # Checks that the provided directory is actually a nutella application
+    # @return [Boolean] true if the directory is a nutella application, false otherwise
+    def is_nutella_app?(dir)
+      nutella_json_file_path = "#{dir}/nutella.json"
+      # Check that there is a nutella.json file in the main directory of the application
+      if !File.exist? nutella_json_file_path
+        return false
+      end
+      # If there is a file, try to parse it
+      begin
+        conf = JSON.parse( IO.read(nutella_json_file_path) )
+      rescue
+        # Not valid JSON, returning false
+        return false
+      end
+      # No nutella version in the file, return false
+      if conf['nutella_version'].nil?
+        return false
+      end
+      true
+    end
 
 
     # Parses command line arguments
     def parse_cli_arguments( args )
       # Parse run_id
-      run_id = parse_run_id_from args
+      run_id = parse_run_id_from_args(args)
       # Extract parameters
       params = parse_cli_parameters args
       # Check that we are not using 'with' and 'without' options at the same time

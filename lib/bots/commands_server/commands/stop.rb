@@ -4,7 +4,7 @@ module Nutella
   class Stop < RunCommand
     @description = 'Stops all the bots in the current application'
 
-    def run(args=nil)
+    def run(opts=nil)
 
       # If the current directory is not a nutella application, return
       unless Nutella.current_app.exist?

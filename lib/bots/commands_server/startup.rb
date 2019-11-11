@@ -17,7 +17,7 @@ nutella.f.init(broker, component_id)
 # Commands handler
 nutella.f.net.handle_requests('commands', lambda do |message, component_id|
   nutella.log.info("[#{Time.now}] Command received: #{message}")
-  execute_command(message['command'], message['params'])
+  execute_command(message['command'], message['opts'])
 end)
 
 # This function executes a particular command
@@ -28,6 +28,7 @@ def execute_command(command, opts=nil)
     begin
       return Object::const_get("Nutella::#{command.capitalize}").new.run(opts)  
     rescue => e
+      puts e.backtrace
       return { success: false, message: "Unexpected failure of command #{command}", exception: e }
     end
   else
