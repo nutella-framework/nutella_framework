@@ -1,15 +1,18 @@
+# frozen_string_literal: true
+
 require_relative 'meta/command'
 require 'fileutils'
 
-module Nutella
+module CommandsServer
   class New < Command
     @description = 'Creates a new nutella application'
-  
-    def run(opts=nil)
+
+    def run(opts = nil)
       # If no app name is provided, return an error
       if opts['args'].empty?
         return failure('You need to specify a name for your new application')
       end
+
       # Parse the name of the app from the CLI parameters
       app_id = opts['args'][0]
       # Checks that a directory (i.e. an app) with the same name doesn't already exist
@@ -27,12 +30,12 @@ module Nutella
       # If all seems good, generate the application skeleton
       create_app(app_id, app_dir)
       # Display a success message and return
-      return success("Your new nutella application #{app_id} is ready!")
+      success("Your new nutella application #{app_id} is ready!")
     end
-    
-    private 
-  
-    def create_app( app_id, app_dir )
+
+    private
+
+    def create_app(app_id, app_dir)
       # Create directories
       FileUtils.mkdir_p("#{app_dir}/bots")
       FileUtils.mkdir_p("#{app_dir}/interfaces")
@@ -40,7 +43,7 @@ module Nutella
       config_file_hash = {
         name: app_id,
         version: '0.1.0',
-        # TODO figure out how to do make this dynamic 
+        # TODO: figure out how to do make this dynamic
         # :nutella_version => File.open("#{Nutella::NUTELLA_SRC}VERSION", 'rb').read,
         nutella_version: '2.0.0',
         type: 'application',
@@ -51,6 +54,5 @@ module Nutella
         f.write(JSON.pretty_generate(config_file_hash))
       end
     end
-  
   end
 end
