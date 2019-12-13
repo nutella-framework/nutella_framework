@@ -3,6 +3,7 @@
 require 'docker-api'
 require 'config/config'
 require 'config/runlist'
+require 'config/app'
 require_relative 'meta/run_command'
 
 module CommandsServer
@@ -11,13 +12,12 @@ module CommandsServer
 
     def run(opts = nil)
       # If opts['current_dir'] is not a nutella application, return and error
-      unless is_nutella_app?(opts['current_dir'])
+      unless Nutella::App.exist?(opts['current_dir'])
         return failure('The current directory is not a nutella application', 'error')
       end
 
       # Extract app path and id (i.e. name)
-      app_path = opts['current_dir']
-      app_id = app_config(app_path)['name']
+      app = Nutella::App.new(opts['current_dir'])
       # If there is an error parsing the run_id, return an error
       begin
         run_id = parse_run_id_from_args(opts['args'])
@@ -25,65 +25,35 @@ module CommandsServer
         return failure(e.message, 'error')
       end
       # Check if there are actully bots that need to be started...
-      if app_bots_running_already?(app_id)
-        return failure("Run #{run} not created!\n
+      if app_bots_running_already?(app) && app.run_level_bots.empty?
+        return failure("Run #{run_id} not created!\n
           Your app bots are running already and your application has no run bots.\n
-          Are you sure that's what you wanted to do?", 'warn')
+          No run was created. Are you sure that's what you wanted to do?", 'warn')
       end
-      if run_exist?(app_id, run_id)
+      if run_exist?(app.id, run_id)
         return failure("Impossible to start nutella app!\n
           An instance of this app with the same run_id is already running!\n
           You might want to kill it with 'nutella stop #{run_id}'", 'warn')
       end
-      # Start bots
-      return unless start_all_components(app_id, app_path, run_id, params)
-      return unless Nutella.runlist.add?(app_id, run_id, app_path)
-
-      print_confirmation(run_id, params, app_id, app_path)
+      # Start bots and create run
+      begin
+        start_app_level_bots(app)
+        start_run_level_bots(app, run_id)
+        runlist.add?(app.path, app.id, run_id)
+      rescue StandardError => e
+        return failure(e.message, 'error')
+      end
+      success(success_message(app, run_id))
     end
 
     private
 
-    def runlist
-      @runlist ||= RunList.new("#{Config.file['home_dir']}/runlist.json")
-    end
-
-    # Checks that the provided directory is actually a nutella application
-    # @return [Boolean] true if the directory is a nutella application, false otherwise
-    def is_nutella_app?(dir)
-      nutella_json_file_path = "#{dir}/nutella.json"
-      # Check that there is a nutella.json file in the main directory of the application
-      return false unless File.exist? nutella_json_file_path
-
-      # If there is a file, try to parse it
-      begin
-        conf = JSON.parse(IO.read(nutella_json_file_path))
-      rescue StandardError
-        # Not valid JSON, returning false
-        return false
-      end
-      # No nutella version in the file, return false
-      return false if conf['nutella_version'].nil?
-
-      true
-    end
-
-    # Builds a PersistedHash of the application nutella.json file and returns it.
-    # This method is used to ease access to the app nutella.json file inside the app.
-    # @return [PersistedHash] the PersistedHash of the app nutella.json file
-    def app_config(dir)
-      PersistedHash.new("#{dir}/nutella.json")
-    end
-
-    # Returns true if both the list of run level bots is empty and the app bots
-    # have been started already
-    def no_app_bot_to_start(app_id, app_path, params)
-      ComponentsList.run_level_bots_list(app_path, params).empty? && app_bots_started?(app_id)
-    end
-
     # Returns true if the app bots have been started already
-    def app_bots_running_already?(app_id)
-      Tmux.session_exist? Tmux.app_bot_session_name app_id
+    def app_bots_running_already?(_app)
+      # TODO: look a what the app level bots are (via app.app_level_bots)
+      # Fetch the list of running app bots for app.id from docker
+      # If eq, all app bots are running, return true
+      false
     end
 
     # Check that the run_id we are trying to start has not been started already
@@ -99,51 +69,44 @@ module CommandsServer
       false
     end
 
-    # Starts all the components at all levels for this run
-    def start_all_components(app_id, app_path, run_id, params)
-      # Start the internal broker
-      return false unless ComponentsStarter.start_internal_broker
-      # Start mongo db
-      return false unless ComponentsStarter.start_mongo_db
-      # Start all framework-level components (if needed)
-      return false unless ComponentsStarter.start_framework_components
-      # Start all app-level bots (if any, if needed)
-      return false unless ComponentsStarter.start_app_bots(app_id, app_path)
-
-      # Start all run-level bots
-      unless ComponentsStarter.start_run_bots(ComponentsList.run_level_bots_list(app_path, params), app_path, app_id, run_id)
-        false
-      end
-      true
+    # Starts app level bots
+    def start_run_level_bots(app)
+      # TODO: implement
     end
 
-    def print_confirmation(run_id, params, app_id, app_path)
-      # If there are no run-level bots to start, do not create the run and error out
-      if ComponentsList.run_level_bots_list(app_path, params).empty? && !Nutella.runlist.app_has_no_bots(app_id)
-        console.warn 'This run doesn\'t seem to have any components. No run was created.'
-        return
-      end
-      print_success_message(app_id, run_id, 'started')
-      print_monitoring_details(app_id, run_id)
+    # Starts run level bots
+    def start_run_level_bots(app, run_id)
+      # TODO: implement
     end
 
-    def print_monitoring_details(app_id, run_id)
-      # Output broker info
-      console.success "Application is running on broker: #{Nutella.config['broker']}"
-      # If some application bots were started, say it
-      app_bots_list = Nutella.current_app.config['app_bots']
-      unless app_bots_list.nil? || app_bots_list.empty?
-        console.success "Do `tmux attach-session -t #{Tmux.app_bot_session_name(app_id)}` to monitor your app bots."
-      end
+    def success_message(app, run_id)
+      # Initialized the message with the broker
+      message = "Application is running on broker: #{Nutella::Config.file['broker']}\n"
+      # If some app-level bots were started, say it
+      # app_bots_list = Nutella.current_app.config['app_bots']
+      # unless app_bots_list.nil? || app_bots_list.empty?
+      #   console.success "Do `tmux attach-session -t #{Tmux.app_bot_session_name(app_id)}` to monitor your app bots."
+      # end
       # Only print bots monitoring info if there bots in the run
-      unless Nutella.runlist.app_has_no_bots app_id
-        console.success "Do `tmux attach-session -t #{Tmux.session_name(app_id, run_id)}` to monitor your bots."
-      end
+      # unless Nutella.runlist.app_has_no_bots app_id
+      #   console.success "Do `tmux attach-session -t #{Tmux.session_name(app_id, run_id)}` to monitor your bots."
+      # end
       # Main interface is always available
-      console.success "Go to http://localhost:#{Nutella.config['main_interface_port']}/#{app_id}/#{run_id} to access your interfaces"
+      message += "Go to http://localhost:#{Nutella::Config.file['main_interface_port']}/#{app.id}/#{run_id} to access your interfaces\n"
+    end
+
+    def runlist
+      @runlist ||= Nutella::RunList.new("#{Nutella::Config.file['home_dir']}/runlist.json")
     end
   end
 end
+
+# Executes a code block for each component in a certain directory
+# @param [String] dir directory where we are iterating
+# @yield [component] Passes the component name to the block
+# def self.for_each_component_in_dir(dir, &block)
+#   components_in_dir(dir).each { |component| block.call component }
+# end
 
 # # Starts the application level bots
 # # @return [boolean] true if all bots are started correctly, false otherwise

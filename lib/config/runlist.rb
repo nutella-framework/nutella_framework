@@ -58,12 +58,12 @@ module Nutella
 
     # Adds a run_id to the runlist
     #
+    # @param [String] path_to_app_files the path to the application files
     # @param [String] app_id the app_id the run_id belongs to
     # @param [String] run_id the run_id we are trying to add to the runs list
-    # @param [String] path_to_app_files the path to the application files
     # @return [Boolean] true if the run_id is added to the list (i.e. there is no other
     #   run_id with for the same app_id)
-    def add?(app_id, run_id, path_to_app_files)
+    def add?(path_to_app_files, app_id, run_id)
       # Check if we are adding the first run for a certain application
       if @ph.add_key_value?(app_id, {})
         t = @ph[app_id]

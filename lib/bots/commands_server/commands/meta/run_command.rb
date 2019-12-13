@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'command'
-require_relative '../../util/components_list'
 
 module CommandsServer
   # This class describes a run command which can be either start or stop.
