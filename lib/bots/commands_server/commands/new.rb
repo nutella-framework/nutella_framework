@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'meta/command'
+require 'config/config'
 require 'fileutils'
 require 'json'
 
@@ -41,9 +42,7 @@ module CommandsServer
       config_file_hash = {
         name: app_id,
         version: '0.1.0',
-        # TODO: figure out how to do make this dynamic
-        # :nutella_version => File.open("#{Nutella::NUTELLA_SRC}VERSION", 'rb').read,
-        nutella_version: '2.0.0',
+        nutella_version: File.open("#{Nutella::Config.file['src_dir']}VERSION", 'rb').read,
         type: 'application',
         description: 'A quick description of your application'
       }

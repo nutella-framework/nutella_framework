@@ -1,23 +1,25 @@
+# frozen_string_literal: true
+
 require_relative 'meta/command'
-require_relative 'server/mqtt_broker'
-require_relative 'server/mongo'
-require_relative 'server/framework_bots'
+require 'util/mqtt_broker'
+require 'util/mongo'
+require 'util/framework_bots'
 
 module Nutella
   class Server < Command
     @description = 'Starts the MQTT broker and the framework level bots'
 
-    def run(args=nil)
+    def run(_args = nil)
       if MQTTBroker.start
         console.success('MQTT broker started')
       else
         console.error('Failed to start MQTT broker')
-      end 
+      end
       if Mongo.start
         console.success('Mongo started')
       else
         console.error('Failed to start Mongo')
-      end 
+      end
       if FrameworkBots.start
         console.success('Framework-level bots started')
       else
@@ -25,5 +27,4 @@ module Nutella
       end
     end
   end
-
 end

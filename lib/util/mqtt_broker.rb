@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require 'docker-api'
 require 'socket'
 require 'config/config'
 
 module Nutella
   class MQTTBroker
-
     def self.start
       MQTTBroker.new.start_internal_broker
     end
@@ -12,14 +13,19 @@ module Nutella
     def self.stop
       MQTTBroker.new.stop_internal_broker
     end
-    
+
+    def self.started?
+      MQTTBroker.new.broker_started?
+    end
+
     def start_internal_broker
       # Check if the broker has been started already
       return true if broker_started? || broker_started_unsupervised?
+
       # Broker is not running so we try to start it
       begin
-        start_broker  
-      rescue
+        start_broker
+      rescue StandardError
         return false
       end
       # Wait until the broker is up
@@ -32,7 +38,7 @@ module Nutella
       begin
         c = Docker::Container.get(broker_container_name)
       rescue Docker::Error::NotFoundError
-        # There is no container so the broker 
+        # There is no container so the broker
         # is definitely not runnning, we're done
         return true
       end
@@ -40,16 +46,10 @@ module Nutella
       begin
         c.stop
         c.delete(force: true)
-      rescue
+      rescue StandardError
         return false
       end
       true
-    end
-  
-    private
-
-    def broker_container_name 
-      @broker_container_name ||= 'mqtt_broker'
     end
 
     # Checks if the broker is running already
@@ -64,6 +64,12 @@ module Nutella
       true
     end
 
+    private
+
+    def broker_container_name
+      @broker_container_name ||= 'mqtt_broker'
+    end
+
     # Checks if port 1883 (MQTT broker port) is free
     # or some other service is already listening on it
     # @return [boolean] true if there is no broker listening on port 1883, false otherwise
@@ -71,7 +77,7 @@ module Nutella
       begin
         s = TCPServer.new('0.0.0.0', 1883)
         s.close
-      rescue
+      rescue StandardError
         return true
       end
       false
@@ -92,12 +98,12 @@ module Nutella
         'name': broker_container_name,
         'Detach': true,
         'HostConfig': {
-          'PortBindings': { 
-            '1883/tcp': [{ 'HostPort': '1883'}],
-            '80/tcp': [{ 'HostPort': '1884'}]
+          'PortBindings': {
+            '1883/tcp': [{ 'HostPort': '1883' }],
+            '80/tcp': [{ 'HostPort': '1884' }]
           },
           'Binds': ["#{Config.file['home_dir']}broker:/db"],
-          'RestartPolicy': {'Name': 'unless-stopped'}
+          'RestartPolicy': { 'Name': 'unless-stopped' }
         }
       ).start
     end
@@ -105,14 +111,11 @@ module Nutella
     # Checks if there is connectivity to localhost:1883. If not,
     # it waits 1/4 second and then tries again
     def wait_for_broker
-      begin
-        s = TCPSocket.open('localhost', 1883)
-        s.close
-      rescue Errno::ECONNREFUSED
-        sleep 0.25
-        wait_for_broker
-      end
+      s = TCPSocket.open('localhost', 1883)
+      s.close
+    rescue Errno::ECONNREFUSED
+      sleep 0.25
+      wait_for_broker
     end
-
   end
 end

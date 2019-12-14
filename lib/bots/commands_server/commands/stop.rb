@@ -61,7 +61,7 @@ module CommandsServer
     end
 
     def stop_framework_components
-      nutella_components_dir = "#{Nutella::NUTELLA_SRC}framework_components"
+      nutella_components_dir = "#{Config.file['src_dir']}framework_components"
       ComponentsList.for_each_component_in_dir nutella_components_dir do |component|
         pid_file_path = "#{nutella_components_dir}/#{component}/.pid"
         kill_process_with_pid pid_file_path

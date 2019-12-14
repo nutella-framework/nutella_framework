@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require 'docker-api'
 require 'config/config'
 require 'config/runlist'
 require 'util/nutella_app'
-require 'util/docker_bot_starter'
+require 'util/docker'
 require_relative 'meta/run_command'
 
 module CommandsServer
@@ -19,11 +18,18 @@ module CommandsServer
 
       # Extract app path and id (i.e. name)
       app = Nutella::NutellaApp.new(opts['current_dir'])
+
       # If there is an error parsing the run_id, return an error
       begin
         run_id = parse_run_id_from_args(opts['args'])
       rescue StandardError => e
         return failure(e.message)
+      end
+      # Check if the brokers, mongo, and the framework level bots are running
+      unless stopped_framework_bots
+        return failure("It looks like the following framework level bots are NOT running:\n
+          #{stopped_framework_bots}\n
+          Try to stop/start them again with `nutella server stop` and  `nutella server start`", 'error')
       end
       # Check if there are actully bots that need to be started...
       if app_level_bots_started?(app.id) && app.run_level_bots.empty?
@@ -49,6 +55,12 @@ module CommandsServer
 
     private
 
+    # This method returns an array of framework-level bots that should be running but are not
+    # If the array is empty it means all framework-level bots are running correctly
+    def stopped_framework_bots
+      []
+    end
+
     # Check that the run_id we are trying to start has not been started already
     def run_exists?(app_id, run_id)
       runlist.include?(app_id, run_id) && run_level_bots_started?(app_id, run_id)
@@ -67,14 +79,14 @@ module CommandsServer
     # Starts app level bots
     def start_app_level_bots(app)
       app.app_level_bots.each do |bot|
-        DockerBotStarter.new.start_app_level_bot(app, bot, true)
+        DockerClient.new.start_app_level_bot(app, bot, true)
       end
     end
 
     # Starts run level bots
     def start_run_level_bots(app, run_id)
       app.run_level_bots.each do |bot|
-        DockerBotStarter.new.start_run_level_bot(app, run_id, bot, true)
+        DockerClient.new.start_run_level_bot(app, run_id, bot, true)
       end
     end
 

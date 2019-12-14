@@ -122,10 +122,10 @@ module CommandsServer
       File.open("#{template_dir}/nutella.json", 'w') { |f| f.write(JSON.pretty_generate(json)) }
       # Add bot/interface specific files
       if json['type'] == 'bot'
-        FileUtils.copy(File.join(Nutella::NUTELLA_SRC, 'data/startup'), template_dir)
+        FileUtils.copy(File.join(Config.file['src_dir'], 'data/startup'), template_dir)
       end
       if json['type'] == 'interface'
-        FileUtils.copy(File.join(Nutella::NUTELLA_SRC, 'data/index.html'), template_dir)
+        FileUtils.copy(File.join(Config.file['src_dir'], 'data/index.html'), template_dir)
       end
       console.success "Template #{json['name']} created successfully!"
     end

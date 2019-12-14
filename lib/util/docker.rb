@@ -3,11 +3,15 @@
 require 'docker-api'
 
 module Nutella
-  class DockerBotStarter
-    def start_framework_level_bot(name)
-      container_name = "nutella_f_#{name}"
-      dir = "#{Nutella::NUTELLA_SRC}lib/bots/#{bot_name}"
-      start_bot(:framework, name, container_name, bot_dir, true)
+  # This class contains a set of utility methods to start bots using DockerClient.
+  # The class can be used to start/stop bots and check the status of
+  # currently runnnig bots.
+  class DockerClient
+    # Starts a framework level bot.
+    def start_framework_level_bot(bot_name)
+      container_name = "nutella_f_#{bot_name}"
+      dir = "#{Config.file['src_dir']}lib/bots/#{bot_name}"
+      start_bot(:framework, bot_name, container_name, bot_dir, true)
     end
 
     def start_app_level_bot(app, bot_name, restart = false)
@@ -20,6 +24,16 @@ module Nutella
       container_name = "nutella_r_#{app.id}_#{run_id}_#{bot_name}"
       dir = "#{app.path}/bots/#{bot_name}"
       start_bot(:run, bot_name, container_name, dir, restart, app.id, run_id)
+    end
+
+    def container_running?(container)
+      begin
+        c = Docker::Container.get(container)
+        return c.info['State']['Running']
+      rescue Docker::Error::NotFoundError
+        return false
+      end
+      true
     end
 
     private

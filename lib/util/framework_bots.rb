@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-require 'docker-api'
 require 'socket'
 require 'config/config'
-require 'util/docker_bot_starter'
+require 'util/docker'
 
 module Nutella
   class FrameworkBots
@@ -15,14 +14,23 @@ module Nutella
       FrameworkBots.new.stop
     end
 
+    def self.list
+      FrameworkBots.new.list_bots
+    end
+
+    def self.running
+      FrameworkBots.new.list_running_bots
+    end
+
     # Starts all framework bots.
     # @return [boolean] true if all bots are started correctly, false otherwise
     def start
+      dbs = DockerClient.new
       framework_bots.each do |bot|
-        next if bot_started?(bot)
+        next if dbs.container_running?("nutella_f_#{bot}")
 
         begin
-          DockerBotStarter.new.start_framework_level_bot(bot)
+          dbs.start_framework_level_bot(bot)
         rescue StandardError => e
           console.error "Failed to start #{bot}!"
           puts e
@@ -39,17 +47,16 @@ module Nutella
       result
     end
 
-    private
-
-    def bot_started?(bot_name)
-      begin
-        c = Docker::Container.get("nutella_f_#{bot_name}")
-        return c.info['State']['Running']
-      rescue Docker::Error::NotFoundError
-        return false
-      end
-      true
+    def list_bots
+      framework_bots
     end
+
+    def list_running_bots
+      d = DockerClient.new
+      framework_bots.select { |bot| d.container_running?("nutella_f_#{bot}") }
+    end
+
+    private
 
     def start_bot(bot_name, bot_container_name, bot_dir)
       # Remove any other containers with the same name to avoid conflicts
@@ -85,7 +92,7 @@ module Nutella
 
     # Finds the framework level bots
     def framework_bots
-      d = "#{Nutella::NUTELLA_SRC}lib/bots"
+      d = "#{Config.file['src_dir']}lib/bots"
       Dir.entries(d)
          .select { |entry| File.directory?(File.join(d, entry)) && !(entry == '.' || entry == '..') }
          .select { |c| File.exist? "#{d}/#{c}/startup.rb" }
