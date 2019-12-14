@@ -3,7 +3,7 @@
 require 'docker-api'
 require 'config/config'
 require 'config/runlist'
-require 'config/app'
+require 'config/nutella_app'
 require_relative 'meta/run_command'
 
 module CommandsServer
@@ -12,12 +12,12 @@ module CommandsServer
 
     def run(opts = nil)
       # If opts['current_dir'] is not a nutella application, return and error
-      unless Nutella::App.exist?(opts['current_dir'])
+      unless Nutella::NutellaApp.exist?(opts['current_dir'])
         return failure('The current directory is not a nutella application', 'error')
       end
 
       # Extract app path and id (i.e. name)
-      app = Nutella::App.new(opts['current_dir'])
+      app = Nutella::NutellaApp.new(opts['current_dir'])
       # If there is an error parsing the run_id, return an error
       begin
         run_id = parse_run_id_from_args(opts['args'])
@@ -48,14 +48,6 @@ module CommandsServer
 
     private
 
-    # Returns true if the app bots have been started already
-    def app_bots_running_already?(_app)
-      # TODO: look a what the app level bots are (via app.app_level_bots)
-      # Fetch the list of running app bots for app.id from docker
-      # If eq, all app bots are running, return true
-      false
-    end
-
     # Check that the run_id we are trying to start has not been started already
     def run_exist?(app_id, run_id)
       if Nutella.runlist.include?(app_id, run_id)
@@ -66,6 +58,14 @@ module CommandsServer
           return true
         end
       end
+      false
+    end
+
+    # Returns true if the app bots have been started already
+    def app_bots_running_already?(_app)
+      # TODO: look a what the app level bots are (via app.app_level_bots)
+      # Fetch the list of running app bots for app.id from docker
+      # If eq, all app bots are running, return true
       false
     end
 

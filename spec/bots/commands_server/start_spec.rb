@@ -22,7 +22,7 @@ module CommandsServer
       end
 
       context 'error parsing run_id' do
-        before { allow(Nutella::App).to receive(:exist?).and_return(true) }
+        before { allow(Nutella::NutellaApp).to receive(:exist?).and_return(true) }
         let(:opts) { { 'args' => ['default'] } }
         subject { @start.run(opts) }
         it { is_expected.to eq(failure('Unfortunately you can\'t use `default` as a run_id because it is reserved :(', 'error')) }
@@ -30,8 +30,8 @@ module CommandsServer
 
       context 'app bots already running' do
         before do
-          allow(Nutella::App).to receive(:exist?).and_return(true)
-          allow_any_instance_of(Nutella::App).to receive(:components_in_dir).and_return([])
+          allow(Nutella::NutellaApp).to receive(:exist?).and_return(true)
+          allow_any_instance_of(Nutella::NutellaApp).to receive(:components_in_dir).and_return([])
           allow(@start).to receive(:app_bots_running_already?).and_return(true)
         end
         let(:opts) { { 'current_directory': 'whatever' } }

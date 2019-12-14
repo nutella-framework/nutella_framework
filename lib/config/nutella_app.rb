@@ -2,7 +2,7 @@
 
 # Models a nutella application
 module Nutella
-  class App
+  class NutellaApp
     attr_reader :path
     attr_reader :id
     attr_reader :config

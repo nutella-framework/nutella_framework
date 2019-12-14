@@ -16,17 +16,17 @@ module Nutella
     end
 
     describe '#add?' do
-      subject { @rl.add?('app_id', 'run_id', 'path_(to_files') }
+      subject { @rl.add?('path/to/app', 'app_id', 'run_id') }
       context 'when list is empty' do
         it { is_expected.to be true }
       end
       context 'when list is not empty' do
         context 'and run exists' do
-          before { @rl.add?('app_id', 'run_id', 'path/to/files') }
+          before { @rl.add?('path/to/app', 'app_id', 'run_id') }
           it { is_expected.to be false }
         end
         context 'and run does not exist' do
-          before { @rl.add?('app_id', 'different', 'path/to/files') }
+          before { @rl.add?('path/to/app', 'app_id', 'different') }
           it { is_expected.to be true }
         end
       end
@@ -37,8 +37,8 @@ module Nutella
         it { expect(@rl.all_apps).to be_empty }
       end
       context 'when list is not empty' do
-        let(:want) { { 'app_id': { runs: ['run_id'], path: 'path/to/files' } } }
-        before { @rl.add?('app_id', 'run_id', 'path/to/files') }
+        let(:want) { { 'app_id': { runs: ['run_id'], path: 'path/to/app' } } }
+        before { @rl.add?('path/to/app', 'app_id', 'run_id') }
         it { expect(@rl.all_apps).to eq(['app_id']) }
       end
     end
