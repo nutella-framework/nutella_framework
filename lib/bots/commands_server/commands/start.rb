@@ -3,7 +3,8 @@
 require 'docker-api'
 require 'config/config'
 require 'config/runlist'
-require 'config/nutella_app'
+require 'util/nutella_app'
+require 'util/docker_bot_starter'
 require_relative 'meta/run_command'
 
 module CommandsServer
@@ -25,12 +26,12 @@ module CommandsServer
         return failure(e.message, 'error')
       end
       # Check if there are actully bots that need to be started...
-      if app_bots_running_already?(app) && app.run_level_bots.empty?
+      if app_level_bots_started?(app.id) && app.run_level_bots.empty?
         return failure("Run #{run_id} not created!\n
           Your app bots are running already and your application has no run bots.\n
           No run was created. Are you sure that's what you wanted to do?", 'warn')
       end
-      if run_exist?(app.id, run_id)
+      if run_exists?(app.id, run_id)
         return failure("Impossible to start nutella app!\n
           An instance of this app with the same run_id is already running!\n
           You might want to kill it with 'nutella stop #{run_id}'", 'warn')
@@ -41,7 +42,7 @@ module CommandsServer
         start_run_level_bots(app, run_id)
         runlist.add?(app.path, app.id, run_id)
       rescue StandardError => e
-        return failure(e.message, 'error')
+        return failure(e.message, 'error', e)
       end
       success(success_message(app, run_id))
     end
@@ -49,34 +50,32 @@ module CommandsServer
     private
 
     # Check that the run_id we are trying to start has not been started already
-    def run_exist?(app_id, run_id)
-      if Nutella.runlist.include?(app_id, run_id)
-        # If the run_id is already in the list, check that it is actually live
-        if Tmux.session_exist? Tmux.session_name(app_id, run_id)
-          console.error 'Impossible to start nutella app: an instance of this app with the same run_id is already running!'
-          console.error "You might want to kill it with 'nutella stop #{run_id}'"
-          return true
-        end
-      end
-      false
+    def run_exists?(app_id, run_id)
+      runlist.include?(app_id, run_id) && run_level_bots_started?(app_id, run_id)
+    end
+
+    # Checks if run level bots are running
+    def run_level_bots_started?(app_id, run_id)
+      !Docker::Container.all.select { |c| c.info['Names'][0].include?("nutella_r_#{app_id}_#{run_id}_") }.empty?
     end
 
     # Returns true if the app bots have been started already
-    def app_bots_running_already?(_app)
-      # TODO: look a what the app level bots are (via app.app_level_bots)
-      # Fetch the list of running app bots for app.id from docker
-      # If eq, all app bots are running, return true
-      false
+    def app_level_bots_started?(app_id)
+      !Docker::Container.all.select { |c| c.info['Names'][0].include?("nutella_a_#{app_id}_") }.empty?
     end
 
     # Starts app level bots
-    def start_run_level_bots(app)
-      # TODO: implement
+    def start_app_level_bots(app)
+      app.app_level_bots.each do |bot|
+        DockerBotStarter.new.start_app_level_bot(app, bot, true)
+      end
     end
 
     # Starts run level bots
     def start_run_level_bots(app, run_id)
-      # TODO: implement
+      app.run_level_bots.each do |bot|
+        DockerBotStarter.new.start_run_level_bot(app, run_id, bot, true)
+      end
     end
 
     def success_message(app, run_id)
@@ -100,6 +99,10 @@ module CommandsServer
     end
   end
 end
+
+# nutella_f_botname                Framework-level bots (1 per server)
+# nutella_a_appname_botname        App-level bots (1 per app, need to namespace with app)
+# nutella_r_appname_runid_botname  Run-level bots (1 per run)
 
 # Executes a code block for each component in a certain directory
 # @param [String] dir directory where we are iterating

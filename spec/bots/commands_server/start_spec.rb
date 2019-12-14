@@ -32,7 +32,7 @@ module CommandsServer
         before do
           allow(Nutella::NutellaApp).to receive(:exist?).and_return(true)
           allow_any_instance_of(Nutella::NutellaApp).to receive(:components_in_dir).and_return([])
-          allow(@start).to receive(:app_bots_running_already?).and_return(true)
+          allow(@start).to receive(:app_level_bots_started?).and_return(true)
         end
         let(:opts) { { 'current_directory': 'whatever' } }
         it 'should return a failure' do
