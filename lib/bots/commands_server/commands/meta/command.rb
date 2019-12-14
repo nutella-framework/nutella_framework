@@ -12,11 +12,11 @@ module CommandsServer
       console.error 'Running the generic command!!! WAT? https://www.destroyallsoftware.com/talks/wat'
     end
 
-    def success(message)
-      { success: true, message: message, message_level: 'success' }
+    def success(message, level = 'success')
+      { success: true, message: message, message_level: level }
     end
 
-    def failure(message, level, exception = nil)
+    def failure(message, level = 'error', exception = nil)
       if exception.nil?
         { success: false, message: message, message_level: level }
       else

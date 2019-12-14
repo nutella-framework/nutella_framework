@@ -2,6 +2,7 @@
 
 require_relative 'meta/command'
 require 'fileutils'
+require 'json'
 
 module CommandsServer
   class New < Command
@@ -9,7 +10,7 @@ module CommandsServer
 
     def run(opts = nil)
       # If no app name is provided, return an error
-      if opts['args'].empty?
+      if opts['args'].nil? || opts['args'].empty?
         return failure('You need to specify a name for your new application')
       end
 
@@ -19,12 +20,9 @@ module CommandsServer
       # If it does, we looks into it to see if there is a nutella.json file and display
       # the proper error message
       app_dir = "#{opts['current_dir']}/#{app_id}"
-      puts app_dir
       if File.directory? app_dir
-        if File.exist? "#{app_dir}/nutella.json"
+        if File.file? "#{app_dir}/nutella.json"
           return failure("An application named #{app_id} already exists")
-        else
-          return failure("A directory named #{app_id} already exists")
         end
       end
       # If all seems good, generate the application skeleton

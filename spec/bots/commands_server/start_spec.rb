@@ -17,7 +17,7 @@ module CommandsServer
       context 'outside nutella app' do
         let(:opts) { { 'current_directory': 'whatever' } }
         it 'errors out' do
-          expect(@start.run(opts)).to eq(failure('The current directory is not a nutella application', 'error'))
+          expect(@start.run(opts)).to eq(Command.new.failure('The current directory is not a nutella application', 'error'))
         end
       end
 
@@ -25,7 +25,7 @@ module CommandsServer
         before { allow(Nutella::NutellaApp).to receive(:exist?).and_return(true) }
         let(:opts) { { 'args' => ['default'] } }
         subject { @start.run(opts) }
-        it { is_expected.to eq(failure('Unfortunately you can\'t use `default` as a run_id because it is reserved :(', 'error')) }
+        it { is_expected.to eq(Command.new.failure('Unfortunately you can\'t use `default` as a run_id because it is reserved :(', 'error')) }
       end
 
       context 'app bots already running' do
@@ -41,16 +41,6 @@ module CommandsServer
       end
 
       # TODO: last part of start method
-    end
-
-    def failure(message, level, _exception = nil)
-      c = Command.new
-      c.failure(message, level, exception = nil)
-    end
-
-    def success(message)
-      c = Command.new
-      c.success(message)
     end
   end
 end

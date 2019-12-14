@@ -14,7 +14,7 @@ module CommandsServer
     def run(opts = nil)
       # If opts['current_dir'] is not a nutella application, return and error
       unless Nutella::NutellaApp.exist?(opts['current_dir'])
-        return failure('The current directory is not a nutella application', 'error')
+        return failure('The current directory is not a nutella application')
       end
 
       # Extract app path and id (i.e. name)
@@ -23,7 +23,7 @@ module CommandsServer
       begin
         run_id = parse_run_id_from_args(opts['args'])
       rescue StandardError => e
-        return failure(e.message, 'error')
+        return failure(e.message)
       end
       # Check if there are actully bots that need to be started...
       if app_level_bots_started?(app.id) && app.run_level_bots.empty?
