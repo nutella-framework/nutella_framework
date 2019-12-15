@@ -23,7 +23,7 @@ module Nutella
 
       # Check that we have a nutella ruby image built
       # if not, build one
-      return unless nutella_docker_image_ready?
+      return unless nutella_docker_images_ready?
 
       # Set ready flag in config.json
       Config.file['ready'] = true
@@ -147,13 +147,13 @@ module Nutella
       end
     end
 
-    def nutella_docker_image_ready?
-      if nutella_image_exists?
+    def nutella_docker_images_ready?
+      if nutella_images_exist?
         console.info 'You have a nutella docker image ready. Yay!'
       else
         console.warn 'You don\'t seem to have a nutella docker image ready. We\'re gonna go ahead and build one for you. This might take some time...'
         begin
-          build_nutella_docker_image
+          build_nutella_docker_images
         rescue StandardError => e
           puts e
           console.error 'Whoops...something went wrong while building the nutella docker image, try running \'nutella checkup\' again'
@@ -165,14 +165,18 @@ module Nutella
     end
 
     # Checks that the nutella image exists and if not tries to build it
-    def nutella_image_exists?
-      Docker::Image.exist?('nutella:1.0.0')
+    def nutella_images_exist?
+      version = File.open("#{Config.file['src_dir']}VERSION", 'rb').read
+      Docker::Image.exist?("nutella_rb:#{version}") && Docker::Image.exist?("nutella_js:#{version}")
     end
 
     # Builds a docker image that we can use to run framework level bots in a dockerized way
-    def build_nutella_docker_image
+    def build_nutella_docker_images
+      version = File.open("#{Config.file['src_dir']}VERSION", 'rb').read
       img = Docker::Image.build_from_dir(Config.file['src_dir'], 'dockerfile': 'Dockerfile.rubyimage')
-      img.tag('repo': 'nutella', 'tag': '1.0.0', force: true)
+      img.tag('repo': 'nutella_rb', 'tag': version, force: true)
+      img = Docker::Image.build_from_dir(Config.file['src_dir'], 'dockerfile': 'Dockerfile.jsimage')
+      img.tag('repo': 'nutella_js', 'tag': version, force: true)
     end
   end
 end

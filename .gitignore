@@ -14,7 +14,6 @@ rdoc/
 doc/
 .yardoc
 .bundle
-Gemfile.lock
 spec/examples.txt
 .gem
 
