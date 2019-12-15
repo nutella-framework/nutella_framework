@@ -4,6 +4,7 @@ require_relative 'meta/command'
 require 'config/config'
 require 'semantic'
 require 'docker-api'
+require 'util/version'
 
 module Nutella
   class Checkup < Command
@@ -151,12 +152,12 @@ module Nutella
       if nutella_images_exist?
         console.info 'You have a nutella docker image ready. Yay!'
       else
-        console.warn 'You don\'t seem to have a nutella docker image ready. We\'re gonna go ahead and build one for you. This might take some time...'
+        console.warn 'You don\'t seem to have all the required nutella docker images. We\'re gonna go ahead and build them for you. This might take some time...'
         begin
           build_nutella_docker_images
         rescue StandardError => e
           puts e
-          console.error 'Whoops...something went wrong while building the nutella docker image, try running \'nutella checkup\' again'
+          console.error 'Whoops...something went wrong while building the nutella docker images. There should be some output above to help you out.'
           return false
         end
         console.info 'nutella docker image built successfully!'
@@ -166,17 +167,15 @@ module Nutella
 
     # Checks that the nutella image exists and if not tries to build it
     def nutella_images_exist?
-      version = File.open("#{Config.file['src_dir']}VERSION", 'rb').read
-      Docker::Image.exist?("nutella_rb:#{version}") && Docker::Image.exist?("nutella_js:#{version}")
+      Docker::Image.exist?("nutella_rb:#{Version.get}") && Docker::Image.exist?("nutella_js:#{Version.get}")
     end
 
     # Builds a docker image that we can use to run framework level bots in a dockerized way
     def build_nutella_docker_images
-      version = File.open("#{Config.file['src_dir']}VERSION", 'rb').read
       img = Docker::Image.build_from_dir(Config.file['src_dir'], 'dockerfile': 'Dockerfile.rubyimage')
-      img.tag('repo': 'nutella_rb', 'tag': version, force: true)
+      img.tag('repo': 'nutella_rb', 'tag': Version.get, force: true)
       img = Docker::Image.build_from_dir(Config.file['src_dir'], 'dockerfile': 'Dockerfile.jsimage')
-      img.tag('repo': 'nutella_js', 'tag': version, force: true)
+      img.tag('repo': 'nutella_js', 'tag': Version.get, force: true)
     end
   end
 end

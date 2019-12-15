@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'docker-api'
+require 'util/version'
 
 module Nutella
   # This class contains a set of utility methods to start bots using DockerClient.
@@ -10,20 +11,20 @@ module Nutella
     # Starts a framework level bot.
     def start_framework_level_bot(bot_name)
       container_name = "nutella_f_#{bot_name}"
-      dir = "#{Config.file['src_dir']}lib/bots/#{bot_name}"
+      bot_dir = "#{Config.file['src_dir']}lib/bots/#{bot_name}"
       start_bot(:framework, bot_name, container_name, bot_dir, true)
     end
 
     def start_app_level_bot(app, bot_name, restart = false)
       container_name = "nutella_a_#{app.id}_#{bot_name}"
-      dir = "#{app.path}/bots/#{bot_name}"
-      start_bot(:app, bot_name, container_name, dir, restart, app.id)
+      bot_dir = "#{app.path}/bots/#{bot_name}"
+      start_bot(:app, bot_name, container_name, bot_dir, restart, app.id)
     end
 
     def start_run_level_bot(app, run_id, bot_name, restart = false)
       container_name = "nutella_r_#{app.id}_#{run_id}_#{bot_name}"
-      dir = "#{app.path}/bots/#{bot_name}"
-      start_bot(:run, bot_name, container_name, dir, restart, app.id, run_id)
+      bot_dir = "#{app.path}/bots/#{bot_name}"
+      start_bot(:run, bot_name, container_name, bot_dir, restart, app.id, run_id)
     end
 
     def container_running?(container)
@@ -65,8 +66,8 @@ module Nutella
 
     def parse_image(runtime)
       map = {
-        ruby: 'nutella_ruby:1.0.0',
-        js: 'nutella_js:1.0.0'
+        ruby: "nutella_rb:#{Version.get}",
+        js: "nutella_js:#{Version.get}"
       }
       map[runtime]
     end
