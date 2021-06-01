@@ -2,7 +2,6 @@
 
 require 'config/config'
 require 'cli/cli'
-require 'util/version'
 
 module Nutella
   # Initialize nutella home to the folder where this source code is

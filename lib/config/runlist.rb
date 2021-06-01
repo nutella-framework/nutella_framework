@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'config/persisted_hash'
+require_relative 'persisted_hash'
 
 module Nutella
   # Manages the list of nutella applications and runs handled by the framework.

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'docker-api'
-require 'util/version'
+require_relative 'version'
 
 module Nutella
   # This class contains a set of utility methods to start bots using DockerClient.
@@ -11,7 +11,7 @@ module Nutella
     # Starts a framework level bot.
     def start_framework_level_bot(bot_name)
       container_name = "nutella_f_#{bot_name}"
-      bot_dir = "#{Config.file['src_dir']}lib/bots/#{bot_name}"
+      bot_dir = Config.file['src_dir']
       start_bot(:framework, bot_name, container_name, bot_dir, true)
     end
 
@@ -39,7 +39,7 @@ module Nutella
 
     private
 
-    def start_bot(level, _name, container_name, dir, restart, app_id = nil, run_id = nil)
+    def start_bot(level, bot_name, container_name, dir, restart, app_id = nil, run_id = nil)
       # Remove any other containers with the same name to avoid conflicts
       begin
         old_c = Docker::Container.get(container_name)
@@ -50,7 +50,7 @@ module Nutella
       # Select runtime
       # TODO error out on wrong runtime!!!
       runtime = parse_runtime(dir)
-      cmd = build_cmd(runtime, level, app_id, run_id)
+      cmd = build_cmd(runtime, level, bot_name, app_id, run_id)
       image = parse_image(runtime)
       c = create_container(image, cmd, container_name, dir, restart)
       c.start
@@ -73,11 +73,15 @@ module Nutella
     end
 
     # Builds the command based on the runtime and level of the bot
-    def build_cmd(runtime, level, app_id = nil, run_id = nil)
-      cmd = case runtime
-            when :ruby then ['ruby', 'startup.rb']
-            when :js then ['node', 'startup.js']
-      end
+    def build_cmd(runtime, level, bot_name, app_id = nil, run_id = nil)
+      cmd = if level == :framework
+              ['ruby', "lib/bots/#{bot_name}/startup.rb"]
+            else
+              case runtime
+              when :ruby then ['ruby', 'startup.rb']
+              when :js then ['node', 'startup.js']
+              end
+          end
       case level
       when :framework then cmd << Config.file['broker']
 

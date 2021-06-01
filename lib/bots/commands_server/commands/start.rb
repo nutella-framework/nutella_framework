@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'config/config'
-require 'config/runlist'
-require 'util/nutella_app'
-require 'util/docker'
 require_relative 'meta/run_command'
+require_relative '../../../config/config'
+require_relative '../../../config/runlist'
+require_relative '../../../util/nutella_app'
+require_relative '../../../util/docker'
 
 module CommandsServer
   class Start < RunCommand

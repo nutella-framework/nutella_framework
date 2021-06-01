@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'meta/command'
-require 'config/config'
 require 'fileutils'
 require 'json'
+require_relative 'meta/command'
+require_relative '../../../config/config'
 
 module CommandsServer
   class New < Command
