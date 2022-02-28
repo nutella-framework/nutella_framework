@@ -2,6 +2,8 @@ require 'sinatra'
 require 'sinatra/cross_origin'
 require 'fileutils'
 
+require 'honeybadger'
+
 require_relative '../../lib/config/runlist'
 require_relative '../../lib/config/config'
 require_relative '../../nutella_lib/framework_core'
